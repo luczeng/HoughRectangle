@@ -1,15 +1,25 @@
 #include "io.hpp"
 #include <iostream>
+#include "string"
+#include <Eigen/Dense>
 //#ifndef STB_IMAGE_IMPLEMENTATION
 //#define STB_IMAGE_IMPLEMENTATION
 //#ifndef STB_IMAGE_WRITE_IMPLEMENTATION
 //#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <Eigen/Dense>
 //#include "stb_image.h"
 //#include "stb_image_write.h"
-#include "string"
 
 using namespace Eigen;
+
+void convertRaw2Eigen(unsigned char * &data, MatrixXf &gray,int x,int y){
+	const int nx = x;
+	const int ny = y;
+	typedef Matrix<unsigned char,Dynamic, Dynamic> MatrixXUC;
+	typedef Map<MatrixXUC,RowMajor> MapType;
+	MapType img(data,y,x);
+	gray = img.cast<float>();
+}
+
 void convertMat2UC(MatrixXf gray,unsigned char * &gray_UC,int size)
 {
 	unsigned char gray_UC_tmp[size];

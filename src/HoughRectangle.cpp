@@ -9,6 +9,7 @@
 #include "string"
 #include "cxxopts.hpp"
 #include "io.hpp"
+#include "process_image.hpp"
 
 using namespace Eigen;
 //void convertMat2UC(MatrixXf gray,unsigned char *& gray_UC,int size);
@@ -33,15 +34,11 @@ int main(int argc, char* argv[] ){
 		std::cout<< "Cant load image"<<std::endl;
 	}
 
-	//Part array to Eigen matrix
-	const int nx = x;
-	const int ny = y;
-	std::cout<<x<<" "<<y<<" "<<n<<std::endl;
-	typedef Matrix<unsigned char,Dynamic, Dynamic> MatrixXUC;
-	typedef Map<MatrixXUC,RowMajor> MapType;
-	MapType img(data,y,x);
-	//Map<Matrix<unsigned char,y,x>,RowMajor > img(data,y,x ); 
-	MatrixXf gray = img.cast<float>();
+	//Port array to Eigen matrix
+	MatrixXf gray;
+	convertRaw2Eigen(data,gray,x,y);
+	normalise_img(gray);
+
 	//Convert back to raw buffer 
 	unsigned char * gray_UC; 
 	convertMat2UC(gray,gray_UC,x*y); 
