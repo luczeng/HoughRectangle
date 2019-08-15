@@ -60,12 +60,3 @@ int main(int argc, char* argv[] ){
 }
 #endif
 #endif
-//void convertMat2UC(MatrixXf gray,unsigned char * &gray_UC,int size)
-//{
-//	unsigned char gray_UC_tmp[size];
-//	float *gray_array = gray.data();
-//	for (int i=0; i<size;++i){
-//		gray_UC_tmp[i] = static_cast<unsigned char> (gray_array[i]);	
-//	}
-//	gray_UC = gray_UC_tmp;
-//}
