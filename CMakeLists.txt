@@ -9,6 +9,8 @@ set(CXX_STANDARD_REQUIRED)
 #----------------------------------------------------------------------------------------------------#
 set(STB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/stb)
 set(CXXOPTS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cxxopts/include)
+set(CONFIG4CPP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/danek-master)
+set(CEREAL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cereal-master/include)
 #message(${CMAKE_CURRENT_SOURCE_DIR})
 #message(${STB_INCLUDE_DIR})
 
@@ -24,6 +26,14 @@ target_include_directories(stb INTERFACE ${STB_INCLUDE_DIR})
 add_library(cxxopts INTERFACE)
 target_include_directories(cxxopts INTERFACE ${CXXOPTS_INCLUDE_DIR})
 
+#Config4cpp
+add_library(config4cpp INTERFACE)
+target_include_directories(config4cpp INTERFACE ${CONFIG4CPP_INCLUDE_DIR})
+
+#Cereal
+add_library(cereal INTERFACE)
+target_include_directories(cereal INTERFACE ${CEREAL_INCLUDE_DIR})
+
 #----------------------------------------------------------------------------------------------------#
 # Main code
 #----------------------------------------------------------------------------------------------------#
@@ -38,6 +48,6 @@ target_link_libraries(main_hough PUBLIC Eigen3::Eigen)
 #Executables
 #----------------------------------------------------------------------------------------------------#
 add_executable(HoughRectangle src/HoughRectangle.cpp )
-target_link_libraries(HoughRectangle PUBLIC Eigen3::Eigen PUBLIC main_hough PUBLIC cxxopts PRIVATE stb)
+target_link_libraries(HoughRectangle PUBLIC Eigen3::Eigen PUBLIC main_hough PUBLIC cxxopts PRIVATE stb PUBLIC cereal)
 #target_include_directories(HoughRectangle PRIVATE ${STB_INCLUDE_DIR} PUBLIC ${CXXOPTS_INCLUDE_DIR})
 
