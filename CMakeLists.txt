@@ -7,16 +7,15 @@ set(CXX_STANDARD_REQUIRED)
 #----------------------------------------------------------------------------------------------------#
 #External libraries
 #----------------------------------------------------------------------------------------------------#
-set(STB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/stb)
-set(CXXOPTS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cxxopts/include)
-set(CONFIG4CPP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/danek-master)
-set(CEREAL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cereal-master/include)
+set(STB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party/stb)
+set(CXXOPTS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party/cxxopts/include)
+set(CEREAL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party/cereal-master/include)
 #message(${CMAKE_CURRENT_SOURCE_DIR})
 #message(${STB_INCLUDE_DIR})
 
 #Eigen
 find_package (Eigen3 REQUIRED NO_MODULE)
-add_subdirectory(eigen)
+add_subdirectory(third_party/eigen)
 
 #Stb
 add_library(stb INTERFACE)
