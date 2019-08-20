@@ -1,6 +1,8 @@
 {
     "value0": {
-        "thetaBins": 10,
-        "rhoBins": 20
+        "thetaBins": 128,
+        "rhoBins": 128,
+	"thetaMin": 0,
+	"thetaMax": 180
     }
 }

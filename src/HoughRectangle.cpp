@@ -49,10 +49,14 @@ int main(int argc, char* argv[] ){
 	convertRaw2Eigen(data,gray,x,y);
 	normalise_img(gray);
 
+	//Perform Hough transform
+	hough_transform(gray,config);
+
 	//Convert back to raw buffer 
 	unsigned char * gray_UC; 
 	convertMat2UC(gray,gray_UC,x*y); 
-	stbi_write_jpg(output_filename.c_str(),x,y,n,gray_UC,100); 
+	int success = stbi_write_jpg(output_filename.c_str(),x,y,n,gray_UC,100); 
+	std::cout << "Successfully wrote image: "<<success<< std::endl;
 
 	return 0;
 }
