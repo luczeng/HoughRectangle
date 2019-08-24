@@ -12,3 +12,11 @@ cmake ..
 make
 ./HoughRectangle -i ../img/LenaBinary.jpg -o output_img.jpg
 ```
+
+Modify parameters in configs.json 
+
+## Project status:
+Conventional Hough transform done!
+
+## FAQ:
+Why don't I use easier libraries like opencv? Because I simply don't want ! 

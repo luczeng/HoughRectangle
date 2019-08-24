@@ -4,10 +4,6 @@
 #include <math.h>
 #include <stdlib.h>
 #include "io.hpp"
-/*#ifndef STB_IMAGE_IMPLEMENTATION*/
-//#define STB_IMAGE_IMPLEMENTATION
-//#ifndef STB_IMAGE_WRITE_IMPLEMENTATION
-/*#define STB_IMAGE_WRITE_IMPLEMENTATION*/
 #include "stb_image.h"
 #include "stb_image_write.h"
 
@@ -32,23 +28,31 @@ void normalise_img(MatrixXf & img){
 	img = tmp;
 }
 
-    // Linear interpolation following MATLAB linspace
 std::vector<float> LinearSpacedArray(float a, float b, std::size_t N)
-{
-double h = (b - a) / static_cast<float>(N-1);
-std::vector<float> xs(N);
-std::vector<float>::iterator x;
-float val;
-for (x = xs.begin(), val = a; x != xs.end(); ++x, val += h) {
-    *x = val;
-}
-return xs;
-}
+	/*
+	 * Returns a linearly spaced array
+	 */
+	{
+	double h = (b - a) / static_cast<float>(N-1);
+	std::vector<float> xs(N);
+	std::vector<float>::iterator x;
+	float val;
+	for (x = xs.begin(), val = a; x != xs.end(); ++x, val += h) {
+	*x = val;
+	}
+	return xs;
+	}
 
 void hough_transform(MatrixXf & img,Config & config){
-	MatrixXf acc(config.thetaBins,config.rhoBins); //accumulator
+	/*
+	 * Performs the Hough trasnform on the input edge detected matrix
+	 */
+
+	//Define accumulator matrix, theta and rho vectors
+	MatrixXf acc = MatrixXf::Zero(config.thetaBins,config.rhoBins); //accumulator
 	VectorXf theta = VectorXf::LinSpaced(Sequential,config.thetaBins,config.thetaMin,config.thetaMax);
-	std::vector<float> rho = LinearSpacedArray(0,sqrt(pow(img.rows()/2.0,2) + pow(img.rows()/2.0,2)),config.rhoBins);
+	std::vector<float> rho = LinearSpacedArray(-360,sqrt(pow(img.rows()/2.0,2) + pow(img.rows()/2.0,2)),config.rhoBins);
+	std::cout<< rho[config.rhoBins-1]<<std::endl;
 
 	//Cartesian coordinate vectors
 	VectorXi vecX = VectorXi::LinSpaced(Sequential,img.cols(),0,img.cols()-1);
@@ -58,8 +62,9 @@ void hough_transform(MatrixXf & img,Config & config){
 	vecX = vecX.array() - mid_X; 
 	vecY = vecY.array() - mid_Y; 
 
-       /* for (int i=0; i<config.rhoBins;++i)*/
-		//std::cout << rho[i]<<std::endl;
+	//Pre-compute cosines and sinuses:
+	VectorXf cosT = cos(theta.array()*PI/180.0);
+	VectorXf sinT = sin(theta.array()*PI/180.0);
 
 	//Compute Hough transform
 	for (int i=0;i<img.rows();++i){
@@ -68,38 +73,34 @@ void hough_transform(MatrixXf & img,Config & config){
 			//generate sinusoidal curve	
 				for (int k=0;k<theta.size();++k){
 					//Calculate rho value
-					float rho_tmp = abs(vecX[j]*cos(theta[k]*PI/180.0) + vecY[i]*sin(theta[k]*PI/180.0));
+					float rho_tmp = (vecX[j]*cosT[k] + vecY[i]*sinT[k]);
+
 					std::vector<float>::iterator idx;
 					idx = std::lower_bound(rho.begin(),rho.end(),rho_tmp);
-					int idx_rho = idx- rho.begin()-1;
+					int idx_rho = idx - rho.begin()-1;
+					//std::cout <<rho_tmp<<std::endl;
 					if (idx_rho<0)
 					{
-						//std::cout<<idx_rho<<std::endl;
 						idx_rho = 0;
 					}
 
 					//Fill accumulator
-					//std::cout <<idx_rho << '\t' <<rho_tmp<< "\t" << acc.cols()<<std::endl;
 					acc(k,idx_rho) = acc(k,idx_rho) + 1;
+					if (acc(k,idx_rho) > pow(2,32)){std::cout<< "Max value overpassed";}
 				}
 			}
 		}
 	}
 
 	//The following is to save the sinuoigram. Shall be moved later on
-	
 	//Normalise to 0-255
 	acc = acc / acc.maxCoeff() *255;
 	acc = acc.array().ceil();
 
 	//Convert to unsigned char and save
-	unsigned char * gray_UC_hough; 
-	int n = config.rhoBins*config.thetaBins;
-	convertMat2UC(acc,gray_UC_hough,n); 
-	int success = stbi_write_jpg("accumulator.jpg",config.thetaBins,config.rhoBins,1,gray_UC_hough,100); 
-	std::cout<< "Accumulator saved: "<< success << std::endl;
-	
-}
-
-/*#endif*/
-/*#endif*/
+//	unsigned char * gray_UC_hough; 
+//	int n = config.rhoBins*config.thetaBins;
+//	convertMat2UC(acc,gray_UC_hough,n); 
+//	int success = stbi_write_png("accumulator.jpg",config.thetaBins,config.rhoBins,1,gray_UC_hough,config.rhoBins); 
+//	std::cout<< "Accumulator saved: "<< success << std::endl;
+}	
