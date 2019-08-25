@@ -2,6 +2,7 @@
 #include <iostream>
 #include "string"
 #include <Eigen/Dense>
+#include "stb_image_write.h"
 using namespace Eigen;
 
 void convertRaw2Eigen(unsigned char * &data, MatrixXf &gray,int x,int y){
@@ -26,3 +27,11 @@ void convertMat2UC(MatrixXf gray,unsigned char * &gray_UC,int size)
 	gray_UC = gray_UC_tmp;
 }
 
+void save_image(MatrixXf img,std::string filename,int size,int x, int y)
+{
+    unsigned char * gray_UC_hough; 
+    convertMat2UC(img,gray_UC_hough,size); 
+    int success = stbi_write_png(filename.c_str(),x,y,1,gray_UC_hough,x); 
+    std::cout<< "Image saved: "<< success << std::endl;
+
+}

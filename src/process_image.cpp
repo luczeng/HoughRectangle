@@ -9,7 +9,14 @@
 
 #define PI 3.14159265
 
+
 using namespace Eigen;
+
+void enhance_hough(MatrixXf & hough,MatrixXf & houghpp,Config & config);
+
+void Log(const char * message){
+    std::cout<< message <<std::endl;
+}
 
 void normalise_img(MatrixXf & img){
 	/*
@@ -92,15 +99,38 @@ void hough_transform(MatrixXf & img,Config & config){
 		}
 	}
 
+    //Enhance HT
+    MatrixXf houghpp = MatrixXf::Zero(acc.rows(),acc.cols());
+    enhance_hough(acc,houghpp,config);
+
 	//The following is to save the sinuoigram. Shall be moved later on
 	//Normalise to 0-255
 	acc = acc / acc.maxCoeff() *255;
 	acc = acc.array().ceil();
+    //std::cout<<houghpp<<std::endl;
+    houghpp= houghpp/ houghpp.maxCoeff() *255;
+	houghpp = houghpp.array().ceil();
 
 	//Convert to unsigned char and save
-//	unsigned char * gray_UC_hough; 
-//	int n = config.rhoBins*config.thetaBins;
-//	convertMat2UC(acc,gray_UC_hough,n); 
-//	int success = stbi_write_png("accumulator.jpg",config.thetaBins,config.rhoBins,1,gray_UC_hough,config.rhoBins); 
-//	std::cout<< "Accumulator saved: "<< success << std::endl;
+    save_image(acc,"accumulator.png",config.rhoBins*config.thetaBins,config.thetaBins,config.rhoBins);
+    save_image(houghpp,"accumulator_enhance.png",config.rhoBins*config.thetaBins,config.thetaBins,config.rhoBins);
 }	
+
+void enhance_hough(MatrixXf & hough,MatrixXf & houghpp,Config & config){
+
+int h = config.h;
+int w = config.w;
+for (int i = h; i < hough.rows()-h; ++i) {
+    for (int j = w; j < hough.cols()-w; ++j) {
+/*           double tmp = pow(hough(i,j)/sqrt(hough.block(i-h/2,j-w/2,h,w).sum()),2);*/
+           /*std::cout <<tmp<<" "<<hough(i,j)<<" "<< hough.block(i-h/2,j-w/2,h,w).sum()<<std::endl;*/
+           if (hough.block(i-h/2,j-w/2,h,w).sum()==0) {
+                houghpp(i,j) = 0;
+           }  
+           else {
+               houghpp(i,j) = pow(hough(i,j),2)*h*w/hough.block(i-h/2,j-w/2,h,w).sum();
+           }
+    }
+    
+}
+}
