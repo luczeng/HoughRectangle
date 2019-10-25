@@ -55,7 +55,8 @@ int main(int argc, char* argv[]) {
 	// normalise_img(gray);
 
 	// Perform Hough transform
-	hough_transform(gray, config);
+		//hough_transform(gray, config);
+    delete data;
 
 	// Convert back to raw buffer
 	/* unsigned char * gray_UC; */

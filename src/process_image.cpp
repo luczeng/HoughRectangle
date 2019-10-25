@@ -6,9 +6,9 @@
 #include "io.hpp"
 #include "stb_image.h"
 #include "stb_image_write.h"
+#include "process_image.hpp"
 
 #define PI 3.14159265
-
 
 using namespace Eigen;
 
@@ -50,7 +50,31 @@ std::vector<float> LinearSpacedArray(float a, float b, std::size_t N)
 	return xs;
 	}
 
-void hough_transform(MatrixXf & img,Config & config){
+/*void windowed_hough(MatrixXf & img, Config & Config){*/
+    /*
+     * Performs the Windowed hough transform
+     */
+
+    //for (int i = img.rows(); i < img.rows(); ++i) {
+        //for (int j = img.cols(); j < img.cols(); ++j) {
+
+            ////Applying circular mask to local region 
+            //MatrixXf subregion = img.block(i,j,Config.L_window,Config.L_window);
+            //hough_transform(subregion, Config)
+        //}
+        
+    //}
+
+
+/*}*/
+
+
+HoughRectangle::HoughRectangle(MatrixXf & img)
+{
+    m_img = img;
+}
+
+void HoughRectangle::hough_transform(MatrixXf & img,Config & config){
 	/*
 	 * Performs the Hough trasnform on the input edge detected matrix
 	 */
@@ -99,24 +123,19 @@ void hough_transform(MatrixXf & img,Config & config){
 		}
 	}
 
-    //Enhance HT
+    //Enhanced HT
     MatrixXf houghpp = MatrixXf::Zero(acc.rows(),acc.cols());
     enhance_hough(acc,houghpp,config);
-
-	//The following is to save the sinuoigram. Shall be moved later on
-	//Normalise to 0-255
-	acc = acc / acc.maxCoeff() *255;
-	acc = acc.array().ceil();
-    //std::cout<<houghpp<<std::endl;
-    houghpp= houghpp/ houghpp.maxCoeff() *255;
-	houghpp = houghpp.array().ceil();
-
+	
 	//Convert to unsigned char and save
     save_image(acc,"accumulator.png",config.rhoBins*config.thetaBins,config.thetaBins,config.rhoBins);
     save_image(houghpp,"accumulator_enhance.png",config.rhoBins*config.thetaBins,config.thetaBins,config.rhoBins);
 }	
 
 void enhance_hough(MatrixXf & hough,MatrixXf & houghpp,Config & config){
+    /*
+     * Computes enhanced Hough transform
+     */
 
 int h = config.h;
 int w = config.w;

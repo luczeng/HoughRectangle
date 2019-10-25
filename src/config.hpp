@@ -14,6 +14,8 @@ struct Config
     int h;
     int w;
 
+    int L_window;
+
 	//Method for cereal to know which member to serialize
 	template <class Archive>
 	void serialize(Archive & archive)
@@ -23,7 +25,8 @@ struct Config
 			CEREAL_NVP(thetaMin),
 			CEREAL_NVP(thetaMax),
             CEREAL_NVP(h),
-            CEREAL_NVP(w));
+            CEREAL_NVP(w),
+            CEREAL_NVP(L_window));
 	}
 
 };

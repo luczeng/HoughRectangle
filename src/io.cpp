@@ -25,13 +25,23 @@ void convertMat2UC(MatrixXf gray,unsigned char * &gray_UC,int size)
 	}
 	
 	gray_UC = gray_UC_tmp;
+
+    //delete gray_array;
+
 }
 
 void save_image(MatrixXf img,std::string filename,int size,int x, int y)
 {
+	//Normalise to 0-255
+	img = img / img.maxCoeff() *255;
+	img= img.array().ceil();
+
+    //Convert to raw buffer
     unsigned char * gray_UC_hough; 
     convertMat2UC(img,gray_UC_hough,size); 
     int success = stbi_write_png(filename.c_str(),x,y,1,gray_UC_hough,x); 
     std::cout<< "Image saved: "<< success << std::endl;
+
+    //delete gray_UC_hough;
 
 }

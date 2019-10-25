@@ -5,6 +5,7 @@
 	"thetaMin": 0,
 	"thetaMax": 90,
     "h": 32,
-    "w": 32
+    "w": 32,
+    "L_window": 50
     }
 }
