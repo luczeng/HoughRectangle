@@ -1,47 +1,62 @@
 #include "io.hpp"
-#include <iostream>
-#include "string"
 #include <Eigen/Dense>
+#include <iostream>
 #include "stb_image_write.h"
+#include "string"
 using namespace Eigen;
 
-void convertRaw2Eigen(unsigned char * &data, MatrixXf &gray,int x,int y){
-	const int nx = x;
-	const int ny = y;
-	typedef Matrix<unsigned char,Dynamic, Dynamic> MatrixXUC;
-	//typedef Map<MatrixXUC,RowMajor> MapType;
-	typedef Map<MatrixXUC> MapType;
-	MapType img(data,y,x);
-	gray = img.cast<float>();
+/**
+ * Converts raw buffer to Eigen float matrix
+ *
+ * \param data unsigned char raw buffer to be converted
+ * \param x image dimension in x direction
+ * \param y image dimension in y direction
+ *
+ *  \return gray eigen float matrix
+ */
+void convert_RawBuff2Mat(std::unique_ptr<unsigned char[]> &data, MatrixXf &gray,
+                         int x, int y) {
+    const int nx = x;
+    const int ny = y;
+    typedef Matrix<unsigned char, Dynamic, Dynamic, RowMajor> MatrixXUC;
+    typedef Map<MatrixXUC> MapType;
+    MapType img(data.get(), y, x);
+    gray = img.cast<float>();
 }
 
-void convertMat2UC(MatrixXf gray,unsigned char * &gray_UC,int size)
-{
-	unsigned char gray_UC_tmp[size];
-	float *gray_array = gray.data();
-
-	for (int i=0; i<size;++i){
-		gray_UC_tmp[i] = static_cast<unsigned char> (gray_array[i]);	
-	}
-	
-	gray_UC = gray_UC_tmp;
-
-    //delete gray_array;
-
+/**
+ * Converts Eigen matrix to raw buffer
+ *
+ * \param gray input float eigen matrix in RowMajor order
+ * \param size integer total size of the raw buffer (x*y)
+ *
+ *  \return gray_UC unique_ptr to uc raw buffer output
+ */
+void convert_Mat2RawBuff(Matrix<float, Dynamic, Dynamic, RowMajor> gray,
+                         std::unique_ptr<unsigned char[]> &gray_UC, int size) {
+    // gray_UC = new unsigned char[size];
+    for (int i = 0; i < size; ++i) {
+        gray_UC[i] = static_cast<unsigned char>(round(*(gray.data() + i)));
+    }
 }
 
-void save_image(MatrixXf img,std::string filename,int size,int x, int y)
-{
-	//Normalise to 0-255
-	img = img / img.maxCoeff() *255;
-	img= img.array().ceil();
+/**
+ * Saves Eigen matrix to png
+ *
+ * \param img input float eigen matrix in RowMajor order
+ * \param filename output file path ending in .png
+ * \param x int, x dimension
+ * \param y int, y dimension
+ *
+ */
+int save_image(MatrixXf img, std::string filename, int size, int x, int y) {
+    // Normalise to 0-255
+    img = img / img.maxCoeff() * 255;
+    img = img.array().ceil();
 
-    //Convert to raw buffer
-    unsigned char * gray_UC_hough; 
-    convertMat2UC(img,gray_UC_hough,size); 
-    int success = stbi_write_png(filename.c_str(),x,y,1,gray_UC_hough,x); 
-    std::cout<< "Image saved: "<< success << std::endl;
+    // Convert to raw buffer
+    std::unique_ptr<unsigned char[]> gray_UC_hough(new unsigned char[size]);
+    convert_Mat2RawBuff(img, gray_UC_hough, size);
 
-    //delete gray_UC_hough;
-
+    return stbi_write_png(filename.c_str(), x, y, 1, gray_UC_hough.get(), x);
 }

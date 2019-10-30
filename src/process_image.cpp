@@ -12,10 +12,9 @@
 
 using namespace Eigen;
 
-void enhance_hough(MatrixXf & hough,MatrixXf & houghpp,Config & config);
 
 void Log(const char * message){
-    std::cout<< message <<std::endl;
+	std::cout<< message <<std::endl;
 }
 
 void normalise_img(MatrixXf & img){
@@ -39,7 +38,7 @@ std::vector<float> LinearSpacedArray(float a, float b, std::size_t N)
 	/*
 	 * Returns a linearly spaced array
 	 */
-	{
+{
 	double h = (b - a) / static_cast<float>(N-1);
 	std::vector<float> xs(N);
 	std::vector<float>::iterator x;
@@ -83,7 +82,6 @@ void HoughRectangle::hough_transform(MatrixXf & img,Config & config){
 	MatrixXf acc = MatrixXf::Zero(config.thetaBins,config.rhoBins); //accumulator
 	VectorXf theta = VectorXf::LinSpaced(Sequential,config.thetaBins,config.thetaMin,config.thetaMax);
 	std::vector<float> rho = LinearSpacedArray(-360,sqrt(pow(img.rows()/2.0,2) + pow(img.rows()/2.0,2)),config.rhoBins);
-	std::cout<< rho[config.rhoBins-1]<<std::endl;
 
 	//Cartesian coordinate vectors
 	VectorXi vecX = VectorXi::LinSpaced(Sequential,img.cols(),0,img.cols()-1);
@@ -127,12 +125,12 @@ void HoughRectangle::hough_transform(MatrixXf & img,Config & config){
     MatrixXf houghpp = MatrixXf::Zero(acc.rows(),acc.cols());
     enhance_hough(acc,houghpp,config);
 	
-	//Convert to unsigned char and save
+    //Convert to unsigned char and save
     save_image(acc,"accumulator.png",config.rhoBins*config.thetaBins,config.thetaBins,config.rhoBins);
     save_image(houghpp,"accumulator_enhance.png",config.rhoBins*config.thetaBins,config.thetaBins,config.rhoBins);
 }	
 
-void enhance_hough(MatrixXf & hough,MatrixXf & houghpp,Config & config){
+void HoughRectangle::enhance_hough(MatrixXf & hough,MatrixXf & houghpp,Config & config){
     /*
      * Computes enhanced Hough transform
      */
