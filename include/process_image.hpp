@@ -10,6 +10,7 @@
 class HoughRectangle{
     public:
         Eigen::MatrixXf m_img;
+	HoughRectangle(Eigen::MatrixXf & img); //declaration
 
     public:
         void hough_transform(Eigen::MatrixXf & img,Config & config);

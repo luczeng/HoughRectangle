@@ -10,8 +10,7 @@ set(CXX_STANDARD_REQUIRED)
 set(STB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party/stb)
 set(CXXOPTS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party/cxxopts/include)
 set(CEREAL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party/cereal-master/include)
-#message(${CMAKE_CURRENT_SOURCE_DIR})
-#message(${STB_INCLUDE_DIR})
+set(CATCH2_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/third_party/catch2)
 
 #Eigen
 find_package (Eigen3 REQUIRED NO_MODULE)
@@ -33,6 +32,10 @@ target_include_directories(config4cpp INTERFACE ${CONFIG4CPP_INCLUDE_DIR})
 add_library(cereal INTERFACE)
 target_include_directories(cereal INTERFACE ${CEREAL_INCLUDE_DIR})
 
+#Catch2
+add_subdirectory(third_party/Catch2)
+
+
 #----------------------------------------------------------------------------------------------------#
 # Main code
 #----------------------------------------------------------------------------------------------------#
@@ -40,7 +43,6 @@ target_include_directories(cereal INTERFACE ${CEREAL_INCLUDE_DIR})
 add_library(main_hough STATIC src/io.cpp src/process_image.cpp include/io.hpp include/config.hpp include/process_image.hpp)
 target_include_directories(main_hough PUBLIC include)
 target_link_libraries(main_hough PUBLIC Eigen3::Eigen PUBLIC cereal PRIVATE stb)
-#target_include_directories(io PUBLIC ${STB_INCLUDE_DIR})
 
 
 #----------------------------------------------------------------------------------------------------#
@@ -48,5 +50,7 @@ target_link_libraries(main_hough PUBLIC Eigen3::Eigen PUBLIC cereal PRIVATE stb)
 #----------------------------------------------------------------------------------------------------#
 add_executable(HoughRectangle src/HoughRectangle.cpp )
 target_link_libraries(HoughRectangle PUBLIC Eigen3::Eigen PUBLIC main_hough PUBLIC cxxopts PRIVATE stb PUBLIC cereal)
-#target_include_directories(HoughRectangle PRIVATE ${STB_INCLUDE_DIR} PUBLIC ${CXXOPTS_INCLUDE_DIR})
+
+add_executable(test unit_test/test.cpp)
+target_link_libraries(test PUBLIC Catch2::Catch2 PRIVATE stb PUBLIC main_hough)
 
