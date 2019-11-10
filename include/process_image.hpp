@@ -16,6 +16,7 @@ class HoughRectangle{
         void hough_transform(Eigen::MatrixXf & img,Config & config);
         void windowed_hough(Eigen::MatrixXf & img,Config & config);
         void enhance_hough(Eigen::MatrixXf & hough,Eigen::MatrixXf & houghpp,Config & config);
+        void ring(Eigen::MatrixXf& img,Config& config);
 
 };
 
