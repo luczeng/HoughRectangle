@@ -48,8 +48,8 @@ target_link_libraries(main_hough PUBLIC Eigen3::Eigen PUBLIC cereal PRIVATE stb)
 #----------------------------------------------------------------------------------------------------#
 #Executables
 #----------------------------------------------------------------------------------------------------#
-add_executable(HoughRectangle src/HoughRectangle.cpp )
-target_link_libraries(HoughRectangle PUBLIC Eigen3::Eigen PUBLIC main_hough PUBLIC cxxopts PRIVATE stb PUBLIC cereal)
+add_executable(main_hough_rectangle src/main_hough_rectangle.cpp )
+target_link_libraries(main_hough_rectangle PUBLIC Eigen3::Eigen PUBLIC main_hough PUBLIC cxxopts PRIVATE stb PUBLIC cereal)
 
 add_executable(test unit_test/test.cpp)
 target_link_libraries(test PUBLIC Catch2::Catch2 PRIVATE stb PUBLIC main_hough)

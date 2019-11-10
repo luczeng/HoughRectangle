@@ -19,11 +19,13 @@ using namespace Eigen;
 
 int main(int argc, char* argv[]) {
     // Nota bene: casting big images to unsigned char in Eigen result in a
-    // segmentation fault. Compiler complains that the array is too big. We
-    // have therefore chosen the following way to convert Eigen matrix to
-    // unsigned char *
+    // segmentation fault on my machine for some unknown reasons. Compiler
+    // complains that the array is too big. We have therefore chosen the
+    // following way to convert Eigen matrix to unsigned char *
 
+    ////////////////////////////////////////////////////////////////////////
     // Parse arguments
+    ////////////////////////////////////////////////////////////////////////
     cxxopts::Options options("Runs Hough rectangle detection algorithm");
 
     options.add_options()("i,image_path", "Path to binary input image",
@@ -33,7 +35,6 @@ int main(int argc, char* argv[]) {
 
     std::string filename = result["image_path"].as<std::string>();
     std::string output_filename = result["output_path"].as<std::string>();
-    std::cout << filename << std::endl;
 
     // Parse config file
     Config config;
@@ -41,7 +42,9 @@ int main(int argc, char* argv[]) {
     cereal::JSONInputArchive archive(is);
     archive(config);
 
-    // Load image
+    ////////////////////////////////////////////////////////////////////////
+    // Load image and prepare matrix
+    ////////////////////////////////////////////////////////////////////////
     int x, y, n;
     std::unique_ptr<unsigned char[]> data(
         stbi_load(filename.c_str(), &x, &y, &n, 0));
@@ -52,11 +55,13 @@ int main(int argc, char* argv[]) {
     // Port array to Eigen matrix
     MatrixXf gray;
     convert_RawBuff2Mat(data, gray, x, y);
-    // normalise_img(gray);
 
+    ////////////////////////////////////////////////////////////////////////
     // Perform Hough transform
+    ////////////////////////////////////////////////////////////////////////
     HoughRectangle ht(gray);
-    ht.hough_transform(gray, config);
+    ht.windowed_hough(gray,config);
+    //ht.hough_transform(gray, config);
 
     return 0;
 }
