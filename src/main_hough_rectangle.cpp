@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
     // Perform Hough transform
     ////////////////////////////////////////////////////////////////////////
     HoughRectangle ht(gray);
-    ht.windowed_hough(gray,config);
+    ht.windowed_hough(gray,config.r_min,config.r_max);
     //ht.hough_transform(gray, config);
 
     return 0;
