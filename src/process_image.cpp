@@ -7,6 +7,7 @@
 #include "io.hpp"
 #include "stb_image.h"
 #include "stb_image_write.h"
+#include <math.h>
 
 #define PI 3.14159265
 
@@ -46,30 +47,41 @@ std::vector<float> LinearSpacedArray(float a, float b, std::size_t N)
     return xs;
 }
 
-void HoughRectangle::ring(MatrixXf& img,Config& config){
+MatrixXf HoughRectangle::ring(MatrixXf & img,int r_min, int r_max){
+    MatrixXf result = img.replicate<1,1>();
+    float center_x,center_y;
+    if (remainder(img.cols(),2) != 0) {
+        center_x = (img.cols()-1)/2;
+    }
+    else {
+        center_x = (img.cols()/2);
+    }
+    if (remainder(img.rows(),2) != 0) {
+        center_y = (img.rows()-1)/2;
+    }
+    else {
+        center_y = (img.rows()-1)/2;
+    }
 
-    int r_min = config.r_min;
-    int r_max = config.r_max;
-
-    for (int i=0;i<img.cols();++i){
-        for (int j=0;j<img.rows();++j){
-            if (r_min<sqrt((i-img.cols()/2) + -(j-img.rows()/2))<r_max){
-
+    for (int i=0;i<m_img.cols();++i){
+        for (int j=0;j<m_img.rows();++j){
+            float dist = sqrt( pow(i-center_x,2) + pow(j-center_y,2)); 
+            if (dist < r_min or dist > r_max){
+                result(j,i) = 0;
             }
-
         }}
 
-
+    return result;
 }
 
 
 // Performs the Windowed hough transform
-void HoughRectangle::windowed_hough(MatrixXf& img, Config& Config) {
+void HoughRectangle::windowed_hough(MatrixXf& img, int r_min,int r_max) {
     for (int i = 0;i < img.rows(); ++i) {
         for (int j =0; j < img.cols(); ++j) {
             // Applying circular mask to local region
-            MatrixXf subregion = img.block(i, j, Config.L_window, Config.L_window);
-            hough_transform(subregion, Config);
+            //MatrixXf subregion = img.block(i, j, Config.L_window, Config.L_window);
+            //hough_transform(subregion, Config);
             exit(0);
         }
     }
