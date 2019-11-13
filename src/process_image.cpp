@@ -76,12 +76,14 @@ MatrixXf HoughRectangle::ring(MatrixXf & img,int r_min, int r_max){
 
 
 // Performs the Windowed hough transform
-void HoughRectangle::windowed_hough(MatrixXf& img, int r_min,int r_max) {
+void HoughRectangle::windowed_hough(MatrixXf& img, int L_window, int r_min,int r_max,int thetaBins, int rhoBins,float  thetaMin,float thetaMax) {
     for (int i = 0;i < img.rows(); ++i) {
         for (int j =0; j < img.cols(); ++j) {
             // Applying circular mask to local region
-            //MatrixXf subregion = img.block(i, j, Config.L_window, Config.L_window);
-            //hough_transform(subregion, Config);
+            MatrixXf subregion = img.block( i, j, L_window, L_window);
+            MatrixXf ringed_subregion = ring(subregion, r_min,r_max);
+
+            Eigen::MatrixXf wht = hough_transform(ringed_subregion, thetaBins,rhoBins,thetaMin,thetaMax);
             exit(0);
         }
     }
@@ -89,19 +91,19 @@ void HoughRectangle::windowed_hough(MatrixXf& img, int r_min,int r_max) {
 
 HoughRectangle::HoughRectangle(MatrixXf& img) { m_img = img; }
 
-void HoughRectangle::hough_transform(MatrixXf& img, Config& config) {
+MatrixXf HoughRectangle::hough_transform(MatrixXf& img, int thetaBins,int rhoBins,float thetaMin,float thetaMax) {
     /*
      * Performs the Hough trasnform on the input edge detected matrix
      */
 
     // Define accumulator matrix, theta and rho vectors
     MatrixXf acc =
-        MatrixXf::Zero(config.thetaBins, config.rhoBins);  // accumulator
-    VectorXf theta = VectorXf::LinSpaced(Sequential, config.thetaBins,
-                                         config.thetaMin, config.thetaMax);
+        MatrixXf::Zero(thetaBins, rhoBins);  // accumulator
+    VectorXf theta = VectorXf::LinSpaced(Sequential, thetaBins,
+                                         thetaMin, thetaMax);
     std::vector<float> rho = LinearSpacedArray(
         -360, sqrt(pow(img.rows() / 2.0, 2) + pow(img.rows() / 2.0, 2)),
-        config.rhoBins);
+        rhoBins);
 
     // Cartesian coordinate vectors
     VectorXi vecX =
@@ -148,14 +150,16 @@ void HoughRectangle::hough_transform(MatrixXf& img, Config& config) {
 
     // Enhanced HT
     MatrixXf houghpp = MatrixXf::Zero(acc.rows(), acc.cols());
-    enhance_hough(acc, houghpp, config);
+    //enhance_hough(acc, houghpp, config);
+
+    return acc;
 
     // Convert to unsigned char and save
-    save_image(acc, "accumulator.png", config.rhoBins * config.thetaBins,
-               config.thetaBins, config.rhoBins);
-    save_image(houghpp, "accumulator_enhance.png",
-               config.rhoBins * config.thetaBins, config.thetaBins,
-               config.rhoBins);
+/*    save_image(acc, "accumulator.png", config.rhoBins * config.thetaBins,*/
+               //config.thetaBins, config.rhoBins);
+    //save_image(houghpp, "accumulator_enhance.png",
+               //config.rhoBins * config.thetaBins, config.thetaBins,
+               //config.rhoBins);
 }
 
 void HoughRectangle::enhance_hough(MatrixXf& hough, MatrixXf& houghpp,

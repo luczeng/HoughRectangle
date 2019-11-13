@@ -13,8 +13,8 @@ class HoughRectangle{
         HoughRectangle(Eigen::MatrixXf & img); //declaration
 
     public:
-        void hough_transform(Eigen::MatrixXf & img,Config & config);
-        void windowed_hough(Eigen::MatrixXf & img,int r_min,int r_max);
+        Eigen::MatrixXf hough_transform(Eigen::MatrixXf & img, int thetaBins, int rhoBins,float  thetaMin,float thetaMax);
+        void windowed_hough(Eigen::MatrixXf & img,int L_window,int r_min,int r_max, int thetaBins, int rhoBins,float  thetaMin,float thetaMax);
         void enhance_hough(Eigen::MatrixXf & hough,Eigen::MatrixXf & houghpp,Config & config);
         Eigen::MatrixXf ring(Eigen::MatrixXf & img,int r_min,int r_max);
 
