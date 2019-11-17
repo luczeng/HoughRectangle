@@ -27,7 +27,6 @@ int main(int argc, char* argv[]) {
     // Parse arguments
     ////////////////////////////////////////////////////////////////////////
     cxxopts::Options options("Runs Hough rectangle detection algorithm");
-
     options.add_options()("i,image_path", "Path to binary input image",
                           cxxopts::value<std::string>())(
         "o,output_path", "Path to save result", cxxopts::value<std::string>());
@@ -60,7 +59,7 @@ int main(int argc, char* argv[]) {
     // Perform Hough transform
     ////////////////////////////////////////////////////////////////////////
     HoughRectangle ht(gray);
-    ht.windowed_hough(gray,config.L_window,config.r_min,config.r_max,config.thetaBins,config.rhoBins,config.thetaMin,config.thetaMax);
+    ht.windowed_hough(gray,config.r_min,config.r_max,config.thetaBins,config.rhoBins,config.thetaMin,config.thetaMax);
     //ht.hough_transform(gray, config);
 
     return 0;

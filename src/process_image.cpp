@@ -7,7 +7,6 @@
 #include "io.hpp"
 #include "stb_image.h"
 #include "stb_image_write.h"
-#include <math.h>
 
 #define PI 3.14159265
 
@@ -47,60 +46,68 @@ std::vector<float> LinearSpacedArray(float a, float b, std::size_t N)
     return xs;
 }
 
-MatrixXf HoughRectangle::ring(MatrixXf & img,int r_min, int r_max){
-    MatrixXf result = img.replicate<1,1>();
-    float center_x,center_y;
-    if (remainder(img.cols(),2) != 0) {
-        center_x = (img.cols()-1)/2;
+// Rectangle class constructor
+HoughRectangle::HoughRectangle(MatrixXf& img) { m_img = img; }
+
+// Applies a ring on the input matrix
+MatrixXf HoughRectangle::ring(MatrixXf& img, int r_min, int r_max) {
+    MatrixXf result = img.replicate<1, 1>();
+    float center_x, center_y;
+    if (remainder(img.cols(), 2) != 0) {
+        center_x = (img.cols() - 1) / 2;
+    } else {
+        center_x = (img.cols() / 2);
     }
-    else {
-        center_x = (img.cols()/2);
-    }
-    if (remainder(img.rows(),2) != 0) {
-        center_y = (img.rows()-1)/2;
-    }
-    else {
-        center_y = (img.rows()-1)/2;
+    if (remainder(img.rows(), 2) != 0) {
+        center_y = (img.rows() - 1) / 2;
+    } else {
+        center_y = (img.rows() - 1) / 2;
     }
 
-    for (int i=0;i<m_img.cols();++i){
-        for (int j=0;j<m_img.rows();++j){
-            float dist = sqrt( pow(i-center_x,2) + pow(j-center_y,2)); 
-            if (dist < r_min or dist > r_max){
-                result(j,i) = 0;
+    for (int i = 0; i < img.cols(); ++i) {
+        for (int j = 0; j < img.rows(); ++j) {
+            float dist = sqrt(pow(i - center_x, 2) + pow(j - center_y, 2));
+            if (dist < r_min or dist > r_max) {
+                result(j, i) = 0;
             }
-        }}
+        }
+    }
 
     return result;
 }
 
-
 // Performs the Windowed hough transform
-void HoughRectangle::windowed_hough(MatrixXf& img, int L_window, int r_min,int r_max,int thetaBins, int rhoBins,float  thetaMin,float thetaMax) {
-    for (int i = 0;i < img.rows(); ++i) {
-        for (int j =0; j < img.cols(); ++j) {
-            // Applying circular mask to local region
-            MatrixXf subregion = img.block( i, j, L_window, L_window);
-            MatrixXf ringed_subregion = ring(subregion, r_min,r_max);
+MatrixXf HoughRectangle::windowed_hough(MatrixXf& img, int r_min, int r_max,
+                                        int thetaBins, int rhoBins,
+                                        float thetaMin, float thetaMax) {
+    MatrixXf ringed_subregion = ring(img, r_min, r_max);
+    Eigen::MatrixXf wht = hough_transform(ringed_subregion, thetaBins, rhoBins,
+                                          thetaMin, thetaMax);
 
-            Eigen::MatrixXf wht = hough_transform(ringed_subregion, thetaBins,rhoBins,thetaMin,thetaMax);
-            exit(0);
+    return wht;
+}
+
+// Applies the Windowed hough transform on the whole image
+MatrixXf HoughRectangle::apply_windowed_hough(MatrixXf& img, int L_window,
+                                              int r_min, int r_max,
+                                              int thetaBins, int rhoBins,
+                                              float thetaMin, float thetaMax) {
+    for (int i = 0; i < img.rows() - L_window; ++i) {
+        for (int j = 0; j < img.cols() - L_window; ++j) {
+            // Applying circular mask to local region
+            MatrixXf subregion = img.block(i, j, L_window, L_window);
         }
     }
 }
 
-HoughRectangle::HoughRectangle(MatrixXf& img) { m_img = img; }
-
-MatrixXf HoughRectangle::hough_transform(MatrixXf& img, int thetaBins,int rhoBins,float thetaMin,float thetaMax) {
-    /*
-     * Performs the Hough trasnform on the input edge detected matrix
-     */
-
+// Applies the classic Hough transform
+MatrixXf HoughRectangle::hough_transform(MatrixXf& img, int thetaBins,
+                                         int rhoBins, float thetaMin,
+                                         float thetaMax) {
     // Define accumulator matrix, theta and rho vectors
-    MatrixXf acc =
-        MatrixXf::Zero(thetaBins, rhoBins);  // accumulator
-    VectorXf theta = VectorXf::LinSpaced(Sequential, thetaBins,
-                                         thetaMin, thetaMax);
+    MatrixXf acc = MatrixXf::Zero(thetaBins, rhoBins);  // accumulator
+    VectorXf theta =
+        VectorXf::LinSpaced(Sequential, thetaBins, thetaMin, thetaMax);
     std::vector<float> rho = LinearSpacedArray(
         -360, sqrt(pow(img.rows() / 2.0, 2) + pow(img.rows() / 2.0, 2)),
         rhoBins);
@@ -111,9 +118,7 @@ MatrixXf HoughRectangle::hough_transform(MatrixXf& img, int thetaBins,int rhoBin
     VectorXi vecY =
         VectorXi::LinSpaced(Sequential, img.rows(), 0, img.rows() - 1);
     int mid_X = round(img.cols() / 2);
-    ;
     int mid_Y = round(img.rows() / 2);
-    ;
     vecX = vecX.array() - mid_X;
     vecY = vecY.array() - mid_Y;
 
@@ -149,17 +154,11 @@ MatrixXf HoughRectangle::hough_transform(MatrixXf& img, int thetaBins,int rhoBin
     }
 
     // Enhanced HT
-    MatrixXf houghpp = MatrixXf::Zero(acc.rows(), acc.cols());
-    //enhance_hough(acc, houghpp, config);
+    // MatrixXf houghpp = MatrixXf::Zero(acc.rows(), acc.cols());
+    // enhance_hough(acc, houghpp, config);
+    std::cout << acc.rows()<<acc.cols()<<std::endl;
 
     return acc;
-
-    // Convert to unsigned char and save
-/*    save_image(acc, "accumulator.png", config.rhoBins * config.thetaBins,*/
-               //config.thetaBins, config.rhoBins);
-    //save_image(houghpp, "accumulator_enhance.png",
-               //config.rhoBins * config.thetaBins, config.thetaBins,
-               //config.rhoBins);
 }
 
 void HoughRectangle::enhance_hough(MatrixXf& hough, MatrixXf& houghpp,

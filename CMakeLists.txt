@@ -57,3 +57,6 @@ target_link_libraries(test_io PUBLIC Catch2::Catch2 PRIVATE stb PUBLIC main_houg
 add_executable(test_process_img unit_test/test_process_img.cpp)
 target_include_directories(test_process_img PUBLIC include)
 target_link_libraries(test_process_img PUBLIC Catch2::Catch2 PRIVATE stb PUBLIC main_hough)
+
+add_executable(windowed_hough src/windowed_hough.cpp)
+target_link_libraries(windowed_hough PUBLIC Eigen3::Eigen PUBLIC main_hough PUBLIC cxxopts PRIVATE stb PRIVATE cereal)
