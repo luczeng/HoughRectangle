@@ -105,7 +105,7 @@ MatrixXf HoughRectangle::hough_transform(MatrixXf& img, int thetaBins,
                                          int rhoBins, float thetaMin,
                                          float thetaMax) {
     // Define accumulator matrix, theta and rho vectors
-    MatrixXf acc = MatrixXf::Zero(thetaBins, rhoBins);  // accumulator
+    MatrixXf acc = MatrixXf::Zero(rhoBins,thetaBins);  // accumulator
     VectorXf theta =
         VectorXf::LinSpaced(Sequential, thetaBins, thetaMin, thetaMax);
     std::vector<float> rho = LinearSpacedArray(
@@ -144,8 +144,8 @@ MatrixXf HoughRectangle::hough_transform(MatrixXf& img, int thetaBins,
                     }
 
                     // Fill accumulator
-                    acc(k, idx_rho) = acc(k, idx_rho) + 1;
-                    if (acc(k, idx_rho) > pow(2, 32)) {
+                    acc(idx_rho,k) = acc(idx_rho,k) + 1;
+                    if (acc(idx_rho,k) > pow(2, 32)) {
                         std::cout << "Max value overpassed";
                     }
                 }
@@ -161,11 +161,11 @@ MatrixXf HoughRectangle::hough_transform(MatrixXf& img, int thetaBins,
     return acc;
 }
 
+/*
+* Computes enhanced Hough transform
+*/
 void HoughRectangle::enhance_hough(MatrixXf& hough, MatrixXf& houghpp,
                                    Config& config) {
-    /*
-     * Computes enhanced Hough transform
-     */
 
     int h = config.h;
     int w = config.w;
