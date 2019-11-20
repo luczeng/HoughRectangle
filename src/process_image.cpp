@@ -14,10 +14,10 @@ using namespace Eigen;
 
 void Log(const char* message) { std::cout << message << std::endl; }
 
+/*
+ * Function to make sure binary is 0 and 255
+ */
 void normalise_img(MatrixXf& img) {
-    /*
-     * Function to make sure binary is 0 and 255
-     */
 
     MatrixXf high;
     high.setOnes(img.rows(), img.cols());
@@ -31,10 +31,10 @@ void normalise_img(MatrixXf& img) {
     img = tmp;
 }
 
-std::vector<float> LinearSpacedArray(float a, float b, std::size_t N)
 /*
  * Returns a linearly spaced array
  */
+std::vector<float> LinearSpacedArray(float a, float b, std::size_t N)
 {
     double h = (b - a) / static_cast<float>(N - 1);
     std::vector<float> xs(N);
@@ -109,7 +109,7 @@ MatrixXf HoughRectangle::hough_transform(MatrixXf& img, int thetaBins,
     VectorXf theta =
         VectorXf::LinSpaced(Sequential, thetaBins, thetaMin, thetaMax);
     std::vector<float> rho = LinearSpacedArray(
-        -360, sqrt(pow(img.rows() / 2.0, 2) + pow(img.rows() / 2.0, 2)),
+        -sqrt(pow(img.rows() / 2.0, 2) + pow(img.rows() / 2.0, 2)), sqrt(pow(img.rows() / 2.0, 2) + pow(img.rows() / 2.0, 2)),
         rhoBins);
 
     // Cartesian coordinate vectors
@@ -154,9 +154,6 @@ MatrixXf HoughRectangle::hough_transform(MatrixXf& img, int thetaBins,
     }
 
     // Enhanced HT
-    // MatrixXf houghpp = MatrixXf::Zero(acc.rows(), acc.cols());
-    // enhance_hough(acc, houghpp, config);
-    std::cout << acc.rows()<<acc.cols()<<std::endl;
 
     return acc;
 }
@@ -164,11 +161,10 @@ MatrixXf HoughRectangle::hough_transform(MatrixXf& img, int thetaBins,
 /*
 * Computes enhanced Hough transform
 */
-void HoughRectangle::enhance_hough(MatrixXf& hough, MatrixXf& houghpp,
-                                   Config& config) {
+MatrixXf HoughRectangle::enhance_hough(MatrixXf& hough,int h, int w){
 
-    int h = config.h;
-    int w = config.w;
+    MatrixXf houghpp = MatrixXf::Zero(hough.rows(),hough.cols());
+
     for (int i = h; i < hough.rows() - h; ++i) {
         for (int j = w; j < hough.cols() - w; ++j) {
             /*           double tmp =
@@ -183,4 +179,7 @@ void HoughRectangle::enhance_hough(MatrixXf& hough, MatrixXf& houghpp,
             }
         }
     }
+
+    return houghpp;
+
 }

@@ -7,6 +7,11 @@
 #include "stb_image_write.h"
 #include "io.hpp"
 #include "process_image.hpp"
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/json.hpp>
+#include <cereal/cereal.hpp>
+#include "config.hpp"
+#include <fstream>
 
 using namespace Eigen;
 
@@ -22,12 +27,11 @@ int main(int argc, char * argv[]){
     std::string input_path = parsing_results["image_path"].as<std::string>();
     std::string output_path = parsing_results["out_img_path"].as<std::string>();
 
-    int r_min = 21;
-    int r_max = 81;
-    int thetaBins = 256;
-    int thetaMin = 0;
-    int thetaMax = 90;
-    int rhoBins = 256;
+    // Parse config file
+    Config config;
+    std::ifstream is("../src/configs.json");
+    cereal::JSONInputArchive archive(is);
+    archive(config);
 
     ////////////////////////////////////////////////////////////////////////
     // Load image and prepare matrix
@@ -47,8 +51,8 @@ int main(int argc, char * argv[]){
     // Process image
     ////////////////////////////////////////////////////////////////////////
     HoughRectangle ht(gray);
-    Eigen::MatrixXf wht = ht.windowed_hough(gray,r_min,r_max,thetaBins,rhoBins,thetaMin,thetaMax); 
+    Eigen::MatrixXf wht = ht.windowed_hough(gray,config.r_min,config.r_max,config.thetaBins,config.rhoBins,config.thetaMin,config.thetaMax); 
 
-    save_image(wht,output_path,thetaBins*rhoBins,thetaBins,rhoBins);
+    save_image(wht,output_path,config.thetaBins*config.rhoBins,config.thetaBins,config.rhoBins);
 
 }

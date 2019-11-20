@@ -15,7 +15,6 @@
 #include "string"
 
 using namespace Eigen;
-// void convertMat2UC(MatrixXf gray,unsigned char *& gray_UC,int size);
 
 int main(int argc, char* argv[]) {
     // Nota bene: casting big images to unsigned char in Eigen result in a
@@ -60,7 +59,6 @@ int main(int argc, char* argv[]) {
     ////////////////////////////////////////////////////////////////////////
     HoughRectangle ht(gray);
     ht.windowed_hough(gray,config.r_min,config.r_max,config.thetaBins,config.rhoBins,config.thetaMin,config.thetaMax);
-    //ht.hough_transform(gray, config);
 
     return 0;
 }
