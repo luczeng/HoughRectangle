@@ -19,7 +19,8 @@ class HoughRectangle{
 
         Eigen::MatrixXf apply_windowed_hough(Eigen::MatrixXf & img,int L_window,int r_min,int r_max, int thetaBins, int rhoBins,float  thetaMin,float thetaMax);
 
-        void enhance_hough(Eigen::MatrixXf & hough,Eigen::MatrixXf & houghpp,Config & config);
+        Eigen::MatrixXf enhance_hough(Eigen::MatrixXf & hough,int h,int w);
+        
         Eigen::MatrixXf ring(Eigen::MatrixXf & img,int r_min,int r_max);
 
 };

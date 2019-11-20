@@ -3,6 +3,7 @@
 #include <iostream>
 #include "stb_image_write.h"
 #include "string"
+
 using namespace Eigen;
 
 /**

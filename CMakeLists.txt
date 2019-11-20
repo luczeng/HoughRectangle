@@ -60,3 +60,6 @@ target_link_libraries(test_process_img PUBLIC Catch2::Catch2 PRIVATE stb PUBLIC 
 
 add_executable(windowed_hough src/windowed_hough.cpp)
 target_link_libraries(windowed_hough PUBLIC Eigen3::Eigen PUBLIC main_hough PUBLIC cxxopts PRIVATE stb PRIVATE cereal)
+
+add_executable(hough_transform src/hough_transform.cpp)
+target_link_libraries(hough_transform PUBLIC Eigen3::Eigen PUBLIC main_hough PUBLIC cxxopts PRIVATE stb PRIVATE cereal)

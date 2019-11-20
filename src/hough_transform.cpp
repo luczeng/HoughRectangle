@@ -33,6 +33,12 @@ int main(int argc, char * argv[]){
     cereal::JSONInputArchive archive(is);
     archive(config);
 
+    int thetaBins = 512;
+    int thetaMin = -90;
+    int thetaMax = 90;
+    int rhoBins = 512;
+    int h =32;
+
     ////////////////////////////////////////////////////////////////////////
     // Load image and prepare matrix
     ////////////////////////////////////////////////////////////////////////
@@ -51,7 +57,7 @@ int main(int argc, char * argv[]){
     // Process image
     ////////////////////////////////////////////////////////////////////////
     HoughRectangle ht(gray);
-    Eigen::MatrixXf wht = ht.windowed_hough(gray,config.r_min,config.r_max,config.thetaBins,config.rhoBins,config.thetaMin,config.thetaMax); 
+    Eigen::MatrixXf wht = ht.hough_transform(gray,config.thetaBins,config.rhoBins,config.thetaMin,config.thetaMax); 
 
     save_image(wht,output_path,config.thetaBins*config.rhoBins,config.thetaBins,config.rhoBins);
 

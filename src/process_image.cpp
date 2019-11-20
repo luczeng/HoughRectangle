@@ -14,10 +14,10 @@ using namespace Eigen;
 
 void Log(const char* message) { std::cout << message << std::endl; }
 
+/*
+ * Function to make sure binary is 0 and 255
+ */
 void normalise_img(MatrixXf& img) {
-    /*
-     * Function to make sure binary is 0 and 255
-     */
 
     MatrixXf high;
     high.setOnes(img.rows(), img.cols());
@@ -31,10 +31,10 @@ void normalise_img(MatrixXf& img) {
     img = tmp;
 }
 
-std::vector<float> LinearSpacedArray(float a, float b, std::size_t N)
 /*
  * Returns a linearly spaced array
  */
+std::vector<float> LinearSpacedArray(float a, float b, std::size_t N)
 {
     double h = (b - a) / static_cast<float>(N - 1);
     std::vector<float> xs(N);
@@ -105,11 +105,11 @@ MatrixXf HoughRectangle::hough_transform(MatrixXf& img, int thetaBins,
                                          int rhoBins, float thetaMin,
                                          float thetaMax) {
     // Define accumulator matrix, theta and rho vectors
-    MatrixXf acc = MatrixXf::Zero(thetaBins, rhoBins);  // accumulator
+    MatrixXf acc = MatrixXf::Zero(rhoBins,thetaBins);  // accumulator
     VectorXf theta =
         VectorXf::LinSpaced(Sequential, thetaBins, thetaMin, thetaMax);
     std::vector<float> rho = LinearSpacedArray(
-        -360, sqrt(pow(img.rows() / 2.0, 2) + pow(img.rows() / 2.0, 2)),
+        -sqrt(pow(img.rows() / 2.0, 2) + pow(img.rows() / 2.0, 2)), sqrt(pow(img.rows() / 2.0, 2) + pow(img.rows() / 2.0, 2)),
         rhoBins);
 
     // Cartesian coordinate vectors
@@ -144,8 +144,8 @@ MatrixXf HoughRectangle::hough_transform(MatrixXf& img, int thetaBins,
                     }
 
                     // Fill accumulator
-                    acc(k, idx_rho) = acc(k, idx_rho) + 1;
-                    if (acc(k, idx_rho) > pow(2, 32)) {
+                    acc(idx_rho,k) = acc(idx_rho,k) + 1;
+                    if (acc(idx_rho,k) > pow(2, 32)) {
                         std::cout << "Max value overpassed";
                     }
                 }
@@ -154,21 +154,17 @@ MatrixXf HoughRectangle::hough_transform(MatrixXf& img, int thetaBins,
     }
 
     // Enhanced HT
-    // MatrixXf houghpp = MatrixXf::Zero(acc.rows(), acc.cols());
-    // enhance_hough(acc, houghpp, config);
-    std::cout << acc.rows()<<acc.cols()<<std::endl;
 
     return acc;
 }
 
-void HoughRectangle::enhance_hough(MatrixXf& hough, MatrixXf& houghpp,
-                                   Config& config) {
-    /*
-     * Computes enhanced Hough transform
-     */
+/*
+* Computes enhanced Hough transform
+*/
+MatrixXf HoughRectangle::enhance_hough(MatrixXf& hough,int h, int w){
 
-    int h = config.h;
-    int w = config.w;
+    MatrixXf houghpp = MatrixXf::Zero(hough.rows(),hough.cols());
+
     for (int i = h; i < hough.rows() - h; ++i) {
         for (int j = w; j < hough.cols() - w; ++j) {
             /*           double tmp =
@@ -183,4 +179,7 @@ void HoughRectangle::enhance_hough(MatrixXf& hough, MatrixXf& houghpp,
             }
         }
     }
+
+    return houghpp;
+
 }
