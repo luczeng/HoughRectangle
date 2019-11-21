@@ -13,4 +13,6 @@ void convert_Mat2RawBuff(
 int save_image(Eigen::MatrixXf img, std::string filename, int size, int x,
                int y);
 
+Eigen::MatrixXf read_image(std::string filename);
+
 #endif

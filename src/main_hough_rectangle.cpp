@@ -43,16 +43,7 @@ int main(int argc, char* argv[]) {
     ////////////////////////////////////////////////////////////////////////
     // Load image and prepare matrix
     ////////////////////////////////////////////////////////////////////////
-    int x, y, n;
-    std::unique_ptr<unsigned char[]> data(
-        stbi_load(filename.c_str(), &x, &y, &n, 0));
-    if (data == NULL) {
-        std::cout << "Cant load image" << std::endl;
-    }
-
-    // Port array to Eigen matrix
-    MatrixXf gray;
-    convert_RawBuff2Mat(data, gray, x, y);
+    MatrixXf gray = read_image(filename.c_str());
 
     ////////////////////////////////////////////////////////////////////////
     // Perform Hough transform

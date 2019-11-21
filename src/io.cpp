@@ -2,6 +2,7 @@
 #include <Eigen/Dense>
 #include <iostream>
 #include "stb_image_write.h"
+#include "stb_image.h"
 #include "string"
 
 using namespace Eigen;
@@ -60,4 +61,28 @@ int save_image(MatrixXf img, std::string filename, int size, int x, int y) {
     convert_Mat2RawBuff(img, gray_UC_hough, size);
 
     return stbi_write_png(filename.c_str(), x, y, 1, gray_UC_hough.get(), x);
+}
+
+/**
+ * Loads png image to Eigen matrix
+ *
+ * \param img input float eigen matrix in RowMajor order
+ * \param filename output file path ending in .png
+ *
+ */
+MatrixXf read_image(std::string filename) {
+    // Load data to raw buffer
+    int x,y,n; 
+    std::unique_ptr<unsigned char[]> data(
+        stbi_load(filename.c_str(), &x, &y, &n, 0));
+
+    if (data == NULL) {
+        std::cout << "Can't load image" << std::endl;
+    }
+
+    // Convert to raw buffer
+    Eigen::MatrixXf img;
+    convert_RawBuff2Mat(data,img,x,y);
+
+    return img;
 }

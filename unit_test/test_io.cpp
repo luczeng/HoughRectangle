@@ -1,11 +1,13 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
-#define STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "io.hpp"
+#include "string"
+#ifndef STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
+#ifndef STB_IMAGE_WRITE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image.h"
 #include "stb_image_write.h"
-#include "string"
 
 unsigned char uc_conv(int x) { return static_cast<unsigned char>(x); };
 
@@ -53,24 +55,30 @@ inline RawBufEq IsEqual(unsigned char* arr1, int L) {
 TEST_CASE("Test Input-output functions for images") {
     std::string filename = "../unit_test/test_img.png";
 
-    SECTION("Image reader into Eigen matrix") {
-        int x, y, n;
+    SECTION("Convert raw buffer to Eigen matrix") {
 
-        // unsigned char* data = stbi_load(filename.c_str(), &x, &y, &n,
-        // 0);
-        std::unique_ptr<unsigned char[]> data_tmp(
-            stbi_load(filename.c_str(), &x, &y, &n, 0));
+        // Convert some data to Eigen matrix
+        std::unique_ptr<unsigned char[]> data(new unsigned char[12]);
+        data[0] =(unsigned char) 1; 
+        data[1] =(unsigned char) 2; 
+        data[2] =(unsigned char) 3; 
+        data[3] =(unsigned char) 155; 
+        data[4] =(unsigned char) 255; 
+        data[5] =(unsigned char) 3; 
+        data[6] =(unsigned char) 4; 
+        data[7] =(unsigned char) 5; 
+        data[8] =(unsigned char) 2; 
+        data[9] =(unsigned char) 5; 
+        data[10] =(unsigned char) 78; 
+        data[11] =(unsigned char) 1; 
 
         Eigen::MatrixXf gray;
-
-        // Function to be tested
-        convert_RawBuff2Mat(data_tmp, gray, x, y);
+        convert_RawBuff2Mat(data, gray, 4, 3);
 
         // Ground truth
         Eigen::MatrixXf ground_truth(3, 4);
         ground_truth << 1, 2, 3, 155, 255, 3, 4, 5, 2, 5, 78, 1;
 
-        // REQUIRE( data_tmp != NULL); //sanity check
         REQUIRE(ground_truth == gray);
     }
 
@@ -110,5 +118,20 @@ TEST_CASE("Test Input-output functions for images") {
 
         REQUIRE(out == 1);
     }
+
+    SECTION("Image reader into Eigen matrix") {
+
+        // Load image
+        Eigen::MatrixXf img = read_image("../unit_test/test_img.png");
+
+        // Ground truth
+        Eigen::MatrixXf ground_truth(3, 4);
+        ground_truth << 1, 2, 3, 155, 255, 3, 4, 5, 2, 5, 78, 1;
+
+        REQUIRE(ground_truth == img);
+
+    }
 }
+#endif
+#endif
 

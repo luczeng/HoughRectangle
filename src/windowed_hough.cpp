@@ -1,7 +1,9 @@
 #include <iostream>
 #include "cxxopts.hpp"
 #include "Eigen/Dense"
+#ifndef STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
+#ifndef STB_IMAGE_WRITE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image.h"
 #include "stb_image_write.h"
@@ -36,16 +38,7 @@ int main(int argc, char * argv[]){
     ////////////////////////////////////////////////////////////////////////
     // Load image and prepare matrix
     ////////////////////////////////////////////////////////////////////////
-    int x, y, n;
-    std::unique_ptr<unsigned char[]> data(
-        stbi_load(input_path.c_str(), &x, &y, &n, 0));
-    if (data == NULL) {
-        std::cout << "Cant load image" << std::endl;
-    }
-
-    // Port array to Eigen matrix
-    MatrixXf gray;
-    convert_RawBuff2Mat(data, gray, x, y);
+    MatrixXf gray = read_image(input_path.c_str());
 
     ////////////////////////////////////////////////////////////////////////
     // Process image
@@ -56,3 +49,5 @@ int main(int argc, char * argv[]){
     save_image(wht,output_path,config.thetaBins*config.rhoBins,config.thetaBins,config.rhoBins);
 
 }
+#endif
+#endif
