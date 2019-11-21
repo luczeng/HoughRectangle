@@ -23,7 +23,9 @@ Modify parameters algorithms parameters in src/configs.json
 ## Algorithm
 The Hough rectangle detection algorithm relies on detecting specific patterns in the Hough domain, as illustrated below:
 
-![hough transform](img/examples/example_hough.png)
+Rectangle            |  Corresponding Hough pattern
+:-------------------------:|:-------------------------:
+<img src="img/rectangle2.png" width="256" height="256">  |   <img src="img/examples/example_hough.png" width="256" height="256">
 
 
 ## Project status:
