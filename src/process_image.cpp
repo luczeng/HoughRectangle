@@ -17,16 +17,16 @@ void Log(const char* message) { std::cout << message << std::endl; }
 /*
  * Function to make sure binary is 0 and 255
  */
-void normalise_img(MatrixXf& img) {
+void normalise_img(Matrix<float,Dynamic,Dynamic,RowMajor>& img) {
 
-    MatrixXf high;
+    Matrix<float,Dynamic,Dynamic,RowMajor> high;
     high.setOnes(img.rows(), img.cols());
     high *= 255;
 
-    MatrixXf low;
+    Matrix<float,Dynamic,Dynamic,RowMajor> low;
     low.setZero(img.rows(), img.cols());
 
-    MatrixXf tmp = (img.array() > 128.0).select(high, low);
+    Matrix<float,Dynamic,Dynamic,RowMajor> tmp = (img.array() > 128.0).select(high, low);
 
     img = tmp;
 }
@@ -47,11 +47,11 @@ std::vector<float> LinearSpacedArray(float a, float b, std::size_t N)
 }
 
 // Rectangle class constructor
-HoughRectangle::HoughRectangle(MatrixXf& img) { m_img = img; }
+HoughRectangle::HoughRectangle(Matrix<float,Dynamic,Dynamic,RowMajor>& img) { m_img = img; }
 
 // Applies a ring on the input matrix
-MatrixXf HoughRectangle::ring(MatrixXf& img, int r_min, int r_max) {
-    MatrixXf result = img.replicate<1, 1>();
+Matrix<float,Dynamic,Dynamic,RowMajor> HoughRectangle::ring(Matrix<float,Dynamic,Dynamic,RowMajor>& img, int r_min, int r_max) {
+    Matrix<float,Dynamic,Dynamic,RowMajor> result = img.replicate<1, 1>();
     float center_x, center_y;
     if (remainder(img.cols(), 2) != 0) {
         center_x = (img.cols() - 1) / 2;
@@ -77,35 +77,35 @@ MatrixXf HoughRectangle::ring(MatrixXf& img, int r_min, int r_max) {
 }
 
 // Performs the Windowed hough transform
-MatrixXf HoughRectangle::windowed_hough(MatrixXf& img, int r_min, int r_max,
+Matrix<float,Dynamic,Dynamic,RowMajor> HoughRectangle::windowed_hough(Matrix<float,Dynamic,Dynamic,RowMajor>& img, int r_min, int r_max,
                                         int thetaBins, int rhoBins,
                                         float thetaMin, float thetaMax) {
-    MatrixXf ringed_subregion = ring(img, r_min, r_max);
-    Eigen::MatrixXf wht = hough_transform(ringed_subregion, thetaBins, rhoBins,
+    Matrix<float,Dynamic,Dynamic,RowMajor> ringed_subregion = ring(img, r_min, r_max);
+    Eigen::Matrix<float,Dynamic,Dynamic,RowMajor> wht = hough_transform(ringed_subregion, thetaBins, rhoBins,
                                           thetaMin, thetaMax);
 
     return wht;
 }
 
 // Applies the Windowed hough transform on the whole image
-MatrixXf HoughRectangle::apply_windowed_hough(MatrixXf& img, int L_window,
+Matrix<float,Dynamic,Dynamic,RowMajor> HoughRectangle::apply_windowed_hough(Matrix<float,Dynamic,Dynamic,RowMajor>& img, int L_window,
                                               int r_min, int r_max,
                                               int thetaBins, int rhoBins,
                                               float thetaMin, float thetaMax) {
     for (int i = 0; i < img.rows() - L_window; ++i) {
         for (int j = 0; j < img.cols() - L_window; ++j) {
             // Applying circular mask to local region
-            MatrixXf subregion = img.block(i, j, L_window, L_window);
+            Matrix<float,Dynamic,Dynamic,RowMajor> subregion = img.block(i, j, L_window, L_window);
         }
     }
 }
 
 // Applies the classic Hough transform
-MatrixXf HoughRectangle::hough_transform(MatrixXf& img, int thetaBins,
+Matrix<float,Dynamic,Dynamic,RowMajor> HoughRectangle::hough_transform(Matrix<float,Dynamic,Dynamic,RowMajor>& img, int thetaBins,
                                          int rhoBins, float thetaMin,
                                          float thetaMax) {
     // Define accumulator matrix, theta and rho vectors
-    MatrixXf acc = MatrixXf::Zero(rhoBins,thetaBins);  // accumulator
+    Matrix<float,Dynamic,Dynamic,RowMajor> acc = MatrixXf::Zero(rhoBins,thetaBins);  // accumulator
     VectorXf theta =
         VectorXf::LinSpaced(Sequential, thetaBins, thetaMin, thetaMax);
     std::vector<float> rho = LinearSpacedArray(
@@ -161,9 +161,9 @@ MatrixXf HoughRectangle::hough_transform(MatrixXf& img, int thetaBins,
 /*
 * Computes enhanced Hough transform
 */
-MatrixXf HoughRectangle::enhance_hough(MatrixXf& hough,int h, int w){
+Matrix<float,Dynamic,Dynamic,RowMajor> HoughRectangle::enhance_hough(Matrix<float,Dynamic,Dynamic,RowMajor>& hough,int h, int w){
 
-    MatrixXf houghpp = MatrixXf::Zero(hough.rows(),hough.cols());
+    Matrix<float,Dynamic,Dynamic,RowMajor> houghpp = MatrixXf::Zero(hough.rows(),hough.cols());
 
     for (int i = h; i < hough.rows() - h; ++i) {
         for (int j = w; j < hough.cols() - w; ++j) {
@@ -182,4 +182,24 @@ MatrixXf HoughRectangle::enhance_hough(MatrixXf& hough,int h, int w){
 
     return houghpp;
 
+}
+
+std::vector<Eigen::Index> HoughRectangle::find_local_maximum(Matrix<float,Dynamic,Dynamic,RowMajor>& hough,float threshold){
+        std::vector<Eigen::Index> idxs;
+
+        Matrix<float,Dynamic,Dynamic,RowMajor> high;
+        high.setOnes(hough.rows(),hough.cols());
+        high *= 255;
+
+        Matrix<float,Dynamic,Dynamic,RowMajor> low;
+        low.setZero(hough.rows(),hough.cols());
+
+        Matrix<float,Dynamic,Dynamic,RowMajor> tmp = (hough.array() >= threshold).select(high, low);
+
+        for (Eigen::Index i=0; i<tmp.size(); ++i){
+            if (tmp(i) >= threshold)
+                idxs.push_back(i);
+        }
+
+        return idxs;
 }
