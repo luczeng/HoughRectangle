@@ -57,7 +57,7 @@ std::vector<Index> find_local_maximum(
 }
 
 /*************************************************************************************/
-HoughRectangle::HoughRectangle(Matrix<float, Dynamic, Dynamic, RowMajor>& img, int thetaBins, int rhoBins,
+HoughRectangle::HoughRectangle(HoughRectangle::fMat & img, int thetaBins, int rhoBins,
     float thetaMin, float thetaMax) {
     m_img = img;
     m_thetaBins = thetaBins;
@@ -74,9 +74,9 @@ HoughRectangle::HoughRectangle(Matrix<float, Dynamic, Dynamic, RowMajor>& img, i
 }
 
 /*************************************************************************************/
-Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::ring(
-    Matrix<float, Dynamic, Dynamic, RowMajor>& img, int r_min, int r_max) {
-    Matrix<float, Dynamic, Dynamic, RowMajor> result = img.replicate<1, 1>();
+HoughRectangle::fMat HoughRectangle::ring(
+    HoughRectangle::fMat & img, int r_min, int r_max) {
+    HoughRectangle::fMat result = img.replicate<1, 1>();
     float center_x, center_y;
     if (remainder(img.cols(), 2) != 0) {
         center_x = (img.cols() - 1) / 2;
@@ -102,21 +102,21 @@ Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::ring(
 }
 
 /*************************************************************************************/
-Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::windowed_hough(
-    Matrix<float, Dynamic, Dynamic, RowMajor>& img, int r_min, int r_max){
+HoughRectangle::fMat HoughRectangle::windowed_hough(
+    HoughRectangle::fMat& img, int r_min, int r_max){
 
-    Matrix<float, Dynamic, Dynamic, RowMajor> ringed_subregion =
+    HoughRectangle::fMat ringed_subregion =
         ring(img, r_min, r_max);
 
-    Matrix<float, Dynamic, Dynamic, RowMajor> wht = hough_transform(
+    HoughRectangle::fMat wht = hough_transform(
         ringed_subregion);
 
     return wht;
 }
 
 /*************************************************************************************/
-Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::apply_windowed_hough(
-    Matrix<float, Dynamic, Dynamic, RowMajor>& img, int L_window, int r_min,
+HoughRectangle::fMat HoughRectangle::apply_windowed_hough(
+    fMat& img, int L_window, int r_min,
     int r_max){
     for (int i = 0; i < img.rows() - L_window; ++i) {
         for (int j = 0; j < img.cols() - L_window; ++j) {
@@ -128,11 +128,11 @@ Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::apply_windowed_hough(
 }
 
 /*************************************************************************************/
-Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::hough_transform(
-    Matrix<float, Dynamic, Dynamic, RowMajor>& img) {
+HoughRectangle::fMat HoughRectangle::hough_transform(
+    fMat& img) {
 
     // Define accumulator matrix, theta and rho vectors
-    Matrix<float, Dynamic, Dynamic, RowMajor> acc =
+    HoughRectangle::fMat acc =
         MatrixXf::Zero(m_rhoBins, m_thetaBins);  // accumulator
 
 
@@ -183,9 +183,9 @@ Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::hough_transform(
 }
 
 /*************************************************************************************/
-Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::enhance_hough(
-    Matrix<float, Dynamic, Dynamic, RowMajor>& hough, int h, int w) {
-    Matrix<float, Dynamic, Dynamic, RowMajor> houghpp =
+HoughRectangle::fMat HoughRectangle::enhance_hough(
+    HoughRectangle::fMat & hough, int h, int w) {
+    HoughRectangle::fMat houghpp =
         MatrixXf::Zero(hough.rows(), hough.cols());
 
     for (int i = h; i < hough.rows() - h; ++i) {

@@ -41,7 +41,6 @@ std::vector<Eigen::Index> find_local_maximum(Eigen::Matrix<float,Eigen::Dynamic,
  */
 class HoughRectangle{
     public:
-        Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> m_img;
         int m_thetaBins;
         int m_thetaMin;
         int m_thetaMax;
@@ -49,12 +48,16 @@ class HoughRectangle{
         Eigen::VectorXf m_theta_vec;
         std::vector<float> m_rho_vec;
 
+        typedef Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> fMat;
+
+        fMat  m_img;
+
         /*
          * Rectangle class constructor
          *
          * @param img Eigen float, Dynamic, RowMajor matrix to process
          */
-        HoughRectangle(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & img,int thetaBins = 256, int rhoBins = 256,
+        HoughRectangle(fMat & img,int thetaBins = 256, int rhoBins = 256,
     float thetaMin = -90, float thetaMax = 90); //declaration
 
     public:
@@ -68,7 +71,7 @@ class HoughRectangle{
          * @param[in]
          * @param[out] acc accumulator (hough transform)
          */
-        Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> hough_transform(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & img);
+        fMat hough_transform(fMat & img);
 
         /**
          * Performs the Windowed hough transform on a single patch
@@ -82,7 +85,7 @@ class HoughRectangle{
          * @param[in]
          * @param[out] wht hough transformed image
          */
-        Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> windowed_hough(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & img,int r_min,int r_max);
+        fMat windowed_hough(fMat & img,int r_min,int r_max);
 
         /**
          * Applies the Windowed hough transform on the whole image
@@ -96,7 +99,7 @@ class HoughRectangle{
          * @param[in]
          * @param[out]
          */
-        Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> apply_windowed_hough(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & img,int L_window,int r_min,int r_max);
+        fMat apply_windowed_hough(fMat & img,int L_window,int r_min,int r_max);
 
         /**
          * Computes enhanced Hough transform
@@ -106,7 +109,7 @@ class HoughRectangle{
          * @param[in]
          * @param[out] 
          */
-        Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> enhance_hough(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & hough,int h,int w);
+        fMat enhance_hough(fMat & hough,int h,int w);
         
         /**
          * Applies a ring on the input matrix by putting to zero all pixels outside the ring
@@ -116,7 +119,7 @@ class HoughRectangle{
          * @param[in] r_max radius of outer ring
          * @param[out] result ringed output matrix
          */
-        Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> ring(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & img,int r_min,int r_max);
+        fMat ring(fMat & img,int r_min,int r_max);
 
 
 };
