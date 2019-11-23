@@ -19,6 +19,8 @@ struct Config
     int r_min;
     int r_max;
 
+    int min_side_length;
+
 	//Method for cereal to know which member to serialize
 	template <class Archive>
 	void serialize(Archive & archive)
@@ -31,7 +33,8 @@ struct Config
             CEREAL_NVP(w),
             CEREAL_NVP(L_window),
             CEREAL_NVP(r_min),
-            CEREAL_NVP(r_max));
+            CEREAL_NVP(r_max),
+            CEREAL_NVP(min_side_length));
 	}
 
 };

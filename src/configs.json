@@ -8,6 +8,7 @@
     "w": 32,
     "L_window": 50,
     "r_min":11,
-    "r_max":61
+    "r_max":61,
+    "min_side_length":50
     }
 }

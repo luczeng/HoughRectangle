@@ -38,13 +38,13 @@ int main(int argc, char * argv[]){
     ////////////////////////////////////////////////////////////////////////
     // Load image and prepare matrix
     ////////////////////////////////////////////////////////////////////////
-    MatrixXf gray = read_image(input_path.c_str());
+    Matrix<float,Dynamic,Dynamic,RowMajor> gray = read_image(input_path.c_str());
 
     ////////////////////////////////////////////////////////////////////////
     // Process image
     ////////////////////////////////////////////////////////////////////////
     HoughRectangle ht(gray);
-    Eigen::MatrixXf wht = ht.windowed_hough(gray,config.r_min,config.r_max,config.thetaBins,config.rhoBins,config.thetaMin,config.thetaMax); 
+    Matrix<float,Dynamic,Dynamic,RowMajor> wht = ht.windowed_hough(gray,config.r_min,config.r_max,config.thetaBins,config.rhoBins,config.thetaMin,config.thetaMax); 
 
     save_image(wht,output_path,config.thetaBins*config.rhoBins,config.thetaBins,config.rhoBins);
 
