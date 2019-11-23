@@ -47,8 +47,8 @@ int main(int argc, char * argv[]){
     ////////////////////////////////////////////////////////////////////////
     // Process image
     ////////////////////////////////////////////////////////////////////////
-    HoughRectangle ht(gray);
-    Matrix<float,Dynamic,Dynamic,RowMajor> wht = ht.hough_transform(gray,config.thetaBins,config.rhoBins,config.thetaMin,config.thetaMax); 
+    HoughRectangle ht(gray,config.thetaBins,config.rhoBins,config.thetaMin,config.thetaMax);
+    Matrix<float,Dynamic,Dynamic,RowMajor> wht = ht.hough_transform(gray);
 
     save_image(wht,output_path,config.thetaBins*config.rhoBins,config.thetaBins,config.rhoBins);
 

@@ -7,6 +7,7 @@
 #include "io.hpp"
 #include "stb_image.h"
 #include "stb_image_write.h"
+#include <tuple>
 
 #define PI 3.14159265
 
@@ -47,9 +48,8 @@ std::vector<Index> find_local_maximum(
     Matrix<float, Dynamic, Dynamic, RowMajor>& hough, float threshold) {
     std::vector<Index> idxs;
 
-
-    //This loop can probably be replaced by something faster(factorized?)
-    for (Index i = 0; i <hough.size(); ++i) {
+    // This loop can probably be replaced by something faster(factorized?)
+    for (Index i = 0; i < hough.size(); ++i) {
         if (hough(i) >= threshold) idxs.push_back(i);
     }
 
@@ -57,8 +57,20 @@ std::vector<Index> find_local_maximum(
 }
 
 /*************************************************************************************/
-HoughRectangle::HoughRectangle(Matrix<float, Dynamic, Dynamic, RowMajor>& img) {
+HoughRectangle::HoughRectangle(Matrix<float, Dynamic, Dynamic, RowMajor>& img, int thetaBins, int rhoBins,
+    float thetaMin, float thetaMax) {
     m_img = img;
+    m_thetaBins = thetaBins;
+    m_thetaMin = thetaMin;
+    m_thetaMax = thetaMax;
+    m_rhoBins = rhoBins;
+
+    VectorXf m_theta_vec =
+        VectorXf::LinSpaced(Sequential, thetaBins, thetaMin, thetaMax);
+
+    std::vector<float> m_rho_vec = LinearSpacedArray(
+        -sqrt(pow(img.rows() / 2.0, 2) + pow(img.rows() / 2.0, 2)),
+        sqrt(pow(img.rows() / 2.0, 2) + pow(img.rows() / 2.0, 2)), rhoBins);
 }
 
 /*************************************************************************************/
@@ -91,14 +103,13 @@ Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::ring(
 
 /*************************************************************************************/
 Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::windowed_hough(
-    Matrix<float, Dynamic, Dynamic, RowMajor>& img, int r_min, int r_max,
-    int thetaBins, int rhoBins, float thetaMin, float thetaMax) {
+    Matrix<float, Dynamic, Dynamic, RowMajor>& img, int r_min, int r_max){
 
     Matrix<float, Dynamic, Dynamic, RowMajor> ringed_subregion =
         ring(img, r_min, r_max);
 
     Matrix<float, Dynamic, Dynamic, RowMajor> wht = hough_transform(
-        ringed_subregion, thetaBins, rhoBins, thetaMin, thetaMax);
+        ringed_subregion);
 
     return wht;
 }
@@ -106,7 +117,7 @@ Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::windowed_hough(
 /*************************************************************************************/
 Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::apply_windowed_hough(
     Matrix<float, Dynamic, Dynamic, RowMajor>& img, int L_window, int r_min,
-    int r_max, int thetaBins, int rhoBins, float thetaMin, float thetaMax) {
+    int r_max){
     for (int i = 0; i < img.rows() - L_window; ++i) {
         for (int j = 0; j < img.cols() - L_window; ++j) {
             // Applying circular mask to local region
@@ -118,16 +129,12 @@ Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::apply_windowed_hough(
 
 /*************************************************************************************/
 Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::hough_transform(
-    Matrix<float, Dynamic, Dynamic, RowMajor>& img, int thetaBins, int rhoBins,
-    float thetaMin, float thetaMax) {
+    Matrix<float, Dynamic, Dynamic, RowMajor>& img) {
+
     // Define accumulator matrix, theta and rho vectors
     Matrix<float, Dynamic, Dynamic, RowMajor> acc =
-        MatrixXf::Zero(rhoBins, thetaBins);  // accumulator
-    VectorXf theta =
-        VectorXf::LinSpaced(Sequential, thetaBins, thetaMin, thetaMax);
-    std::vector<float> rho = LinearSpacedArray(
-        -sqrt(pow(img.rows() / 2.0, 2) + pow(img.rows() / 2.0, 2)),
-        sqrt(pow(img.rows() / 2.0, 2) + pow(img.rows() / 2.0, 2)), rhoBins);
+        MatrixXf::Zero(m_rhoBins, m_thetaBins);  // accumulator
+
 
     // Cartesian coordinate vectors
     VectorXi vecX =
@@ -140,21 +147,21 @@ Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::hough_transform(
     vecY = vecY.array() - mid_Y;
 
     // Pre-compute cosines and sinuses:
-    VectorXf cosT = cos(theta.array() * PI / 180.0);
-    VectorXf sinT = sin(theta.array() * PI / 180.0);
+    VectorXf cosT = cos(m_theta_vec.array() * PI / 180.0);
+    VectorXf sinT = sin(m_theta_vec.array() * PI / 180.0);
 
     // Compute Hough transform
     for (int i = 0; i < img.rows(); ++i) {
         for (int j = 0; j < img.cols(); ++j) {
             if (img(i, j) != 0) {
                 // generate sinusoidal curve
-                for (int k = 0; k < theta.size(); ++k) {
+                for (int k = 0; k < m_theta_vec.size(); ++k) {
                     // Calculate rho value
                     float rho_tmp = (vecX[j] * cosT[k] + vecY[i] * sinT[k]);
 
                     std::vector<float>::iterator idx;
-                    idx = std::lower_bound(rho.begin(), rho.end(), rho_tmp);
-                    int idx_rho = idx - rho.begin() - 1;
+                    idx = std::lower_bound(m_rho_vec.begin(), m_rho_vec.end(), rho_tmp);
+                    int idx_rho = idx - m_rho_vec.begin() - 1;
                     // std::cout <<rho_tmp<<std::endl;
                     if (idx_rho < 0) {
                         idx_rho = 0;

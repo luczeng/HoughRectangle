@@ -2,6 +2,7 @@
 #define PROCESS_IMAGE_H
 #include <Eigen/Dense>
 #include "config.hpp"
+#include <tuple>
 
 /**
  * Function to make sure binary is 0 and 255
@@ -18,7 +19,7 @@ void normalise_img(Eigen::MatrixXf & img);
  * @param N number of bins
  * @return vector<float> 
  */
-vector<float> LinearSpacedArray(float a, float b, std::size_t N);
+std::vector<float> LinearSpacedArray(float a, float b, std::size_t N);
 
 
 /*
@@ -41,13 +42,20 @@ std::vector<Eigen::Index> find_local_maximum(Eigen::Matrix<float,Eigen::Dynamic,
 class HoughRectangle{
     public:
         Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> m_img;
+        int m_thetaBins;
+        int m_thetaMin;
+        int m_thetaMax;
+        int m_rhoBins;
+        Eigen::VectorXf m_theta_vec;
+        std::vector<float> m_rho_vec;
 
         /*
          * Rectangle class constructor
          *
          * @param img Eigen float, Dynamic, RowMajor matrix to process
          */
-        HoughRectangle(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & img); //declaration
+        HoughRectangle(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & img,int thetaBins = 256, int rhoBins = 256,
+    float thetaMin = -90, float thetaMax = 90); //declaration
 
     public:
         /**
@@ -60,7 +68,7 @@ class HoughRectangle{
          * @param[in]
          * @param[out] acc accumulator (hough transform)
          */
-        Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> hough_transform(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & img, int thetaBins, int rhoBins,float  thetaMin,float thetaMax);
+        Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> hough_transform(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & img);
 
         /**
          * Performs the Windowed hough transform on a single patch
@@ -74,7 +82,7 @@ class HoughRectangle{
          * @param[in]
          * @param[out] wht hough transformed image
          */
-        Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> windowed_hough(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & img,int r_min,int r_max, int thetaBins, int rhoBins,float  thetaMin,float thetaMax);
+        Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> windowed_hough(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & img,int r_min,int r_max);
 
         /**
          * Applies the Windowed hough transform on the whole image
@@ -88,7 +96,7 @@ class HoughRectangle{
          * @param[in]
          * @param[out]
          */
-        Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> apply_windowed_hough(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & img,int L_window,int r_min,int r_max, int thetaBins, int rhoBins,float  thetaMin,float thetaMax);
+        Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> apply_windowed_hough(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & img,int L_window,int r_min,int r_max);
 
         /**
          * Computes enhanced Hough transform
