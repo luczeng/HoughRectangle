@@ -12,11 +12,10 @@
 
 using namespace Eigen;
 
+/*************************************************************************************/
 void Log(const char* message) { std::cout << message << std::endl; }
 
-/*
- * Function to make sure binary is 0 and 255
- */
+/*************************************************************************************/
 void normalise_img(Matrix<float, Dynamic, Dynamic, RowMajor>& img) {
     Matrix<float, Dynamic, Dynamic, RowMajor> high;
     high.setOnes(img.rows(), img.cols());
@@ -31,9 +30,7 @@ void normalise_img(Matrix<float, Dynamic, Dynamic, RowMajor>& img) {
     img = tmp;
 }
 
-/*
- * Returns a linearly spaced array
- */
+/*************************************************************************************/
 std::vector<float> LinearSpacedArray(float a, float b, std::size_t N) {
     double h = (b - a) / static_cast<float>(N - 1);
     std::vector<float> xs(N);
@@ -45,12 +42,26 @@ std::vector<float> LinearSpacedArray(float a, float b, std::size_t N) {
     return xs;
 }
 
-// Rectangle class constructor
+/*************************************************************************************/
+std::vector<Index> find_local_maximum(
+    Matrix<float, Dynamic, Dynamic, RowMajor>& hough, float threshold) {
+    std::vector<Index> idxs;
+
+
+    //This loop can probably be replaced by something faster(factorized?)
+    for (Index i = 0; i <hough.size(); ++i) {
+        if (hough(i) >= threshold) idxs.push_back(i);
+    }
+
+    return idxs;
+}
+
+/*************************************************************************************/
 HoughRectangle::HoughRectangle(Matrix<float, Dynamic, Dynamic, RowMajor>& img) {
     m_img = img;
 }
 
-// Applies a ring on the input matrix
+/*************************************************************************************/
 Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::ring(
     Matrix<float, Dynamic, Dynamic, RowMajor>& img, int r_min, int r_max) {
     Matrix<float, Dynamic, Dynamic, RowMajor> result = img.replicate<1, 1>();
@@ -78,19 +89,21 @@ Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::ring(
     return result;
 }
 
-// Performs the Windowed hough transform
+/*************************************************************************************/
 Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::windowed_hough(
     Matrix<float, Dynamic, Dynamic, RowMajor>& img, int r_min, int r_max,
     int thetaBins, int rhoBins, float thetaMin, float thetaMax) {
+
     Matrix<float, Dynamic, Dynamic, RowMajor> ringed_subregion =
         ring(img, r_min, r_max);
+
     Matrix<float, Dynamic, Dynamic, RowMajor> wht = hough_transform(
         ringed_subregion, thetaBins, rhoBins, thetaMin, thetaMax);
 
     return wht;
 }
 
-// Applies the Windowed hough transform on the whole image
+/*************************************************************************************/
 Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::apply_windowed_hough(
     Matrix<float, Dynamic, Dynamic, RowMajor>& img, int L_window, int r_min,
     int r_max, int thetaBins, int rhoBins, float thetaMin, float thetaMax) {
@@ -103,7 +116,7 @@ Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::apply_windowed_hough(
     }
 }
 
-// Applies the classic Hough transform
+/*************************************************************************************/
 Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::hough_transform(
     Matrix<float, Dynamic, Dynamic, RowMajor>& img, int thetaBins, int rhoBins,
     float thetaMin, float thetaMax) {
@@ -162,9 +175,7 @@ Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::hough_transform(
     return acc;
 }
 
-/*
- * Computes enhanced Hough transform
- */
+/*************************************************************************************/
 Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::enhance_hough(
     Matrix<float, Dynamic, Dynamic, RowMajor>& hough, int h, int w) {
     Matrix<float, Dynamic, Dynamic, RowMajor> houghpp =
@@ -188,18 +199,3 @@ Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::enhance_hough(
     return houghpp;
 }
 
-/*
- * Finds position of all elements superior to threshold
- */
-std::vector<Index> HoughRectangle::find_local_maximum(
-    Matrix<float, Dynamic, Dynamic, RowMajor>& hough, float threshold) {
-    std::vector<Index> idxs;
-
-
-    //This loop can probably be replaced by something faster(factorized?)
-    for (Index i = 0; i <hough.size(); ++i) {
-        if (hough(i) >= threshold) idxs.push_back(i);
-    }
-
-    return idxs;
-}

@@ -46,8 +46,8 @@ TEST_CASE("Test functions to compute the Hough Rectangle function") {
         idxs = {7, 14, 16, 18};
 
         //std::cout<<img<<std::endl;
-        HoughRectangle ht(img);
-        std::vector<Eigen::Index> max_pos = ht.find_local_maximum(img,8);
+        //HoughRectangle ht(img);
+        std::vector<Eigen::Index> max_pos = find_local_maximum(img,8);
 
         REQUIRE(idxs == max_pos);
     }
