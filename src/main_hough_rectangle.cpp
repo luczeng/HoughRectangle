@@ -48,8 +48,8 @@ int main(int argc, char* argv[]) {
     ////////////////////////////////////////////////////////////////////////
     // Perform Hough transform
     ////////////////////////////////////////////////////////////////////////
-    HoughRectangle ht(gray);
-    ht.windowed_hough(gray,config.r_min,config.r_max,config.thetaBins,config.rhoBins,config.thetaMin,config.thetaMax);
+    HoughRectangle ht(gray,config.thetaBins,config.rhoBins,config.thetaMin,config.thetaMax);
+    ht.windowed_hough(gray,config.r_min,config.r_max);
 
     return 0;
 }

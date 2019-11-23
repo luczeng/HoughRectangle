@@ -11,10 +11,14 @@
 
 TEST_CASE("Test functions to compute the Hough Rectangle function") {
     SECTION("Tests the ring mask") {
-        // Ground truth
+
+        //Input
         Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> img =
             ((1 + Eigen::MatrixXf::Random(7, 7).array() / 2) * 10).round();
+
+        // Ground truth
         Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> img_gt = img.replicate<1, 1>();
+
         img_gt(0, 0) = 0, img_gt(0, 1) = 0, img_gt(0, 2) = 0, img_gt(0, 4) = 0,
                   img_gt(0, 5) = 0, img_gt(0, 6) = 0;
         img_gt(1, 6) = 0, img_gt(2, 6) = 0, img_gt(4, 6) = 0, img_gt(5, 6) = 0,
@@ -45,9 +49,8 @@ TEST_CASE("Test functions to compute the Hough Rectangle function") {
         std::vector<Eigen::Index> idxs;
         idxs = {7, 14, 16, 18};
 
-        //std::cout<<img<<std::endl;
-        HoughRectangle ht(img);
-        std::vector<Eigen::Index> max_pos = ht.find_local_maximum(img,8);
+        //HoughRectangle ht(img);
+        std::vector<Eigen::Index> max_pos = find_local_maximum(img,8);
 
         REQUIRE(idxs == max_pos);
     }

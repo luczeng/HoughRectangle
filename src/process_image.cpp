@@ -7,16 +7,16 @@
 #include "io.hpp"
 #include "stb_image.h"
 #include "stb_image_write.h"
+#include <tuple>
 
 #define PI 3.14159265
 
 using namespace Eigen;
 
+/*************************************************************************************/
 void Log(const char* message) { std::cout << message << std::endl; }
 
-/*
- * Function to make sure binary is 0 and 255
- */
+/*************************************************************************************/
 void normalise_img(Matrix<float, Dynamic, Dynamic, RowMajor>& img) {
     Matrix<float, Dynamic, Dynamic, RowMajor> high;
     high.setOnes(img.rows(), img.cols());
@@ -31,9 +31,7 @@ void normalise_img(Matrix<float, Dynamic, Dynamic, RowMajor>& img) {
     img = tmp;
 }
 
-/*
- * Returns a linearly spaced array
- */
+/*************************************************************************************/
 std::vector<float> LinearSpacedArray(float a, float b, std::size_t N) {
     double h = (b - a) / static_cast<float>(N - 1);
     std::vector<float> xs(N);
@@ -45,15 +43,40 @@ std::vector<float> LinearSpacedArray(float a, float b, std::size_t N) {
     return xs;
 }
 
-// Rectangle class constructor
-HoughRectangle::HoughRectangle(Matrix<float, Dynamic, Dynamic, RowMajor>& img) {
-    m_img = img;
+/*************************************************************************************/
+std::vector<Index> find_local_maximum(
+    Matrix<float, Dynamic, Dynamic, RowMajor>& hough, float threshold) {
+    std::vector<Index> idxs;
+
+    // This loop can probably be replaced by something faster(factorized?)
+    for (Index i = 0; i < hough.size(); ++i) {
+        if (hough(i) >= threshold) idxs.push_back(i);
+    }
+
+    return idxs;
 }
 
-// Applies a ring on the input matrix
-Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::ring(
-    Matrix<float, Dynamic, Dynamic, RowMajor>& img, int r_min, int r_max) {
-    Matrix<float, Dynamic, Dynamic, RowMajor> result = img.replicate<1, 1>();
+/*************************************************************************************/
+HoughRectangle::HoughRectangle(HoughRectangle::fMat & img, int thetaBins, int rhoBins,
+    float thetaMin, float thetaMax) {
+    m_img = img;
+    m_thetaBins = thetaBins;
+    m_thetaMin = thetaMin;
+    m_thetaMax = thetaMax;
+    m_rhoBins = rhoBins;
+
+    VectorXf m_theta_vec =
+        VectorXf::LinSpaced(Sequential, thetaBins, thetaMin, thetaMax);
+
+    std::vector<float> m_rho_vec = LinearSpacedArray(
+        -sqrt(pow(img.rows() / 2.0, 2) + pow(img.rows() / 2.0, 2)),
+        sqrt(pow(img.rows() / 2.0, 2) + pow(img.rows() / 2.0, 2)), rhoBins);
+}
+
+/*************************************************************************************/
+HoughRectangle::fMat HoughRectangle::ring(
+    HoughRectangle::fMat & img, int r_min, int r_max) {
+    HoughRectangle::fMat result = img.replicate<1, 1>();
     float center_x, center_y;
     if (remainder(img.cols(), 2) != 0) {
         center_x = (img.cols() - 1) / 2;
@@ -78,22 +101,23 @@ Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::ring(
     return result;
 }
 
-// Performs the Windowed hough transform
-Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::windowed_hough(
-    Matrix<float, Dynamic, Dynamic, RowMajor>& img, int r_min, int r_max,
-    int thetaBins, int rhoBins, float thetaMin, float thetaMax) {
-    Matrix<float, Dynamic, Dynamic, RowMajor> ringed_subregion =
+/*************************************************************************************/
+HoughRectangle::fMat HoughRectangle::windowed_hough(
+    HoughRectangle::fMat& img, int r_min, int r_max){
+
+    HoughRectangle::fMat ringed_subregion =
         ring(img, r_min, r_max);
-    Matrix<float, Dynamic, Dynamic, RowMajor> wht = hough_transform(
-        ringed_subregion, thetaBins, rhoBins, thetaMin, thetaMax);
+
+    HoughRectangle::fMat wht = hough_transform(
+        ringed_subregion);
 
     return wht;
 }
 
-// Applies the Windowed hough transform on the whole image
-Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::apply_windowed_hough(
-    Matrix<float, Dynamic, Dynamic, RowMajor>& img, int L_window, int r_min,
-    int r_max, int thetaBins, int rhoBins, float thetaMin, float thetaMax) {
+/*************************************************************************************/
+HoughRectangle::fMat HoughRectangle::apply_windowed_hough(
+    fMat& img, int L_window, int r_min,
+    int r_max){
     for (int i = 0; i < img.rows() - L_window; ++i) {
         for (int j = 0; j < img.cols() - L_window; ++j) {
             // Applying circular mask to local region
@@ -103,18 +127,14 @@ Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::apply_windowed_hough(
     }
 }
 
-// Applies the classic Hough transform
-Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::hough_transform(
-    Matrix<float, Dynamic, Dynamic, RowMajor>& img, int thetaBins, int rhoBins,
-    float thetaMin, float thetaMax) {
+/*************************************************************************************/
+HoughRectangle::fMat HoughRectangle::hough_transform(
+    fMat& img) {
+
     // Define accumulator matrix, theta and rho vectors
-    Matrix<float, Dynamic, Dynamic, RowMajor> acc =
-        MatrixXf::Zero(rhoBins, thetaBins);  // accumulator
-    VectorXf theta =
-        VectorXf::LinSpaced(Sequential, thetaBins, thetaMin, thetaMax);
-    std::vector<float> rho = LinearSpacedArray(
-        -sqrt(pow(img.rows() / 2.0, 2) + pow(img.rows() / 2.0, 2)),
-        sqrt(pow(img.rows() / 2.0, 2) + pow(img.rows() / 2.0, 2)), rhoBins);
+    HoughRectangle::fMat acc =
+        MatrixXf::Zero(m_rhoBins, m_thetaBins);  // accumulator
+
 
     // Cartesian coordinate vectors
     VectorXi vecX =
@@ -127,21 +147,21 @@ Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::hough_transform(
     vecY = vecY.array() - mid_Y;
 
     // Pre-compute cosines and sinuses:
-    VectorXf cosT = cos(theta.array() * PI / 180.0);
-    VectorXf sinT = sin(theta.array() * PI / 180.0);
+    VectorXf cosT = cos(m_theta_vec.array() * PI / 180.0);
+    VectorXf sinT = sin(m_theta_vec.array() * PI / 180.0);
 
     // Compute Hough transform
     for (int i = 0; i < img.rows(); ++i) {
         for (int j = 0; j < img.cols(); ++j) {
             if (img(i, j) != 0) {
                 // generate sinusoidal curve
-                for (int k = 0; k < theta.size(); ++k) {
+                for (int k = 0; k < m_theta_vec.size(); ++k) {
                     // Calculate rho value
                     float rho_tmp = (vecX[j] * cosT[k] + vecY[i] * sinT[k]);
 
                     std::vector<float>::iterator idx;
-                    idx = std::lower_bound(rho.begin(), rho.end(), rho_tmp);
-                    int idx_rho = idx - rho.begin() - 1;
+                    idx = std::lower_bound(m_rho_vec.begin(), m_rho_vec.end(), rho_tmp);
+                    int idx_rho = idx - m_rho_vec.begin() - 1;
                     // std::cout <<rho_tmp<<std::endl;
                     if (idx_rho < 0) {
                         idx_rho = 0;
@@ -162,12 +182,10 @@ Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::hough_transform(
     return acc;
 }
 
-/*
- * Computes enhanced Hough transform
- */
-Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::enhance_hough(
-    Matrix<float, Dynamic, Dynamic, RowMajor>& hough, int h, int w) {
-    Matrix<float, Dynamic, Dynamic, RowMajor> houghpp =
+/*************************************************************************************/
+HoughRectangle::fMat HoughRectangle::enhance_hough(
+    HoughRectangle::fMat & hough, int h, int w) {
+    HoughRectangle::fMat houghpp =
         MatrixXf::Zero(hough.rows(), hough.cols());
 
     for (int i = h; i < hough.rows() - h; ++i) {
@@ -188,18 +206,3 @@ Matrix<float, Dynamic, Dynamic, RowMajor> HoughRectangle::enhance_hough(
     return houghpp;
 }
 
-/*
- * Finds position of all elements superior to threshold
- */
-std::vector<Index> HoughRectangle::find_local_maximum(
-    Matrix<float, Dynamic, Dynamic, RowMajor>& hough, float threshold) {
-    std::vector<Index> idxs;
-
-
-    //This loop can probably be replaced by something faster(factorized?)
-    for (Index i = 0; i <hough.size(); ++i) {
-        if (hough(i) >= threshold) idxs.push_back(i);
-    }
-
-    return idxs;
-}
