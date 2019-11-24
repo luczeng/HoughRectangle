@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 #include "config.hpp"
 #include <tuple>
+#include <array>
 
 /**
  * Function to make sure binary is 0 and 255
@@ -30,7 +31,7 @@ std::vector<float> LinearSpacedArray(float a, float b, std::size_t N);
  * @float threshold float
  * @return vector of Eigen::Index of the positions where hough is more than threshold
  */
-std::vector<Eigen::Index> find_local_maximum(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & img,float threshold);
+std::vector<std::array<int,2>> find_local_maximum(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & img,float threshold);
 
 /**
  *
@@ -41,7 +42,7 @@ std::vector<Eigen::Index> find_local_maximum(Eigen::Matrix<float,Eigen::Dynamic,
  *
  */
 class HoughRectangle{
-    public:
+    private:
         int m_thetaBins;
         int m_thetaMin;
         int m_thetaMax;
@@ -49,15 +50,15 @@ class HoughRectangle{
         Eigen::VectorXf m_theta_vec;
         std::vector<float> m_rho_vec;
 
-        typedef Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> fMat;
+        Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> m_img;
 
-        fMat  m_img;
-
+    public:
         /*
          * Rectangle class constructor
          *
          * @param img Eigen float, Dynamic, RowMajor matrix to process
          */
+        typedef Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> fMat;
         HoughRectangle(fMat & img,int thetaBins = 256, int rhoBins = 256,
     float thetaMin = -90, float thetaMax = 90); //declaration
 
@@ -121,6 +122,14 @@ class HoughRectangle{
          * @param[out] result ringed output matrix
          */
         fMat ring(fMat & img,int r_min,int r_max);
+        
+        
+        /**
+         * Returns vectors of theta and rho positions corresponding to the input indexes
+         *
+         *
+         */
+        std::tuple<std::vector<float>,std::vector<float>> index_rho_theta(std::vector<std::array<int,2>> indexes);
 
 
 };

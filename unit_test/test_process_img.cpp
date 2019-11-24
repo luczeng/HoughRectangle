@@ -8,6 +8,11 @@
 #include "stb_image.h"
 #include "stb_image_write.h"
 #include "string"
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/json.hpp>
+#include <cereal/cereal.hpp>
+#include "config.hpp"
+#include <array>
 
 TEST_CASE("Test functions to compute the Hough Rectangle function") {
     SECTION("Tests the ring mask") {
@@ -46,12 +51,47 @@ TEST_CASE("Test functions to compute the Hough Rectangle function") {
         img << 1, 2, 4, 5, 5, 5, 3, 9, 2, 5, 4, 2, 6, 5, 9, 3, 9, 1, 8, 2;
 
         // Ground truth
-        std::vector<Eigen::Index> idxs;
-        idxs = {7, 14, 16, 18};
+        std::vector<std::array<int,2>> idxs;
+        idxs.push_back({1,2});
+        idxs.push_back({2,4});
+        idxs.push_back({3,1});
+        idxs.push_back({3,3});
 
         //HoughRectangle ht(img);
-        std::vector<Eigen::Index> max_pos = find_local_maximum(img,8);
+        std::vector<std::array<int,2>> max_pos = find_local_maximum(img,8);
 
         REQUIRE(idxs == max_pos);
+    }
+
+    SECTION("Test the peak detection"){
+        HoughRectangle::fMat  gray = read_image("../img/rectangle1.png");
+
+        // Parse config file
+        Config config;
+        std::ifstream is("../src/configs.json");
+        cereal::JSONInputArchive archive(is);
+        archive(config);
+
+        // 
+        int thetaBins =100;
+        int thetaMin = -90;
+        int thetaMax = 90;
+        int rhoBins =100;
+
+        // Process image
+        HoughRectangle ht(gray,thetaBins,rhoBins,thetaMin,thetaMax);
+        HoughRectangle::fMat wht = ht.hough_transform(gray);
+        HoughRectangle::fMat eht = ht.enhance_hough(wht,20,20);
+
+        std::vector<std::array<int,2>> indexes = find_local_maximum(eht,100);
+        std::cout<<"Detected "<<indexes.size()<<" points"<<std::endl;
+        std::vector<float> rho_maxs, theta_maxs;
+        std::tie(rho_maxs,theta_maxs) =ht.index_rho_theta(indexes);
+
+        //for (int i=0;i<rho_maxs.size();++i){
+            //std::cout<< i <<" "<<rho_maxs[i] << " "<<theta_maxs[i]<<std::endl;
+        //}
+
+
     }
 }

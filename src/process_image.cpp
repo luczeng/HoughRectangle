@@ -8,6 +8,7 @@
 #include "stb_image.h"
 #include "stb_image_write.h"
 #include <tuple>
+#include <array>
 
 #define PI 3.14159265
 
@@ -45,14 +46,20 @@ std::vector<float> LinearSpacedArray(float a, float b, std::size_t N) {
 }
 
 /*************************************************************************************/
-std::vector<Index> find_local_maximum(
+std::vector<std::array<int,2>> find_local_maximum(
     Matrix<float, Dynamic, Dynamic, RowMajor>& hough, float threshold) {
-    std::vector<Index> idxs;
+    std::vector<std::array<int,2>> idxs;
 
     // This loop can probably be replaced by something faster(factorized?)
     // TODO(luczeng): what about std::max_element?
-    for (Index i = 0; i < hough.size(); ++i) {
-        if (hough(i) >= threshold) idxs.push_back(i);
+    //for (Index i = 0; i < hough.size(); ++i) {
+    for (int i =0;i<hough.rows();++i){
+        for (int j =0; j<hough.cols();++j){
+            if (hough(i,j) >= threshold){
+                std::array<int,2> x = {i,j};
+                idxs.push_back(x);
+            }
+        }
     }
 
     return idxs;
@@ -67,12 +74,13 @@ HoughRectangle::HoughRectangle(HoughRectangle::fMat & img, int thetaBins, int rh
     m_thetaMax = thetaMax;
     m_rhoBins = rhoBins;
 
-    VectorXf m_theta_vec =
+    m_theta_vec =
         VectorXf::LinSpaced(Sequential, thetaBins, thetaMin, thetaMax);
 
-    std::vector<float> m_rho_vec = LinearSpacedArray(
+    m_rho_vec = LinearSpacedArray(
         -sqrt(pow(img.rows() / 2.0, 2) + pow(img.rows() / 2.0, 2)),
         sqrt(pow(img.rows() / 2.0, 2) + pow(img.rows() / 2.0, 2)), rhoBins);
+
 }
 
 /*************************************************************************************/
@@ -141,7 +149,6 @@ HoughRectangle::fMat HoughRectangle::hough_transform(
     HoughRectangle::fMat acc =
         MatrixXf::Zero(m_rhoBins, m_thetaBins);  // accumulator
 
-
     // Cartesian coordinate vectors
     VectorXi vecX =
         VectorXi::LinSpaced(Sequential, img.cols(), 0, img.cols() - 1);
@@ -166,7 +173,7 @@ HoughRectangle::fMat HoughRectangle::hough_transform(
                     float rho_tmp = (vecX[j] * cosT[k] + vecY[i] * sinT[k]);
 
                     std::vector<float>::iterator idx;
-                    idx = std::lower_bound(m_rho_vec.begin(), m_rho_vec.end(), rho_tmp);
+                    idx = std::lower_bound(m_rho_vec.begin(), m_rho_vec.end(), rho_tmp); //could be replaced 
                     int idx_rho = idx - m_rho_vec.begin() - 1;
                     // std::cout <<rho_tmp<<std::endl;
                     if (idx_rho < 0) {
@@ -212,3 +219,16 @@ HoughRectangle::fMat HoughRectangle::enhance_hough(
     return houghpp;
 }
 
+/*************************************************************************************/
+std::tuple<std::vector<float>,std::vector<float>> HoughRectangle::index_rho_theta(std::vector<std::array<int,2>> indexes){
+
+    std::vector<float> rho_max(indexes.size());
+    std::vector<float> theta_max(indexes.size());
+
+    for (int i = 0; i < indexes.size(); ++i) {
+        rho_max[i] = m_rho_vec[indexes[i][0]];
+        theta_max[i] = m_theta_vec(indexes[i][1]);
+    }
+
+    return std::make_tuple(rho_max,theta_max);
+}
