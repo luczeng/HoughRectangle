@@ -10,6 +10,8 @@ void convert_Mat2RawBuff(
     Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> gray,
     std::unique_ptr<unsigned char[]> &gray_UC, int size);
 
+
+// TODO(luczeng): usually, you take std::strings by const reference, unless there is a good reason not to
 int save_image(Eigen::MatrixXf img, std::string filename, int size, int x,
                int y);
 

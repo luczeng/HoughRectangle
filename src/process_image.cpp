@@ -31,6 +31,7 @@ void normalise_img(Matrix<float, Dynamic, Dynamic, RowMajor>& img) {
     img = tmp;
 }
 
+// TODO(luczeng): maybe give credit to the original author ;)
 /*************************************************************************************/
 std::vector<float> LinearSpacedArray(float a, float b, std::size_t N) {
     double h = (b - a) / static_cast<float>(N - 1);
@@ -49,6 +50,7 @@ std::vector<Index> find_local_maximum(
     std::vector<Index> idxs;
 
     // This loop can probably be replaced by something faster(factorized?)
+    // TODO(luczeng): what about std::max_element?
     for (Index i = 0; i < hough.size(); ++i) {
         if (hough(i) >= threshold) idxs.push_back(i);
     }
@@ -121,10 +123,13 @@ HoughRectangle::fMat HoughRectangle::apply_windowed_hough(
     for (int i = 0; i < img.rows() - L_window; ++i) {
         for (int j = 0; j < img.cols() - L_window; ++j) {
             // Applying circular mask to local region
+            // TODO(luczeng): This is weird. You keep overwriting a local variable.
             Matrix<float, Dynamic, Dynamic, RowMajor> subregion =
                 img.block(i, j, L_window, L_window);
         }
     }
+    // TODO(luczeng): return something?
+    return HoughRectangle::fMat{};
 }
 
 /*************************************************************************************/
@@ -132,6 +137,7 @@ HoughRectangle::fMat HoughRectangle::hough_transform(
     fMat& img) {
 
     // Define accumulator matrix, theta and rho vectors
+    // TODO(luczeng): please give your users the freedom to pass in their self-allocated matrix. They might want to reuse memory and thus save a lot of time (if fMat is big).
     HoughRectangle::fMat acc =
         MatrixXf::Zero(m_rhoBins, m_thetaBins);  // accumulator
 
