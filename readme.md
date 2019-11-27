@@ -10,15 +10,22 @@ The work is currently in progress. Stay tuned for progress!
 - cmake >3.11.4
 
 ## Usage
+For now, the code only accepts **_png_** images. The input image is expected to be an _edge detected image_.  
+
 ```
 mkdir build 
 cd build
 cmake ..
 make
-./HoughRectangle -i ../img/LenaBinary.jpg -o output_img.jpg
+./HoughRectangle -i ../img/LenaBinary.png-o output_img.png
 ```
 
 Modify parameters algorithms parameters in src/configs.json 
+
+Some python opencv scripts in "utils" folder are provided to facilitate usage. Require opencv and matplolib. Call `-h`for help. :  
+-`detect_edges`: applies Canny edge detection algorithm to input.  
+-`create_rectangle`: creates some dummy rectangles, with or without an angle.  
+-`display`: calls matplotlib on input image
 
 ## Algorithm
 The Hough rectangle detection algorithm relies on detecting specific patterns in the Hough domain, as illustrated below:
@@ -29,8 +36,9 @@ Rectangle            |  Corresponding Hough pattern
 
 
 ## Project status:
-- Hough transform : done
-- Enhanced Hough transform : done
-- Windowed Hough transform : done
-- Hough rectangle detection : in progress
+- Hough transform: done
+- Enhanced Hough transform: done
+- Windowed Hough transform: done
+- Peak detection: done
+- Hough rectangle detection: in progress (expected mid-december 2019)
 
