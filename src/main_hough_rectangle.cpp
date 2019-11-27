@@ -1,4 +1,6 @@
 #include <iostream>
+// TODO(luczeng): It's always a bit hacky to make #include depend on specific #define statements.
+//                Better encapsulate in a seperate header
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <Eigen/Dense>
@@ -14,7 +16,10 @@
 #include "stb_image_write.h"
 #include "string"
 
-using namespace Eigen;
+// TODO(luczeng): better to use separate using clauses, otherwise you quickly get name clashes.
+using Eigen::Matrix;
+using Eigen::Dynamic;
+using Eigen::RowMajor;
 
 int main(int argc, char* argv[]) {
     // Nota bene: casting big images to unsigned char in Eigen result in a
@@ -22,6 +27,8 @@ int main(int argc, char* argv[]) {
     // complains that the array is too big. We have therefore chosen the
     // following way to convert Eigen matrix to unsigned char *
 
+
+    // TODO(luczeng): personal preference, but these type of comments scare me :p just a oneliner should be enough
     ////////////////////////////////////////////////////////////////////////
     // Parse arguments
     ////////////////////////////////////////////////////////////////////////

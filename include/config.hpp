@@ -1,10 +1,16 @@
+
+// TODO(luczeng): alternative to header guards: '#pragma once' is understood by almost all compilers
+//                and you don't need the last '#ifdef' then.
 #ifndef CONFIG_H
 #define CONFIG_H
 #include <cereal/cereal.hpp>
 
+// TODO(luczeng): you should probably wrap your library in a seperate namespace, as follows:
+// namespace Hough {
+
 struct Config
 {
-	public:
+	public: // TODO(luczeng): in a struct, all data members and member functions are public so this is unnecessary
 	int thetaBins;
 	int rhoBins;
 
@@ -22,7 +28,7 @@ struct Config
     int min_side_length;
 
 	//Method for cereal to know which member to serialize
-	template <class Archive>
+	template <class Archive> // TODO(luczeng): I prefer 'typename' for templates but that's a personal choice
 	void serialize(Archive & archive)
 	{
 		archive(CEREAL_NVP(thetaBins),

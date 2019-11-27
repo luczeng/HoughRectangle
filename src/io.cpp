@@ -5,6 +5,7 @@
 #include "stb_image.h"
 #include "string"
 
+// TODO(luczeng): use specific using clauses
 using namespace Eigen;
 
 /**
@@ -16,6 +17,9 @@ using namespace Eigen;
  *
  *  \return gray eigen float matrix
  */
+// TODO(luczeng): why do you pass in a unique_ptr by reference? Just pass the pointer, passing the unique pointer does not give you any extra advantage, and it is confusing.
+//                std::unique_ptr are very useful inside classes, not so much as arguments to functions.
+// TODO(luczeng): use return type for gray, not output argument.
 void convert_RawBuff2Mat(std::unique_ptr<unsigned char[]> &data, MatrixXf &gray,
                          int x, int y) {
     const int nx = x;
@@ -51,6 +55,7 @@ void convert_Mat2RawBuff(Matrix<float, Dynamic, Dynamic, RowMajor> gray,
  * \param y int, y dimension
  *
  */
+// TODO(luczeng): don't make a copy of 'img' here, it will cost you a lot of time if the Matrix is big. Better pass it by reference or by pointer.
 int save_image(MatrixXf img, std::string filename, int size, int x, int y) {
     // Normalise to 0-255
     img = img / img.maxCoeff() * 255;
@@ -77,6 +82,7 @@ MatrixXf read_image(std::string filename) {
         stbi_load(filename.c_str(), &x, &y, &n, 0));
 
     if (data == NULL) {
+        // TODO(luczeng): std::cerr instead of std::cout?
         std::cout << "Can't load image" << std::endl;
     }
 

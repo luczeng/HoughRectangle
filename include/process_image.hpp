@@ -19,6 +19,7 @@ void normalise_img(Eigen::MatrixXf & img);
  * @param N number of bins
  * @return vector<float> 
  */
+// TODO(luczeng): this is a perfect use case for a template
 std::vector<float> LinearSpacedArray(float a, float b, std::size_t N);
 
 
