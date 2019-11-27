@@ -1,4 +1,5 @@
 #include "process_image.hpp"
+#include <stdlib.h>
 #include <math.h>
 #include <stdlib.h>
 #include <Eigen/Dense>
@@ -231,4 +232,47 @@ std::tuple<std::vector<float>,std::vector<float>> HoughRectangle::index_rho_thet
     }
 
     return std::make_tuple(rho_max,theta_max);
+}
+
+/*************************************************************************************/
+std::vector<std::array<float,3>> HoughRectangle::match_maximums(std::vector<float> & rho_maxs,std::vector<float> &theta_maxs,float T_t,float T_rho,float T_L,float T_alpha){
+
+    std::vector<std::array<float,3>> rectangles;
+
+    //Match peaks into pairs
+    std::vector<Matrix<float,1,2>> pairs;
+    Matrix<float,1,2> pair;
+    for (int i=0;i<rho_maxs.size();++i) {
+        for (int j=0;j<rho_maxs.size();++j) {
+            //Parralelism
+            if (abs(theta_maxs[i] - theta_maxs[j]) > T_t) continue;
+
+            //Symmetry wrt x axis
+            if (abs(rho_maxs[i] + rho_maxs[j]) > T_rho) continue;
+
+            //Approximately same length
+
+            //Construct extended peak
+            pair(0,0) = 0.5*abs(rho_maxs[i] - rho_maxs[j]);
+            pair(0,1) = 0.5*(theta_maxs[i] + theta_maxs[j]);
+            pairs.push_back(pair);
+            std::cout<<pair<<std::endl;
+            
+        }
+    }
+    
+
+    std::cout << "Found "<<pairs.size()<<" pairs"<<std::endl;
+    //Match pairs into rectangle
+    for (auto pair1: pairs) {
+        for (auto pair2: pairs) {
+            //Orthogonality
+            //std::cout<<abs(abs(pair1(0,1) - pair2(0,1)) - 90) <<std::endl;
+            if (abs(abs(pair1(0,1) - pair2(0,1)) - 90) > T_alpha) continue;
+                rectangles.push_back({pair1(0,1),2*pair1(0,0),2*pair2(0,0)});
+        }
+    }
+
+    return rectangles;
+
 }

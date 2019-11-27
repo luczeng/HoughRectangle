@@ -88,9 +88,18 @@ TEST_CASE("Test functions to compute the Hough Rectangle function") {
         std::vector<float> rho_maxs, theta_maxs;
         std::tie(rho_maxs,theta_maxs) =ht.index_rho_theta(indexes);
 
+
         //for (int i=0;i<rho_maxs.size();++i){
             //std::cout<< i <<" "<<rho_maxs[i] << " "<<theta_maxs[i]<<std::endl;
         //}
+
+        std::vector<std::array<float,3>> rectangles = ht.match_maximums(rho_maxs,theta_maxs,1,1,30,10);
+
+        std::cout<<rectangles.size()<<std::endl;
+        for (auto rect:rectangles){
+            std::cout<<"here"<<std::endl;
+            std::cout<<rect[0]<<rect[1]<<rect[2]<<std::endl;
+        }
 
 
     }
