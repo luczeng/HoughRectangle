@@ -5,7 +5,7 @@
 #include "stb_image.h"
 #include "string"
 #include <fstream>
-#include <vector>
+#include <array>
 
 // TODO(luczeng): use specific using clauses
 using namespace Eigen;
@@ -95,13 +95,13 @@ MatrixXf read_image(std::string filename) {
     return img;
 }
 
-void save_maximum(std::string filename,std::vector<float> theta, std::vector<float> rho) {
+void save_maximum(std::string filename,std::vector<std::array<int,2>> indexes) {
 
     std::ofstream maximums(filename.c_str());
 
     if (maximums.is_open()){
-        for (int i = 0; i < theta.size(); ++i) {
-           maximums <<theta[i]<<" "<<rho[i]<<"\n";
+        for (int i = 0; i <indexes.size(); ++i) {
+           maximums <<indexes[i][0]<<" "<<indexes[i][1]<<"\n";
         }
         maximums.close();
     }

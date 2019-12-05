@@ -18,6 +18,6 @@ int save_image(Eigen::MatrixXf img, std::string filename, int size, int x,
 
 Eigen::MatrixXf read_image(std::string filename);
 
-void save_maximum(std::string filename, std::vector<float> theta, std::vector<float> rho);
+void save_maximum(std::string filename, std::vector<std::array<int ,2>> maximums);
 
 #endif

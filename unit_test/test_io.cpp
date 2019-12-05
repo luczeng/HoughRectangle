@@ -138,7 +138,7 @@ TEST_CASE("Test Input-output functions for images") {
         std::vector<float> rho = {4,5,6};
         std::string filename = "../unit_test/test_maximums.cpp";
 
-        save_maximum(filename,theta,rho);
+        //save_maximum(filename,theta,rho);
 
     }
 }
