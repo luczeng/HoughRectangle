@@ -260,6 +260,8 @@ std::vector<std::array<float,3>> HoughRectangle::match_maximums(std::vector<floa
             
         }
     }
+
+    std::cout << m_theta_vec<<std::endl;
     
 
     std::cout << "Found "<<pairs.size()<<" pairs"<<std::endl;
@@ -268,8 +270,9 @@ std::vector<std::array<float,3>> HoughRectangle::match_maximums(std::vector<floa
         for (auto pair2: pairs) {
             //Orthogonality
             //std::cout<<abs(abs(pair1(0,1) - pair2(0,1)) - 90) <<std::endl;
-            if (abs(abs(pair1(0,1) - pair2(0,1)) - 90) > T_alpha) continue;
+            if (abs(abs(pair1(0,1) - pair2(0,1)) - 90) < T_alpha) continue;
                 rectangles.push_back({pair1(0,1),2*pair1(0,0),2*pair2(0,0)});
+                std::cout<<"Found rectangle"<<std::endl;
         }
     }
 

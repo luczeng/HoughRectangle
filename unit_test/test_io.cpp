@@ -131,6 +131,16 @@ TEST_CASE("Test Input-output functions for images") {
         REQUIRE(ground_truth == img);
 
     }
+
+    SECTION("Save maximums to txt file") {
+
+        std::vector<float> theta = {1,2,3};
+        std::vector<float> rho = {4,5,6};
+        std::string filename = "../unit_test/test_maximums.cpp";
+
+        save_maximum(filename,theta,rho);
+
+    }
 }
 #endif
 #endif

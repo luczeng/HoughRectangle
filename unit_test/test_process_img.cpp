@@ -83,23 +83,23 @@ TEST_CASE("Test functions to compute the Hough Rectangle function") {
         HoughRectangle::fMat wht = ht.hough_transform(gray);
         HoughRectangle::fMat eht = ht.enhance_hough(wht,20,20);
 
-        std::vector<std::array<int,2>> indexes = find_local_maximum(eht,100);
+        std::vector<std::array<int,2>> indexes = find_local_maximum(wht,50);
         std::cout<<"Detected "<<indexes.size()<<" points"<<std::endl;
         std::vector<float> rho_maxs, theta_maxs;
         std::tie(rho_maxs,theta_maxs) =ht.index_rho_theta(indexes);
 
 
-        //for (int i=0;i<rho_maxs.size();++i){
-            //std::cout<< i <<" "<<rho_maxs[i] << " "<<theta_maxs[i]<<std::endl;
-        //}
+        for (int i=0;i<rho_maxs.size();++i){
+            std::cout<< i <<" "<<rho_maxs[i] << " "<<theta_maxs[i]<<std::endl;
+        }
 
         std::vector<std::array<float,3>> rectangles = ht.match_maximums(rho_maxs,theta_maxs,1,1,30,10);
 
-        std::cout<<rectangles.size()<<std::endl;
-        for (auto rect:rectangles){
-            std::cout<<"here"<<std::endl;
-            std::cout<<rect[0]<<rect[1]<<rect[2]<<std::endl;
-        }
+        //std::cout<<rectangles.size()<<std::endl;
+        //for (auto rect:rectangles){
+            //std::cout<<"here"<<std::endl;
+            //std::cout<<rect[0]<<rect[1]<<rect[2]<<std::endl;
+        //}
 
 
     }

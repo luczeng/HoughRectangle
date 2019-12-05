@@ -4,6 +4,8 @@
 #include "stb_image_write.h"
 #include "stb_image.h"
 #include "string"
+#include <fstream>
+#include <vector>
 
 // TODO(luczeng): use specific using clauses
 using namespace Eigen;
@@ -91,4 +93,18 @@ MatrixXf read_image(std::string filename) {
     convert_RawBuff2Mat(data,img,x,y);
 
     return img;
+}
+
+void save_maximum(std::string filename,std::vector<float> theta, std::vector<float> rho) {
+
+    std::ofstream maximums(filename.c_str());
+
+    if (maximums.is_open()){
+        for (int i = 0; i < theta.size(); ++i) {
+           maximums <<theta[i]<<" "<<rho[i]<<"\n";
+        }
+        maximums.close();
+    }
+    else
+    {std::cerr<<"Couldnt save maximum file"<<std::endl;}
 }
