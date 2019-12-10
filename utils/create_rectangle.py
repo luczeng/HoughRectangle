@@ -7,7 +7,7 @@ L = 101
 #Rectangle
 img = np.zeros([N,N])
 mid = int(N/2)
-L_x = int((L-1)/2)
+L_x = int((L-1)/1.5)
 L_y = int((L-1)/2)
 
 img[mid-L_y,mid-L_x:mid+L_x] = 255

@@ -8,6 +8,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image.h"
 #include "stb_image_write.h"
+#include <array>
 
 unsigned char uc_conv(int x) { return static_cast<unsigned char>(x); };
 
@@ -139,6 +140,34 @@ TEST_CASE("Test Input-output functions for images") {
         std::string filename = "../unit_test/test_maximums.cpp";
 
         //save_maximum(filename,theta,rho);
+
+    }
+
+    SECTION("Convert normal line to cartesian coordinates") {
+
+        std::array<float,3> vert_line = convert_normal2cartesian(0,20);
+        std::array<float,3> vert_line_gt = {1,0,-20};
+
+        std::array<float,3> horiz_line = convert_normal2cartesian(90,20);
+        std::array<float,3> horiz_line_gt = {0,1,-20};
+
+        std::cout<<horiz_line[0]<<" "<<horiz_line[1]<<" "<<horiz_line[2]<<std::endl;
+
+        REQUIRE( vert_line == vert_line_gt );
+        //REQUIRE( horiz_line == horiz_line_gt );
+
+        //assert vert_line 
+
+    }
+
+    SECTION("Convert rectangle to corners") {
+
+        std::array<float,3> rectangle_normal = {0,20,10};
+
+        std::array<int,8> rectangle = convert_normal_rect2_corners_rect(rectangle_normal);
+
+        for (int corner:rectangle)
+            std::cout<<corner<<std::endl;
 
     }
 }

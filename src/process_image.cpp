@@ -240,7 +240,7 @@ std::vector<std::array<float,3>> HoughRectangle::match_maximums(std::vector<floa
     std::vector<std::array<float,3>> rectangles;
 
     //Match peaks into pairs
-    std::vector<Matrix<float,1,2>> pairs;
+    std::vector<Matrix<float,1,2>> pairs; //1st: rho, 2nd: theta
     Matrix<float,1,2> pair;
     for (int i=0;i<rho_maxs.size();++i) {
         for (int j=0;j<rho_maxs.size();++j) {
@@ -257,22 +257,25 @@ std::vector<std::array<float,3>> HoughRectangle::match_maximums(std::vector<floa
             pair(0,1) = 0.5*(theta_maxs[i] + theta_maxs[j]);
             pairs.push_back(pair);
             std::cout<<pair<<std::endl;
-            
         }
     }
 
-    std::cout << m_theta_vec<<std::endl;
+    //std::cout << m_theta_vec<<std::endl;
     
 
     std::cout << "Found "<<pairs.size()<<" pairs"<<std::endl;
     //Match pairs into rectangle
-    for (auto pair1: pairs) {
-        for (auto pair2: pairs) {
+    for (int i=0; i<pairs.size(); i++) {
+        for (int j=0; j<pairs.size(); j++) {
             //Orthogonality
             //std::cout<<abs(abs(pair1(0,1) - pair2(0,1)) - 90) <<std::endl;
-            if (abs(abs(pair1(0,1) - pair2(0,1)) - 90) < T_alpha) continue;
-                rectangles.push_back({pair1(0,1),2*pair1(0,0),2*pair2(0,0)});
-                std::cout<<"Found rectangle"<<std::endl;
+            if (j==i)
+                continue;
+
+            if (abs(abs(pairs[i](0,1) - pairs[j](0,1)) - 90) < T_alpha) 
+                continue;
+
+            rectangles.push_back({pairs[i](0,1),2*pairs[i](0,0),2*pairs[j](0,0)});
         }
     }
 

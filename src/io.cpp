@@ -6,6 +6,8 @@
 #include "string"
 #include <fstream>
 #include <array>
+#include <cmath>
+
 
 // TODO(luczeng): use specific using clauses
 using namespace Eigen;
@@ -95,6 +97,10 @@ MatrixXf read_image(std::string filename) {
     return img;
 }
 
+/*
+ * Saves maximums detected position in text file
+ *
+ */
 void save_maximum(std::string filename,std::vector<std::array<int,2>> indexes) {
 
     std::ofstream maximums(filename.c_str());
@@ -104,6 +110,84 @@ void save_maximum(std::string filename,std::vector<std::array<int,2>> indexes) 
            maximums <<indexes[i][0]<<" "<<indexes[i][1]<<"\n";
         }
         maximums.close();
+    }
+    else
+        std::cerr<<"Couldnt save maximum file"<<std::endl;
+}
+
+/*
+ * Convert normal coordinate to cartesian coordinates
+ *
+ *
+ * \param normal line in normal form rho, theta
+ * \return cartesian ax + by + c = 0, a,b,c
+ */
+std::array<float,3> convert_normal2cartesian(float angle, float rho){
+
+    std::array<float,3> cartesian;
+
+    cartesian[0] = cos(angle*M_PI/ 180.0);
+    cartesian[1] = sin(angle*M_PI/ 180.0);
+    cartesian[2] = -rho;
+    
+    return cartesian;
+}
+
+/*
+ * Convert normal rectangle into corner format
+ */
+std::array<int,8> convert_normal_rect2_corners_rect(std::array<float,3> in_rectangle){
+
+    std::array<int,8> rectangle;
+
+    //Create rectangle lines
+    std::array<float,3> line1= convert_normal2cartesian(in_rectangle[0],in_rectangle[0]);
+    std::array<float,3> line2= convert_normal2cartesian(in_rectangle[0],-in_rectangle[0]);
+    std::array<float,3> line3= convert_normal2cartesian(in_rectangle[0] + 90,in_rectangle[1]);
+    std::array<float,3> line4= convert_normal2cartesian(in_rectangle[0] + 90,-in_rectangle[1]);
+
+    //Compute rectangle corners
+    rectangle[0] = (-line1[2]*line3[1] + line1[1]*line3[2]) / (line1[0]*line3[1] - line1[1]*line3[0]);
+    rectangle[1] = (-line1[0]*line3[2] + line1[2]*line3[0]) / (line1[0]*line3[1] - line1[1]*line3[0]);
+ 
+    rectangle[2] = (-line1[2]*line4[1] + line1[1]*line4[2]) / (line1[0]*line4[1] - line1[1]*line4[0]);
+    rectangle[3] = (-line1[0]*line4[2] + line1[2]*line4[0]) / (line1[0]*line4[1] - line1[1]*line4[0]);
+ 
+    rectangle[4] = (-line2[2]*line3[1] + line2[1]*line3[2]) / (line2[0]*line3[1] - line2[1]*line3[0]);
+    rectangle[5] = (-line2[0]*line3[2] + line2[2]*line3[0]) / (line2[0]*line3[1] - line2[1]*line3[0]);
+ 
+    rectangle[6] = (-line2[2]*line4[1] + line2[1]*line4[2]) / (line2[0]*line4[1] - line2[1]*line4[0]);
+    rectangle[7] = (-line2[0]*line4[2] + line2[2]*line4[0]) / (line2[0]*line4[1] - line2[1]*line4[0]);
+
+    return rectangle;
+}
+
+/*
+ * Convert all rectangles to corner format
+ */
+std::vector<std::array<int,8>> convert_all_rects_2_cartesian(std::vector<std::array<float,3>> rectangles) {
+
+    std::vector<std::array<int,8>> rectangles_cart;
+    for (std::array<float,3> rect : rectangles)
+        rectangles_cart.push_back(convert_normal_rect2_corners_rect(rect));
+
+    return rectangles_cart;
+
+}
+
+/*
+ * Saves detected rectangles in text file
+ */
+void save_rectangle(std::string filename,std::vector<std::array<int,8>> rectangles) {
+
+    std::ofstream rectangle_file(filename.c_str());
+
+    if (rectangle_file.is_open()){
+        for (int i = 0; i <rectangles.size(); ++i) {
+           rectangle_file<<rectangles[i][0]<<" "<<rectangles[i][1]<<" "<<rectangles[i][2]<<" "<<rectangles[i][3]<<
+               " "<<rectangles[i][4]<<" "<<rectangles[i][5]<<" "<<rectangles[i][6]<<" "<<rectangles[i][7]<<"\n";
+        }
+        rectangle_file.close();
     }
     else
     {std::cerr<<"Couldnt save maximum file"<<std::endl;}

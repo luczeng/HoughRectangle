@@ -10,7 +10,6 @@ parser.add_argument('-i','--input_path',help = "path to txt file containing maxi
 args = parser.parse_args()
 
 x = np.loadtxt(args.maximum_file)
-print(x)
 
 plt.imshow(mpimg.imread(args.input_path))
 plt.plot( x[:,1],x[:,0],'xy')
