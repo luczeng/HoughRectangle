@@ -164,7 +164,7 @@ TEST_CASE("Test Input-output functions for images") {
 
         std::array<float,3> rectangle_normal = {0,20,10};
 
-        std::array<int,8> rectangle = convert_normal_rect2_corners_rect(rectangle_normal);
+        std::array<int,8> rectangle = convert_normal_rect2_corners_rect(rectangle_normal,0,0);
 
         for (int corner:rectangle)
             std::cout<<corner<<std::endl;

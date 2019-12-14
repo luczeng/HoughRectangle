@@ -176,7 +176,7 @@ HoughRectangle::fMat HoughRectangle::hough_transform(
                     std::vector<float>::iterator idx;
                     idx = std::lower_bound(m_rho_vec.begin(), m_rho_vec.end(), rho_tmp); //could be replaced 
                     int idx_rho = idx - m_rho_vec.begin() - 1;
-                    // std::cout <<rho_tmp<<std::endl;
+
                     if (idx_rho < 0) {
                         idx_rho = 0;
                     }
@@ -275,7 +275,7 @@ std::vector<std::array<float,3>> HoughRectangle::match_maximums(std::vector<floa
             if (abs(abs(pairs[i](0,1) - pairs[j](0,1)) - 90) < T_alpha) 
                 continue;
 
-            rectangles.push_back({pairs[i](0,1),2*pairs[i](0,0),2*pairs[j](0,0)});
+            rectangles.push_back({pairs[i](0,1),pairs[i](0,0),2*pairs[j](0,0)});
         }
     }
 

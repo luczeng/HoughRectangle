@@ -47,12 +47,12 @@ class HoughRectangle{
         int m_thetaMin;
         int m_thetaMax;
         int m_rhoBins;
-        Eigen::VectorXf m_theta_vec;
-        std::vector<float> m_rho_vec;
 
         Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> m_img;
 
     public:
+        Eigen::VectorXf m_theta_vec; //make those private later with getters
+        std::vector<float> m_rho_vec;
         /*
          * Rectangle class constructor
          *

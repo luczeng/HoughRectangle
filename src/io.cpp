@@ -136,28 +136,34 @@ std::array<float,3> convert_normal2cartesian(float angle, float rho){
 /*
  * Convert normal rectangle into corner format
  */
-std::array<int,8> convert_normal_rect2_corners_rect(std::array<float,3> in_rectangle){
+std::array<int,8> convert_normal_rect2_corners_rect(std::array<float,3> in_rectangle, float x_bias, float y_bias){
 
     std::array<int,8> rectangle;
 
     //Create rectangle lines
-    std::array<float,3> line1= convert_normal2cartesian(in_rectangle[0],in_rectangle[0]);
-    std::array<float,3> line2= convert_normal2cartesian(in_rectangle[0],-in_rectangle[0]);
-    std::array<float,3> line3= convert_normal2cartesian(in_rectangle[0] + 90,in_rectangle[1]);
-    std::array<float,3> line4= convert_normal2cartesian(in_rectangle[0] + 90,-in_rectangle[1]);
+    float bias;
+    if (in_rectangle[0] < 0)
+         bias = 90;
+    else
+         bias = -90;
+
+    std::array<float,3> line1= convert_normal2cartesian(in_rectangle[0],in_rectangle[1]);
+    std::array<float,3> line2= convert_normal2cartesian(in_rectangle[0],-in_rectangle[1]);
+    std::array<float,3> line3= convert_normal2cartesian(in_rectangle[0] +bias,in_rectangle[2]);
+    std::array<float,3> line4= convert_normal2cartesian(in_rectangle[0] +bias,-in_rectangle[2]);
 
     //Compute rectangle corners
-    rectangle[0] = (-line1[2]*line3[1] + line1[1]*line3[2]) / (line1[0]*line3[1] - line1[1]*line3[0]);
-    rectangle[1] = (-line1[0]*line3[2] + line1[2]*line3[0]) / (line1[0]*line3[1] - line1[1]*line3[0]);
+    rectangle[0] = (-line1[2]*line3[1] + line1[1]*line3[2]) / (line1[0]*line3[1] - line1[1]*line3[0])+ x_bias;
+    rectangle[1] = (-line1[0]*line3[2] + line1[2]*line3[0]) / (line1[0]*line3[1] - line1[1]*line3[0])+ y_bias;
  
-    rectangle[2] = (-line1[2]*line4[1] + line1[1]*line4[2]) / (line1[0]*line4[1] - line1[1]*line4[0]);
-    rectangle[3] = (-line1[0]*line4[2] + line1[2]*line4[0]) / (line1[0]*line4[1] - line1[1]*line4[0]);
+    rectangle[2] = (-line1[2]*line4[1] + line1[1]*line4[2]) / (line1[0]*line4[1] - line1[1]*line4[0])+ x_bias;
+    rectangle[3] = (-line1[0]*line4[2] + line1[2]*line4[0]) / (line1[0]*line4[1] - line1[1]*line4[0])+ y_bias;
  
-    rectangle[4] = (-line2[2]*line3[1] + line2[1]*line3[2]) / (line2[0]*line3[1] - line2[1]*line3[0]);
-    rectangle[5] = (-line2[0]*line3[2] + line2[2]*line3[0]) / (line2[0]*line3[1] - line2[1]*line3[0]);
+    rectangle[4] = (-line2[2]*line3[1] + line2[1]*line3[2]) / (line2[0]*line3[1] - line2[1]*line3[0])+ x_bias;
+    rectangle[5] = (-line2[0]*line3[2] + line2[2]*line3[0]) / (line2[0]*line3[1] - line2[1]*line3[0])+ y_bias;
  
-    rectangle[6] = (-line2[2]*line4[1] + line2[1]*line4[2]) / (line2[0]*line4[1] - line2[1]*line4[0]);
-    rectangle[7] = (-line2[0]*line4[2] + line2[2]*line4[0]) / (line2[0]*line4[1] - line2[1]*line4[0]);
+    rectangle[6] = (-line2[2]*line4[1] + line2[1]*line4[2]) / (line2[0]*line4[1] - line2[1]*line4[0])+ x_bias;
+    rectangle[7] = (-line2[0]*line4[2] + line2[2]*line4[0]) / (line2[0]*line4[1] - line2[1]*line4[0])+ y_bias;
 
     return rectangle;
 }
@@ -165,11 +171,12 @@ std::array<int,8> convert_normal_rect2_corners_rect(std::array<float,3> in_recta
 /*
  * Convert all rectangles to corner format
  */
-std::vector<std::array<int,8>> convert_all_rects_2_cartesian(std::vector<std::array<float,3>> rectangles) {
+std::vector<std::array<int,8>> convert_all_rects_2_cartesian(std::vector<std::array<float,3>> rectangles, float x_bias,float y_bias) {
+
 
     std::vector<std::array<int,8>> rectangles_cart;
     for (std::array<float,3> rect : rectangles)
-        rectangles_cart.push_back(convert_normal_rect2_corners_rect(rect));
+        rectangles_cart.push_back(convert_normal_rect2_corners_rect(rect, x_bias,y_bias));
 
     return rectangles_cart;
 
