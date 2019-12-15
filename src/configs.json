@@ -1,9 +1,9 @@
 {
     "value0": {
-        "thetaBins": 512,
-        "rhoBins": 512,
-	"thetaMin": -95,
-	"thetaMax": 95,
+        "thetaBins": 256,
+        "rhoBins": 256,
+	"thetaMin": -90,
+	"thetaMax": 90,
     "h": 32,
     "w": 32,
     "L_window": 50,

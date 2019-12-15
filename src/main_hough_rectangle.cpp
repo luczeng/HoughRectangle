@@ -56,7 +56,22 @@ int main(int argc, char* argv[]) {
     // Perform Hough transform
     ////////////////////////////////////////////////////////////////////////
     HoughRectangle ht(gray,config.thetaBins,config.rhoBins,config.thetaMin,config.thetaMax);
-    ht.windowed_hough(gray,config.r_min,config.r_max);
+    HoughRectangle::fMat hough_img = ht.hough_transform(gray);
+
+    // Detect peaks
+    std::vector<std::array<int, 2>> indexes = find_local_maximum(hough_img, 25);
+    std::vector<float> rho_maxs, theta_maxs;
+    std::tie(rho_maxs, theta_maxs) = ht.index_rho_theta(indexes);
+
+    // Find pairs
+    std::vector<std::array<float,2>> pairs = ht.find_pairs(rho_maxs,theta_maxs,2,2);
+    
+    // Find rectangle
+
+    std::vector<std::array<float, 3>> rectangles = ht.match_pairs_into_rectangle(pairs, 30, 20);
+    std::vector<std::array<int,8>> rectangles_corners = convert_all_rects_2_cartesian(rectangles,128,128);
+    std::cout << "Found "<<rectangles_corners.size()<<" rectangles"<<std::endl;
+    save_rectangle("rectangles.txt",rectangles_corners);
 
     return 0;
 }
