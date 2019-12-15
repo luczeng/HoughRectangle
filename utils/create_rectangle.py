@@ -28,7 +28,10 @@ img_rotated[mid-L_y:mid+L_y,mid+L_x] = 255
 img_rotated[mid+L_y,mid-L_x:mid+L_x] = 255
 img_rotated[mid-L_y:mid+L_y,mid-L_x] = 255
 
-rotation_mat = cv2.getRotationMatrix2D((mid,mid),20,1)
+rotation_mat = cv2.getRotationMatrix2D((mid,mid),60,1)
 img_rotated = cv2.warpAffine(img_rotated, rotation_mat, (N,N))
+
+img_rotated[img_rotated>=128] =255
+img_rotated[img_rotated<128] = 0
 
 cv2.imwrite("rectangle2.png",img_rotated)
