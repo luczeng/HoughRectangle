@@ -20,8 +20,9 @@ Eigen::MatrixXf read_image(std::string filename);
 
 // Result io
 void save_maximum(std::string filename, std::vector<std::array<int ,2>> maximums);
-
+void save_pairs(std::string filename,std::vector<std::array<float,2>> pairs);
 void save_rectangle(std::string filename,std::vector<std::array<int,8>> indexes);
+void save_maximum_values(std::string filename,std::vector<std::array<float,2>> indexes);
 
 // Conversion utils
 std::array<float,3> convert_normal2cartesian(float angle, float rho);

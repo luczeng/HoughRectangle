@@ -116,6 +116,25 @@ void save_maximum(std::string filename,std::vector<std::array<int,2>> indexes) 
 }
 
 /*
+ * Saves maximums detected position in text file
+ * T0D0: template and merge with previous func
+ *
+ */
+void save_maximum_values(std::string filename,std::vector<std::array<float,2>> indexes) {
+
+    std::ofstream maximums(filename.c_str());
+
+    if (maximums.is_open()){
+        for (int i = 0; i <indexes.size(); ++i) {
+           maximums <<indexes[i][0]<<" "<<indexes[i][1]<<"\n";
+        }
+        maximums.close();
+    }
+    else
+        std::cerr<<"Couldnt save maximum file"<<std::endl;
+}
+
+/*
  * Convert normal coordinate to cartesian coordinates
  *
  *
@@ -181,6 +200,25 @@ std::vector<std::array<int,8>> convert_all_rects_2_cartesian(std::vector<std::ar
     return rectangles_cart;
 
 }
+
+
+/*
+ * Saves detected pairs in text file
+ */
+void save_pairs(std::string filename,std::vector<std::array<float,2>> pairs) {
+
+    std::ofstream rectangle_file(filename.c_str());
+
+    if (rectangle_file.is_open()){
+        for (int i = 0; i <pairs.size(); ++i) {
+           rectangle_file<<pairs[i][0]<<" "<<pairs[i][1]<<"\n";
+        }
+        rectangle_file.close();
+    }
+    else
+    {std::cerr<<"Couldnt save pairs file"<<std::endl;}
+}
+
 
 /*
  * Saves detected rectangles in text file

@@ -131,6 +131,15 @@ class HoughRectangle{
          */
         std::tuple<std::vector<float>,std::vector<float>> index_rho_theta(std::vector<std::array<int,2>> indexes);
 
+        /*
+         * Match detected peaks into pairs 
+         *
+         * @param[in] rho_maxs vector specifying rho positions of detected peaks
+         * @param[in] theta_maxs vector specifying theta positions of detected peaks
+         *
+         */
+        std::vector<std::array<float,2>> find_pairs(std::vector<float> & rho_maxs,std::vector<float> &theta_maxs,float T_t,float T_rho);
+
         /**
          * Matches detected peaks into rectangle
          *
@@ -138,7 +147,7 @@ class HoughRectangle{
          * @param[in] theta_maxs vector specifying theta positions of detected peaks
          * @param[out] 
          */
-         std::vector<std::array<float,3>> match_maximums(std::vector<float> &rho_maxs,std::vector<float> & theta_maxs,float T_t,float T_rho,float T_L,float T_alpha);
+        std::vector<std::array<float,3>> match_pairs_into_rectangle(std::vector<std::array<float,2>> pairs,float T_L,float T_alpha);
 
 };
 
