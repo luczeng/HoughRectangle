@@ -145,8 +145,8 @@ std::array<float,3> convert_normal2cartesian(float angle, float rho){
 
     std::array<float,3> cartesian;
 
-    cartesian[0] = cos(angle*M_PI/ 180.0);
-    cartesian[1] = sin(angle*M_PI/ 180.0);
+    cartesian[0] = cos((180-angle)*M_PI/ 180.0);
+    cartesian[1] = sin((180-angle)*M_PI/ 180.0);
     cartesian[2] = -rho;
     
     return cartesian;
@@ -173,16 +173,16 @@ std::array<int,8> convert_normal_rect2_corners_rect(std::array<float,3> in_recta
 
     //Compute rectangle corners
     rectangle[0] = (-line1[2]*line3[1] + line1[1]*line3[2]) / (line1[0]*line3[1] - line1[1]*line3[0])+ x_bias;
-    rectangle[1] = (-line1[0]*line3[2] + line1[2]*line3[0]) / (line1[0]*line3[1] - line1[1]*line3[0])+ y_bias;
+    rectangle[1] = -(-line1[0]*line3[2] + line1[2]*line3[0]) / (line1[0]*line3[1] - line1[1]*line3[0])+ y_bias;
  
     rectangle[2] = (-line1[2]*line4[1] + line1[1]*line4[2]) / (line1[0]*line4[1] - line1[1]*line4[0])+ x_bias;
-    rectangle[3] = (-line1[0]*line4[2] + line1[2]*line4[0]) / (line1[0]*line4[1] - line1[1]*line4[0])+ y_bias;
+    rectangle[3] = -(-line1[0]*line4[2] + line1[2]*line4[0]) / (line1[0]*line4[1] - line1[1]*line4[0])+ y_bias;
  
     rectangle[4] = (-line2[2]*line3[1] + line2[1]*line3[2]) / (line2[0]*line3[1] - line2[1]*line3[0])+ x_bias;
-    rectangle[5] = (-line2[0]*line3[2] + line2[2]*line3[0]) / (line2[0]*line3[1] - line2[1]*line3[0])+ y_bias;
+    rectangle[5] = -(-line2[0]*line3[2] + line2[2]*line3[0]) / (line2[0]*line3[1] - line2[1]*line3[0])+ y_bias;
  
     rectangle[6] = (-line2[2]*line4[1] + line2[1]*line4[2]) / (line2[0]*line4[1] - line2[1]*line4[0])+ x_bias;
-    rectangle[7] = (-line2[0]*line4[2] + line2[2]*line4[0]) / (line2[0]*line4[1] - line2[1]*line4[0])+ y_bias;
+    rectangle[7] = -(-line2[0]*line4[2] + line2[2]*line4[0]) / (line2[0]*line4[1] - line2[1]*line4[0])+ y_bias;
 
     return rectangle;
 }
