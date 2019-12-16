@@ -16,27 +16,21 @@
 TEST_CASE("Test functions to compute the Hough Rectangle function") {
     SECTION("Tests the ring mask") {
         // Input
-        Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>
-            img =
-                ((1 + Eigen::MatrixXf::Random(7, 7).array() / 2) * 10).round();
+        Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> img =
+            ((1 + Eigen::MatrixXf::Random(7, 7).array() / 2) * 10).round();
 
         // Ground truth
-        Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>
-            img_gt = img.replicate<1, 1>();
+        Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> img_gt = img.replicate<1, 1>();
 
-        img_gt(0, 0) = 0, img_gt(0, 1) = 0, img_gt(0, 2) = 0, img_gt(0, 4) = 0,
-                  img_gt(0, 5) = 0, img_gt(0, 6) = 0;
-        img_gt(1, 6) = 0, img_gt(2, 6) = 0, img_gt(4, 6) = 0, img_gt(5, 6) = 0,
-                  img_gt(6, 6) = 0;
-        img_gt(6, 0) = 0, img_gt(6, 1) = 0, img_gt(6, 2) = 0, img_gt(6, 4) = 0,
-                  img_gt(6, 5) = 0, img_gt(6, 6) = 0;
+        img_gt(0, 0) = 0, img_gt(0, 1) = 0, img_gt(0, 2) = 0, img_gt(0, 4) = 0, img_gt(0, 5) = 0, img_gt(0, 6) = 0;
+        img_gt(1, 6) = 0, img_gt(2, 6) = 0, img_gt(4, 6) = 0, img_gt(5, 6) = 0, img_gt(6, 6) = 0;
+        img_gt(6, 0) = 0, img_gt(6, 1) = 0, img_gt(6, 2) = 0, img_gt(6, 4) = 0, img_gt(6, 5) = 0, img_gt(6, 6) = 0;
         img_gt(1, 0) = 0, img_gt(2, 0) = 0, img_gt(4, 0) = 0, img_gt(5, 0) = 0;
         img_gt.block<3, 3>(2, 2) = Eigen::MatrixXf::Zero(3, 3);
 
         // Apply ring
         HoughRectangle ht(img);
-        Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>
-            img_ring = ht.ring(img, 2, 3);
+        Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> img_ring = ht.ring(img, 2, 3);
         std::cout << img << std::endl << std::endl;
         std::cout << img_gt << std::endl << std::endl;
         std::cout << img_ring << std::endl << std::endl;
@@ -47,8 +41,7 @@ TEST_CASE("Test functions to compute the Hough Rectangle function") {
 
     SECTION("Test the local maximum detection") {
         // Input
-        Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>
-            img(4, 5);
+        Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> img(4, 5);
         // Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>
         // img;
         img << 1, 2, 4, 5, 5, 5, 3, 9, 2, 5, 4, 2, 6, 5, 9, 3, 9, 1, 8, 2;
@@ -91,27 +84,27 @@ TEST_CASE("Test functions to compute the Hough Rectangle function") {
         std::tie(rho_maxs, theta_maxs) = ht.index_rho_theta(indexes);
         // std::cout<<"Detected "<<indexes.size()<<" points"<<std::endl;
 
-        //for (int i = 0; i < rho_maxs.size(); ++i) {
-            //std::cout << i << " " << rho_maxs[i] << " " << theta_maxs[i]
-                      //<< std::endl;
+        // for (int i = 0; i < rho_maxs.size(); ++i) {
+        // std::cout << i << " " << rho_maxs[i] << " " << theta_maxs[i]
+        //<< std::endl;
         //}
 
         // Match peaks into rectangles
-        std::vector<std::array<float, 3>> rectangles =
-            ht.match_maximums(rho_maxs, theta_maxs, 1, 1, 30, 3);
+        // std::vector<std::array<float, 3>> rectangles =
+        // ht.match_maximums(rho_maxs, theta_maxs, 1, 1, 30, 3);
 
-        std::cout << "Found " << rectangles.size() << " rectangles"
-                  << std::endl;
+        // std::cout << "Found " << rectangles.size() << " rectangles"
+        //<< std::endl;
 
-        //for (auto rect : rectangles) {
-            //std::cout << rect[0] << " " << rect[1] << " " << rect[2]
-                      //<< std::endl;
-        //}
+        ////for (auto rect : rectangles) {
+        ////std::cout << rect[0] << " " << rect[1] << " " << rect[2]
+        ////<< std::endl;
+        ////}
 
-        std::vector<std::array<int, 8>> rectangles_cart =
-            convert_all_rects_2_cartesian(rectangles,
-                    128,128);
+        // std::vector<std::array<int, 8>> rectangles_cart =
+        // convert_all_rects_2_cartesian(rectangles,
+        // 128,128);
 
-        save_rectangle("rectangles.txt", rectangles_cart);
+        // save_rectangle("rectangles.txt", rectangles_cart);
     }
 }
