@@ -57,7 +57,7 @@ int main(int argc, char * argv[]){
     std::tie(rho_maxs, theta_maxs) = ht.index_rho_theta(indexes);
 
     // Find pairs
-    std::vector<std::array<float,2>> pairs = ht.find_pairs(rho_maxs,theta_maxs,1,2);
+    std::vector<std::array<float,2>> pairs = ht.find_pairs(rho_maxs,theta_maxs,1,2,1);
     
     // Save pairs
     save_pairs(output_path,pairs);

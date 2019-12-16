@@ -235,7 +235,7 @@ std::tuple<std::vector<float>,std::vector<float>> HoughRectangle::index_rho_thet
 }
 
 /*************************************************************************************/
-std::vector<std::array<float,2>> HoughRectangle::find_pairs(std::vector<float> & rho_maxs,std::vector<float> &theta_maxs,float T_t,float T_rho) {
+std::vector<std::array<float,2>> HoughRectangle::find_pairs(std::vector<float> & rho_maxs,std::vector<float> &theta_maxs,float T_t,float T_rho,float T_L) {
 
     //Match peaks into pairs
     std::vector<std::array<float,2>> pairs; //1st: rho, 2nd: theta
@@ -264,17 +264,17 @@ std::vector<std::array<float,2>> HoughRectangle::find_pairs(std::vector<float> &
 
 
 /*************************************************************************************/
-std::vector<std::array<float,3>> HoughRectangle::match_pairs_into_rectangle(std::vector<std::array<float,2>> pairs,float T_L,float T_alpha){
+std::vector<std::array<float,3>> HoughRectangle::match_pairs_into_rectangle(std::vector<std::array<float,2>> pairs,float T_alpha){
 
     std::vector<std::array<float,3>> rectangles;
 
     //Match pairs into rectangle
     for (int i=0; i<pairs.size(); i++) {
         for (int j=0; j<pairs.size(); j++) {
-            //Orthogonality
             if (j==i)
                continue;
 
+            //Orthogonality
             if (abs(abs(pairs[i][1] - pairs[j][1]) - 90) > T_alpha) 
                 continue;
 
