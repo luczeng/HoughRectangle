@@ -11,9 +11,10 @@ args = parser.parse_args()
 
 x = np.loadtxt(args.maximum_file)
 
-plt.imshow(mpimg.imread(args.input_path))
+plt.imshow(mpimg.imread(args.input_path),cmap = 'gray')
 # for i in range(x.shape[0]):
 for i in range(10):
     # print(i)
     plt.plot( x[i,0::2],x[i,1::2],'rx')
+plt.axis('off')
 plt.show()
