@@ -63,3 +63,9 @@ target_link_libraries(windowed_hough PUBLIC Eigen3::Eigen PUBLIC main_hough PUBL
 
 add_executable(hough_transform src/hough_transform.cpp)
 target_link_libraries(hough_transform PUBLIC Eigen3::Eigen PUBLIC main_hough PUBLIC cxxopts PRIVATE stb PRIVATE cereal)
+
+add_executable(find_maximums src/find_maximums.cpp)
+target_link_libraries(find_maximums PUBLIC Eigen3::Eigen PUBLIC main_hough PUBLIC cxxopts PRIVATE stb PRIVATE cereal)
+
+add_executable(find_pairs src/find_pairs.cpp)
+target_link_libraries(find_pairs PUBLIC Eigen3::Eigen PUBLIC main_hough PUBLIC cxxopts PRIVATE stb PRIVATE cereal)

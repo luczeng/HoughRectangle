@@ -33,9 +33,9 @@ int main(int argc, char* argv[]) {
     // Parse arguments
     ////////////////////////////////////////////////////////////////////////
     cxxopts::Options options("Runs Hough rectangle detection algorithm");
-    options.add_options()("i,image_path", "Path to binary input image",
+    options.add_options()("i,image_path", "Path to binary (0-255) input image",
                           cxxopts::value<std::string>())(
-        "o,output_path", "Path to save result", cxxopts::value<std::string>());
+        "o,output_path", "Path to .txt file where detected rectangles will be saved", cxxopts::value<std::string>());
     auto result = options.parse(argc, argv);
 
     std::string filename = result["image_path"].as<std::string>();
@@ -56,7 +56,21 @@ int main(int argc, char* argv[]) {
     // Perform Hough transform
     ////////////////////////////////////////////////////////////////////////
     HoughRectangle ht(gray,config.thetaBins,config.rhoBins,config.thetaMin,config.thetaMax);
-    ht.windowed_hough(gray,config.r_min,config.r_max);
+    HoughRectangle::fMat hough_img = ht.hough_transform(gray);
+
+    // Detect peaks
+    std::vector<std::array<int, 2>> indexes = find_local_maximum(hough_img, config.min_side_length);
+    std::vector<float> rho_maxs, theta_maxs;
+    std::tie(rho_maxs, theta_maxs) = ht.index_rho_theta(indexes);
+
+    // Find pairs
+    std::vector<std::array<float,2>> pairs = ht.find_pairs(rho_maxs,theta_maxs,config.T_rho,config.T_theta,config.T_l);
+    
+    // Find rectangle
+    std::vector<std::array<float, 3>> rectangles = ht.match_pairs_into_rectangle(pairs,config.T_alpha);
+    std::vector<std::array<int,8>> rectangles_corners = convert_all_rects_2_cartesian(rectangles,gray.rows()/2,gray.cols()/2);
+    std::cout << "Found "<<rectangles_corners.size()<<" rectangles"<<std::endl;
+    save_rectangle("rectangles.txt",rectangles_corners);
 
     return 0;
 }

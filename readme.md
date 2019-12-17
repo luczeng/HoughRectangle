@@ -36,9 +36,10 @@ Rectangle            |  Corresponding Hough pattern
 
 
 ## Project status:
-- Hough transform: done
-- Enhanced Hough transform: done
-- Windowed Hough transform: done
+- Hough transform : done
+- Enhanced Hough transform : done
+- Windowed Hough transform : done
 - Peak detection: done
-- Hough rectangle detection: in progress (expected mid-december 2019)
+- Hough rectangle detection on rectangle-centric image: done
+- Hough rectangle detection on full image: in progress
 

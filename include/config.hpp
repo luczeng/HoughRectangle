@@ -26,6 +26,10 @@ struct Config
     int r_max;
 
     int min_side_length;
+    float T_theta;
+    float T_rho;
+    float T_l;
+    float T_alpha;
 
 	//Method for cereal to know which member to serialize
 	template <class Archive> // TODO(luczeng): I prefer 'typename' for templates but that's a personal choice
@@ -40,7 +44,11 @@ struct Config
             CEREAL_NVP(L_window),
             CEREAL_NVP(r_min),
             CEREAL_NVP(r_max),
-            CEREAL_NVP(min_side_length));
+            CEREAL_NVP(min_side_length),
+            CEREAL_NVP(T_theta),
+            CEREAL_NVP(T_rho),
+            CEREAL_NVP(T_l),
+            CEREAL_NVP(T_alpha));
 	}
 
 };

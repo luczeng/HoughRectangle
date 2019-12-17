@@ -1,15 +1,16 @@
 #ifndef PROCESS_IMAGE_H
 #define PROCESS_IMAGE_H
 #include <Eigen/Dense>
-#include "config.hpp"
+#include <array>
 #include <tuple>
+#include "config.hpp"
 
 /**
  * Function to make sure binary is 0 and 255
  *
  * @param img Eigen float matrix to be normalized
  */
-void normalise_img(Eigen::MatrixXf & img);
+void normalise_img(Eigen::MatrixXf &img);
 
 /*
  * Returns a linearly spaced array
@@ -17,11 +18,10 @@ void normalise_img(Eigen::MatrixXf & img);
  * @param a starting value
  * @param b end value
  * @param N number of bins
- * @return vector<float> 
+ * @return vector<float>
  */
 // TODO(luczeng): this is a perfect use case for a template
-std::vector<float> LinearSpacedArray(float a, float b, std::size_t N);
-
+std::vector<float> LinearSpacedArray(const float &a, const float &b, const std::size_t &N);
 
 /*
  * Finds position of all elements superior to threshold
@@ -30,7 +30,8 @@ std::vector<float> LinearSpacedArray(float a, float b, std::size_t N);
  * @float threshold float
  * @return vector of Eigen::Index of the positions where hough is more than threshold
  */
-std::vector<Eigen::Index> find_local_maximum(Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> & img,float threshold);
+std::vector<std::array<int, 2>> find_local_maximum(
+    const Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> &img, const float &threshold);
 
 /**
  *
@@ -40,89 +41,115 @@ std::vector<Eigen::Index> find_local_maximum(Eigen::Matrix<float,Eigen::Dynamic,
  * in order to compute the so called Hough Rectangle detection.
  *
  */
-class HoughRectangle{
-    public:
-        int m_thetaBins;
-        int m_thetaMin;
-        int m_thetaMax;
-        int m_rhoBins;
-        Eigen::VectorXf m_theta_vec;
-        std::vector<float> m_rho_vec;
+class HoughRectangle {
+   private:
+    int m_thetaBins;
+    int m_thetaMin;
+    int m_thetaMax;
+    int m_rhoBins;
 
-        typedef Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> fMat;
+    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> m_img;
 
-        fMat  m_img;
+   public:
+    Eigen::VectorXf m_theta_vec;  // make those private later with getters
+    std::vector<float> m_rho_vec;
+    /*
+     * Rectangle class constructor
+     *
+     * @param img Eigen float, Dynamic, RowMajor matrix to process
+     */
+    typedef Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> fMat;
+    HoughRectangle(fMat &img, int thetaBins = 256, int rhoBins = 256, float thetaMin = -90,
+                   float thetaMax = 90);  // declaration
 
-        /*
-         * Rectangle class constructor
-         *
-         * @param img Eigen float, Dynamic, RowMajor matrix to process
-         */
-        HoughRectangle(fMat & img,int thetaBins = 256, int rhoBins = 256,
-    float thetaMin = -90, float thetaMax = 90); //declaration
+   public:
+    /**
+     * Applies the classic Hough transform
+     *
+     * @param[in]
+     * @param[in]
+     * @param[in]
+     * @param[in]
+     * @param[in]
+     * @param[out] acc accumulator (hough transform)
+     */
+    fMat hough_transform(const fMat &img);
 
-    public:
-        /**
-         * Applies the classic Hough transform
-         *
-         * @param[in]
-         * @param[in]
-         * @param[in]
-         * @param[in]
-         * @param[in]
-         * @param[out] acc accumulator (hough transform)
-         */
-        fMat hough_transform(fMat & img);
+    /**
+     * Performs the Windowed hough transform on a single patch
+     *
+     * @param[in]
+     * @param[in]
+     * @param[in]
+     * @param[in]
+     * @param[in]
+     * @param[in]
+     * @param[in]
+     * @param[out] wht hough transformed image
+     */
+    fMat windowed_hough(const fMat &img, const int &r_min, const int &r_max);
 
-        /**
-         * Performs the Windowed hough transform on a single patch
-         *
-         * @param[in]
-         * @param[in]
-         * @param[in]
-         * @param[in]
-         * @param[in]
-         * @param[in]
-         * @param[in]
-         * @param[out] wht hough transformed image
-         */
-        fMat windowed_hough(fMat & img,int r_min,int r_max);
+    /**
+     * Applies the Windowed hough transform on the whole image
+     *
+     * @param[in]
+     * @param[in]
+     * @param[in]
+     * @param[in]
+     * @param[in]
+     * @param[in]
+     * @param[in]
+     * @param[out]
+     */
+    fMat apply_windowed_hough(const fMat &img, const int &L_window, const int &r_min, const int &r_max);
 
-        /**
-         * Applies the Windowed hough transform on the whole image
-         *
-         * @param[in]
-         * @param[in]
-         * @param[in]
-         * @param[in]
-         * @param[in]
-         * @param[in]
-         * @param[in]
-         * @param[out]
-         */
-        fMat apply_windowed_hough(fMat & img,int L_window,int r_min,int r_max);
+    /**
+     * Computes enhanced Hough transform
+     *
+     * @param[in]
+     * @param[in]
+     * @param[in]
+     * @param[out]
+     */
+    fMat enhance_hough(const fMat &hough, const int &h, const int &w);
 
-        /**
-         * Computes enhanced Hough transform
-         *
-         * @param[in]
-         * @param[in]
-         * @param[in]
-         * @param[out] 
-         */
-        fMat enhance_hough(fMat & hough,int h,int w);
-        
-        /**
-         * Applies a ring on the input matrix by putting to zero all pixels outside the ring
-         *
-         * @param[in] img Eigen matrix
-         * @param[in] r_min radius of inner ring
-         * @param[in] r_max radius of outer ring
-         * @param[out] result ringed output matrix
-         */
-        fMat ring(fMat & img,int r_min,int r_max);
+    /**
+     * Applies a ring on the input matrix by putting to zero all pixels outside the ring
+     *
+     * @param[in] img Eigen matrix
+     * @param[in] r_min radius of inner ring
+     * @param[in] r_max radius of outer ring
+     * @param[out] result ringed output matrix
+     */
+    fMat ring(const fMat &img, const int &r_min, const int &r_max);
 
+    /**
+     * Returns vectors of theta and rho positions corresponding to the input indexes
+     *
+     *
+     */
+    std::tuple<std::vector<float>, std::vector<float>> index_rho_theta(const std::vector<std::array<int, 2>> &indexes);
 
+    /*
+     * Match detected peaks into pairs
+     *
+     * @param[in] rho_maxs vector specifying rho positions of detected peaks
+     * @param[in] theta_maxs vector specifying theta positions of detected peaks
+     *
+     */
+    std::vector<std::array<float, 2>> find_pairs(const std::vector<float> &rho_maxs,
+                                                 const std::vector<float> &theta_maxs, const float &T_t,
+                                                 const float &T_rho, const float &T_L);
+
+    /**
+     * Matches detected peaks into rectangle
+     *
+     * @param[in] rho_maxs vector specifying rho positions of detected peaks
+     * @param[in] theta_maxs vector specifying theta positions of detected peaks
+     * @param[out]
+     */
+    std::vector<std::array<float, 3>> match_pairs_into_rectangle(const std::vector<std::array<float, 2>> &pairs,
+                                                                 const float &T_alpha);
 };
 
 #endif
