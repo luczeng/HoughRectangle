@@ -11,15 +11,6 @@
 // TODO(luczeng): use specific using clauses
 using namespace Eigen;
 
-/**
- * Converts raw buffer to Eigen float matrix
- *
- * \param data unsigned char raw buffer to be converted
- * \param x image dimension in x direction
- * \param y image dimension in y direction
- *
- *  \return gray eigen float matrix
- */
 // TODO(luczeng): why do you pass in a unique_ptr by reference? Just pass the pointer, passing the unique pointer does
 // not give you any extra advantage, and it is confusing.
 //                std::unique_ptr are very useful inside classes, not so much as arguments to functions.
@@ -33,14 +24,6 @@ void convert_RawBuff2Mat(const std::unique_ptr<unsigned char[]> &data, MatrixXf 
     gray = img.cast<float>();
 }
 
-/**
- * Converts Eigen matrix to raw buffer
- *
- * \param gray input float eigen matrix in RowMajor order
- * \param size integer total size of the raw buffer (x*y)
- *
- *  \return gray_UC unique_ptr to uc raw buffer output
- */
 void convert_Mat2RawBuff(const Matrix<float, Dynamic, Dynamic, RowMajor> &gray,
                          std::unique_ptr<unsigned char[]> &gray_UC, const int &size) {
     // gray_UC = new unsigned char[size];
@@ -49,15 +32,6 @@ void convert_Mat2RawBuff(const Matrix<float, Dynamic, Dynamic, RowMajor> &gray,
     }
 }
 
-/**
- * Saves Eigen matrix to png
- *
- * \param img input float eigen matrix in RowMajor order
- * \param filename output file path ending in .png
- * \param x int, x dimension
- * \param y int, y dimension
- *
- */
 int save_image(Matrix<float, Dynamic, Dynamic, RowMajor> &img, const std::string &filename, const int &size,
                const int &x, const int &y) {
     // Normalise to 0-255

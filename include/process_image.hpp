@@ -35,7 +35,7 @@ std::vector<std::array<int, 2>> find_local_maximum(
 
 /**
  *
- * Implementation of rectangle detection via the Hough rectangle transform
+ * Class containing all the tools to perform rectangle detection on an image.
  *
  * This class implements the Hough transform, enhanced hough transform, windowed hough transform and utility functions
  * in order to compute the so called Hough Rectangle detection.
@@ -64,13 +64,9 @@ class HoughRectangle {
 
    public:
     /**
-     * Applies the classic Hough transform
+     * Applies the classic Hough transform on the image
      *
-     * @param[in]
-     * @param[in]
-     * @param[in]
-     * @param[in]
-     * @param[in]
+     * @param[in] img input image to be processed
      * @param[out] acc accumulator (hough transform)
      */
     fMat hough_transform(const fMat &img);
@@ -78,38 +74,29 @@ class HoughRectangle {
     /**
      * Performs the Windowed hough transform on a single patch
      *
-     * @param[in]
-     * @param[in]
-     * @param[in]
-     * @param[in]
-     * @param[in]
-     * @param[in]
-     * @param[in]
-     * @param[out] wht hough transformed image
+     * \param[in] img input float image
+     * \param[out] acc accumulator (windowed hough transform)
      */
     fMat windowed_hough(const fMat &img, const int &r_min, const int &r_max);
 
     /**
      * Applies the Windowed hough transform on the whole image
      *
-     * @param[in]
-     * @param[in]
-     * @param[in]
-     * @param[in]
-     * @param[in]
-     * @param[in]
-     * @param[in]
+     * @param[in] img image to process
+     * @param[in] L_window size of the window on which the Hough transform is applied to. Should be > rectangle length
+     * @param[in] r_min inner size of the ring. Should be smaller than the rectangle
+     * @param[in] r_max outer size of the ring. Should be bigger than the rectangle
      * @param[out]
      */
     fMat apply_windowed_hough(const fMat &img, const int &L_window, const int &r_min, const int &r_max);
 
     /**
-     * Computes enhanced Hough transform
+     * Computes enhanced Hough transform by amplying high pixels
      *
-     * @param[in]
-     * @param[in]
-     * @param[in]
-     * @param[out]
+     * @param[in] hough transform
+     * @param[in] h height of patch
+     * @param[in] w width of patch
+     * @param[out] houghpp enhanced hough transform
      */
     fMat enhance_hough(const fMat &hough, const int &h, const int &w);
 
@@ -126,7 +113,8 @@ class HoughRectangle {
     /**
      * Returns vectors of theta and rho positions corresponding to the input indexes
      *
-     *
+     * @param[in] indexes vector of array containing index for rho in 1st element and theta in 2nd
+     * @param[out] rho_vec, theta_vec tuple of vectors containing the rho and theta maximums
      */
     std::tuple<std::vector<float>, std::vector<float>> index_rho_theta(const std::vector<std::array<int, 2>> &indexes);
 
@@ -135,7 +123,7 @@ class HoughRectangle {
      *
      * @param[in] rho_maxs vector specifying rho positions of detected peaks
      * @param[in] theta_maxs vector specifying theta positions of detected peaks
-     *
+     * @param[out] pairs vector containing the extended peaks of pairs. 1st element = rho, 2nd = theta.
      */
     std::vector<std::array<float, 2>> find_pairs(const std::vector<float> &rho_maxs,
                                                  const std::vector<float> &theta_maxs, const float &T_t,
@@ -146,7 +134,8 @@ class HoughRectangle {
      *
      * @param[in] rho_maxs vector specifying rho positions of detected peaks
      * @param[in] theta_maxs vector specifying theta positions of detected peaks
-     * @param[out]
+     * @param[out] rectangles a vector of arrays of size 3. First element is the angle, 2nd corresponding rho, 3rd rho
+     * of opposite corner.
      */
     std::vector<std::array<float, 3>> match_pairs_into_rectangle(const std::vector<std::array<float, 2>> &pairs,
                                                                  const float &T_alpha);
