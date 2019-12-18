@@ -1,0 +1,179 @@
+\hypertarget{class_hough_rectangle}{}\section{Hough\+Rectangle Class Reference}
+\label{class_hough_rectangle}\index{Hough\+Rectangle@{Hough\+Rectangle}}
+
+
+{\ttfamily \#include $<$process\+\_\+image.\+hpp$>$}
+
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_hough_rectangle_a0cd25532f8e21e7716dc8e1aac2568b8}\label{class_hough_rectangle_a0cd25532f8e21e7716dc8e1aac2568b8}} 
+typedef Eigen\+::\+Matrix$<$ float, Eigen\+::\+Dynamic, Eigen\+::\+Dynamic, Eigen\+::\+Row\+Major $>$ {\bfseries f\+Mat}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_hough_rectangle_ab5ab09cbfe4cebb830a2c75d4112df95}\label{class_hough_rectangle_ab5ab09cbfe4cebb830a2c75d4112df95}} 
+{\bfseries Hough\+Rectangle} (f\+Mat \&img, int theta\+Bins=256, int rho\+Bins=256, float theta\+Min=-\/90, float theta\+Max=90)
+\item 
+f\+Mat \mbox{\hyperlink{class_hough_rectangle_ab3ff810c6e33c8d0832d49c7347b500b}{hough\+\_\+transform}} (const f\+Mat \&img)
+\item 
+f\+Mat \mbox{\hyperlink{class_hough_rectangle_aca6876916a1b547dbd36e9a7f0312473}{windowed\+\_\+hough}} (const f\+Mat \&img, const int \&r\+\_\+min, const int \&r\+\_\+max)
+\item 
+f\+Mat \mbox{\hyperlink{class_hough_rectangle_a5e4e337efcd49b7c0c77ee180847197f}{apply\+\_\+windowed\+\_\+hough}} (const f\+Mat \&img, const int \&L\+\_\+window, const int \&r\+\_\+min, const int \&r\+\_\+max)
+\item 
+f\+Mat \mbox{\hyperlink{class_hough_rectangle_ae4692e63ca5846f48045778b1e377362}{enhance\+\_\+hough}} (const f\+Mat \&hough, const int \&h, const int \&w)
+\item 
+f\+Mat \mbox{\hyperlink{class_hough_rectangle_aa43d49848bcf0ceafe1444e744222d5c}{ring}} (const f\+Mat \&img, const int \&r\+\_\+min, const int \&r\+\_\+max)
+\item 
+std\+::tuple$<$ std\+::vector$<$ float $>$, std\+::vector$<$ float $>$ $>$ \mbox{\hyperlink{class_hough_rectangle_aedd6bcecc2e612a2581e34029afe0cb8}{index\+\_\+rho\+\_\+theta}} (const std\+::vector$<$ std\+::array$<$ int, 2 $>$$>$ \&indexes)
+\item 
+\mbox{\Hypertarget{class_hough_rectangle_a20e04bf149b566202e3b9ebf81829253}\label{class_hough_rectangle_a20e04bf149b566202e3b9ebf81829253}} 
+std\+::vector$<$ std\+::array$<$ float, 2 $>$ $>$ {\bfseries find\+\_\+pairs} (const std\+::vector$<$ float $>$ \&rho\+\_\+maxs, const std\+::vector$<$ float $>$ \&theta\+\_\+maxs, const float \&T\+\_\+t, const float \&T\+\_\+rho, const float \&T\+\_\+L)
+\item 
+std\+::vector$<$ std\+::array$<$ float, 3 $>$ $>$ \mbox{\hyperlink{class_hough_rectangle_a6605c68fdf0577bb6b96403ecd0c59b2}{match\+\_\+pairs\+\_\+into\+\_\+rectangle}} (const std\+::vector$<$ std\+::array$<$ float, 2 $>$$>$ \&pairs, const float \&T\+\_\+alpha)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_hough_rectangle_a921574bcf35739fe8317458e3a899179}\label{class_hough_rectangle_a921574bcf35739fe8317458e3a899179}} 
+Eigen\+::\+Vector\+Xf {\bfseries m\+\_\+theta\+\_\+vec}
+\item 
+\mbox{\Hypertarget{class_hough_rectangle_a072a4eff485ec2848d7697934cabd189}\label{class_hough_rectangle_a072a4eff485ec2848d7697934cabd189}} 
+std\+::vector$<$ float $>$ {\bfseries m\+\_\+rho\+\_\+vec}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Class containing all the tools to perform rectangle detection on an image.
+
+This class implements the Hough transform, enhanced hough transform, windowed hough transform and utility functions in order to compute the so called Hough Rectangle detection. 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{class_hough_rectangle_a5e4e337efcd49b7c0c77ee180847197f}\label{class_hough_rectangle_a5e4e337efcd49b7c0c77ee180847197f}} 
+\index{Hough\+Rectangle@{Hough\+Rectangle}!apply\+\_\+windowed\+\_\+hough@{apply\+\_\+windowed\+\_\+hough}}
+\index{apply\+\_\+windowed\+\_\+hough@{apply\+\_\+windowed\+\_\+hough}!Hough\+Rectangle@{Hough\+Rectangle}}
+\subsubsection{\texorpdfstring{apply\+\_\+windowed\+\_\+hough()}{apply\_windowed\_hough()}}
+{\footnotesize\ttfamily Hough\+Rectangle\+::f\+Mat Hough\+Rectangle\+::apply\+\_\+windowed\+\_\+hough (\begin{DoxyParamCaption}\item[{const f\+Mat \&}]{img,  }\item[{const int \&}]{L\+\_\+window,  }\item[{const int \&}]{r\+\_\+min,  }\item[{const int \&}]{r\+\_\+max }\end{DoxyParamCaption})}
+
+Applies the Windowed hough transform on the whole image
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em img} & image to process \\
+\hline
+\mbox{\tt in}  & {\em L\+\_\+window} & size of the window on which the Hough transform is applied to. Should be $>$ rectangle length \\
+\hline
+\mbox{\tt in}  & {\em r\+\_\+min} & inner size of the ring. Should be smaller than the rectangle \\
+\hline
+\mbox{\tt in}  & {\em r\+\_\+max} & outer size of the ring. Should be bigger than the rectangle \\
+\hline
+\mbox{\tt out}  & {\em } & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_hough_rectangle_ae4692e63ca5846f48045778b1e377362}\label{class_hough_rectangle_ae4692e63ca5846f48045778b1e377362}} 
+\index{Hough\+Rectangle@{Hough\+Rectangle}!enhance\+\_\+hough@{enhance\+\_\+hough}}
+\index{enhance\+\_\+hough@{enhance\+\_\+hough}!Hough\+Rectangle@{Hough\+Rectangle}}
+\subsubsection{\texorpdfstring{enhance\+\_\+hough()}{enhance\_hough()}}
+{\footnotesize\ttfamily Hough\+Rectangle\+::f\+Mat Hough\+Rectangle\+::enhance\+\_\+hough (\begin{DoxyParamCaption}\item[{const f\+Mat \&}]{hough,  }\item[{const int \&}]{h,  }\item[{const int \&}]{w }\end{DoxyParamCaption})}
+
+Computes enhanced Hough transform by amplying high pixels
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em hough} & transform \\
+\hline
+\mbox{\tt in}  & {\em h} & height of patch \\
+\hline
+\mbox{\tt in}  & {\em w} & width of patch \\
+\hline
+\mbox{\tt out}  & {\em houghpp} & enhanced hough transform \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_hough_rectangle_ab3ff810c6e33c8d0832d49c7347b500b}\label{class_hough_rectangle_ab3ff810c6e33c8d0832d49c7347b500b}} 
+\index{Hough\+Rectangle@{Hough\+Rectangle}!hough\+\_\+transform@{hough\+\_\+transform}}
+\index{hough\+\_\+transform@{hough\+\_\+transform}!Hough\+Rectangle@{Hough\+Rectangle}}
+\subsubsection{\texorpdfstring{hough\+\_\+transform()}{hough\_transform()}}
+{\footnotesize\ttfamily Hough\+Rectangle\+::f\+Mat Hough\+Rectangle\+::hough\+\_\+transform (\begin{DoxyParamCaption}\item[{const f\+Mat \&}]{img }\end{DoxyParamCaption})}
+
+Applies the classic Hough transform on the image
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em img} & input image to be processed \\
+\hline
+\mbox{\tt out}  & {\em acc} & accumulator (hough transform) \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_hough_rectangle_aedd6bcecc2e612a2581e34029afe0cb8}\label{class_hough_rectangle_aedd6bcecc2e612a2581e34029afe0cb8}} 
+\index{Hough\+Rectangle@{Hough\+Rectangle}!index\+\_\+rho\+\_\+theta@{index\+\_\+rho\+\_\+theta}}
+\index{index\+\_\+rho\+\_\+theta@{index\+\_\+rho\+\_\+theta}!Hough\+Rectangle@{Hough\+Rectangle}}
+\subsubsection{\texorpdfstring{index\+\_\+rho\+\_\+theta()}{index\_rho\_theta()}}
+{\footnotesize\ttfamily std\+::tuple$<$ std\+::vector$<$ float $>$, std\+::vector$<$ float $>$ $>$ Hough\+Rectangle\+::index\+\_\+rho\+\_\+theta (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ std\+::array$<$ int, 2 $>$$>$ \&}]{indexes }\end{DoxyParamCaption})}
+
+Returns vectors of theta and rho positions corresponding to the input indexes
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em indexes} & vector of array containing index for rho in 1st element and theta in 2nd \\
+\hline
+\mbox{\tt out}  & {\em rho\+\_\+vec,theta\+\_\+vec} & tuple of vectors containing the rho and theta maximums \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_hough_rectangle_a6605c68fdf0577bb6b96403ecd0c59b2}\label{class_hough_rectangle_a6605c68fdf0577bb6b96403ecd0c59b2}} 
+\index{Hough\+Rectangle@{Hough\+Rectangle}!match\+\_\+pairs\+\_\+into\+\_\+rectangle@{match\+\_\+pairs\+\_\+into\+\_\+rectangle}}
+\index{match\+\_\+pairs\+\_\+into\+\_\+rectangle@{match\+\_\+pairs\+\_\+into\+\_\+rectangle}!Hough\+Rectangle@{Hough\+Rectangle}}
+\subsubsection{\texorpdfstring{match\+\_\+pairs\+\_\+into\+\_\+rectangle()}{match\_pairs\_into\_rectangle()}}
+{\footnotesize\ttfamily std\+::vector$<$ std\+::array$<$ float, 3 $>$ $>$ Hough\+Rectangle\+::match\+\_\+pairs\+\_\+into\+\_\+rectangle (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ std\+::array$<$ float, 2 $>$$>$ \&}]{pairs,  }\item[{const float \&}]{T\+\_\+alpha }\end{DoxyParamCaption})}
+
+Matches detected peaks into rectangle
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em rho\+\_\+maxs} & vector specifying rho positions of detected peaks \\
+\hline
+\mbox{\tt in}  & {\em theta\+\_\+maxs} & vector specifying theta positions of detected peaks \\
+\hline
+\mbox{\tt out}  & {\em rectangles} & a vector of arrays of size 3. First element is the angle, 2nd corresponding rho, 3rd rho of opposite corner. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_hough_rectangle_aa43d49848bcf0ceafe1444e744222d5c}\label{class_hough_rectangle_aa43d49848bcf0ceafe1444e744222d5c}} 
+\index{Hough\+Rectangle@{Hough\+Rectangle}!ring@{ring}}
+\index{ring@{ring}!Hough\+Rectangle@{Hough\+Rectangle}}
+\subsubsection{\texorpdfstring{ring()}{ring()}}
+{\footnotesize\ttfamily Hough\+Rectangle\+::f\+Mat Hough\+Rectangle\+::ring (\begin{DoxyParamCaption}\item[{const f\+Mat \&}]{img,  }\item[{const int \&}]{r\+\_\+min,  }\item[{const int \&}]{r\+\_\+max }\end{DoxyParamCaption})}
+
+Applies a ring on the input matrix by putting to zero all pixels outside the ring
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em img} & Eigen matrix \\
+\hline
+\mbox{\tt in}  & {\em r\+\_\+min} & radius of inner ring \\
+\hline
+\mbox{\tt in}  & {\em r\+\_\+max} & radius of outer ring \\
+\hline
+\mbox{\tt out}  & {\em result} & ringed output matrix \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{class_hough_rectangle_aca6876916a1b547dbd36e9a7f0312473}\label{class_hough_rectangle_aca6876916a1b547dbd36e9a7f0312473}} 
+\index{Hough\+Rectangle@{Hough\+Rectangle}!windowed\+\_\+hough@{windowed\+\_\+hough}}
+\index{windowed\+\_\+hough@{windowed\+\_\+hough}!Hough\+Rectangle@{Hough\+Rectangle}}
+\subsubsection{\texorpdfstring{windowed\+\_\+hough()}{windowed\_hough()}}
+{\footnotesize\ttfamily Hough\+Rectangle\+::f\+Mat Hough\+Rectangle\+::windowed\+\_\+hough (\begin{DoxyParamCaption}\item[{const f\+Mat \&}]{img,  }\item[{const int \&}]{r\+\_\+min,  }\item[{const int \&}]{r\+\_\+max }\end{DoxyParamCaption})}
+
+Performs the Windowed hough transform on a single patch
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em img} & input float image \\
+\hline
+\mbox{\tt out}  & {\em acc} & accumulator (windowed hough transform) \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/luczeng/\+Hough\+Rectangle/include/process\+\_\+image.\+hpp\item 
+/\+Users/luczeng/\+Hough\+Rectangle/src/process\+\_\+image.\+cpp\end{DoxyCompactItemize}
