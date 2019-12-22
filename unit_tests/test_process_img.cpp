@@ -60,11 +60,11 @@ TEST_CASE("Test functions to compute the Hough Rectangle function") {
     }
 
     SECTION("Test the peak detection") {
-        HoughRectangle::fMat gray = read_image("../img/rectangle1.png");
+        HoughRectangle::fMat gray = read_image("../../img/rectangle1.png");
 
         // Parse config file
         Config config;
-        std::ifstream is("../src/configs.json");
+        std::ifstream is("../../src/configs.json");
         cereal::JSONInputArchive archive(is);
         archive(config);
 
