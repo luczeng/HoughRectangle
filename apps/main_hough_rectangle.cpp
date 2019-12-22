@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
     std::tie(rho_maxs, theta_maxs) = ht.index_rho_theta(indexes);
 
     // Find pairs
-    std::vector<std::array<float,2>> pairs = ht.find_pairs(rho_maxs,theta_maxs,config.T_rho,config.T_theta,config.T_l);
+    std::vector<std::array<float,4>> pairs = ht.find_pairs(rho_maxs,theta_maxs,config.T_rho,config.T_theta,config.T_l);
     
     // Find rectangle
     std::vector<std::array<float, 3>> rectangles = ht.match_pairs_into_rectangle(pairs,config.T_alpha);

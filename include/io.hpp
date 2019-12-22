@@ -51,9 +51,8 @@ Eigen::MatrixXf read_image(const std::string &filename);
 
 // Result io
 void save_maximum(const std::string &filename, const std::vector<std::array<int, 2>> &maximums);
-void save_pairs(const std::string &filename, const std::vector<std::array<float, 2>> &pairs);
+void save_pairs(const std::string &filename, const std::vector<std::array<float, 4>> &pairs);
 void save_rectangle(const std::string &filename, const std::vector<std::array<int, 8>> &indexes);
-void save_maximum_values(const std::string &filename, const std::vector<std::array<float, 2>> &indexes);
 
 // Conversion utils
 std::array<float, 3> convert_normal2cartesian(const float &angle, const float &rho);

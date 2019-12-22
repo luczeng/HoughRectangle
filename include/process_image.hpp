@@ -123,9 +123,10 @@ class HoughRectangle {
      *
      * @param[in] rho_maxs vector specifying rho positions of detected peaks
      * @param[in] theta_maxs vector specifying theta positions of detected peaks
-     * @param[out] pairs vector containing the extended peaks of pairs. 1st element = rho, 2nd = theta.
+     * @param[out] pairs vector containing the extended peaks of pairs. 1st element = rho, 2nd = theta, 3rd = error on
+     * rho, 4th = error on theta
      */
-    std::vector<std::array<float, 2>> find_pairs(const std::vector<float> &rho_maxs,
+    std::vector<std::array<float, 4>> find_pairs(const std::vector<float> &rho_maxs,
                                                  const std::vector<float> &theta_maxs, const float &T_t,
                                                  const float &T_rho, const float &T_L);
 
@@ -137,7 +138,7 @@ class HoughRectangle {
      * @param[out] rectangles a vector of arrays of size 3. First element is the angle, 2nd corresponding rho, 3rd rho
      * of opposite corner.
      */
-    std::vector<std::array<float, 3>> match_pairs_into_rectangle(const std::vector<std::array<float, 2>> &pairs,
+    std::vector<std::array<float, 3>> match_pairs_into_rectangle(const std::vector<std::array<float, 4>> &pairs,
                                                                  const float &T_alpha);
 };
 

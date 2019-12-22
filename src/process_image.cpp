@@ -216,12 +216,12 @@ std::tuple<std::vector<float>, std::vector<float>> HoughRectangle::index_rho_the
 }
 
 /*************************************************************************************/
-std::vector<std::array<float, 2>> HoughRectangle::find_pairs(const std::vector<float>& rho_maxs,
+std::vector<std::array<float, 4>> HoughRectangle::find_pairs(const std::vector<float>& rho_maxs,
                                                              const std::vector<float>& theta_maxs, const float& T_t,
                                                              const float& T_rho, const float& T_L) {
     // Match peaks into pairs
-    std::vector<std::array<float, 2>> pairs;  // 1st: rho, 2nd: theta
-    std::array<float, 2> pair;
+    std::vector<std::array<float, 4>> pairs;  // 1st: rho, 2nd: theta
+    std::array<float, 4> pair;
     for (int i = 0; i < rho_maxs.size(); ++i) {
         for (int j = 0; j < rho_maxs.size(); ++j) {
             // Parralelism
@@ -235,6 +235,9 @@ std::vector<std::array<float, 2>> HoughRectangle::find_pairs(const std::vector<f
             // Construct extended peak
             pair[0] = 0.5 * abs(rho_maxs[i] - rho_maxs[j]);
             pair[1] = 0.5 * (theta_maxs[i] + theta_maxs[j]);
+            pair[2] = abs(rho_maxs[i] + rho_maxs[j]);       // error measure on rho
+            pair[3] = abs( theta_maxs[i] - theta_maxs[j]);  // error measure on theta
+
             pairs.push_back(pair);
         }
     }
@@ -246,7 +249,7 @@ std::vector<std::array<float, 2>> HoughRectangle::find_pairs(const std::vector<f
 
 /*************************************************************************************/
 std::vector<std::array<float, 3>> HoughRectangle::match_pairs_into_rectangle(
-    const std::vector<std::array<float, 2>>& pairs, const float& T_alpha) {
+    const std::vector<std::array<float, 4>>& pairs, const float& T_alpha) {
     std::vector<std::array<float, 3>> rectangles;
 
     // Match pairs into rectangle

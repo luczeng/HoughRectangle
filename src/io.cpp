@@ -170,7 +170,7 @@ std::vector<std::array<int, 8>> convert_all_rects_2_cartesian(const std::vector<
 /*
  * Saves detected pairs in text file
  */
-void save_pairs(const std::string &filename, const std::vector<std::array<float, 2>> &pairs) {
+void save_pairs(const std::string &filename, const std::vector<std::array<float, 4>> &pairs) {
     std::ofstream rectangle_file(filename.c_str());
 
     if (rectangle_file.is_open()) {
