@@ -115,7 +115,8 @@ TEST_CASE("Test Input-output functions for images") {
 
     SECTION("Image reader into Eigen matrix") {
         // Load image
-        Eigen::MatrixXf img = read_image("../unit_tests/test_img.png");
+        std::string test_img_folder_path = UNIT_TEST_FOLDER_PATH;
+        Eigen::MatrixXf img = read_image(test_img_folder_path + "/test_img.png");
 
         // Ground truth
         Eigen::MatrixXf ground_truth(3, 4);
@@ -142,7 +143,7 @@ TEST_CASE("Test Input-output functions for images") {
         std::cout << horiz_line[0] << " " << horiz_line[1] << " " << horiz_line[2] << std::endl;
 
         //REQUIRE(vert_line == vert_line_gt);
-        // REQUIRE( horiz_line == horiz_line_gt );
+        //REQUIRE( horiz_line == horiz_line_gt );
 
         // assert vert_line
     }
