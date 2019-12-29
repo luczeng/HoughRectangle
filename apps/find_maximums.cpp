@@ -1,9 +1,7 @@
 #include <iostream>
 #include "cxxopts.hpp"
 #include "Eigen/Dense"
-#ifndef STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
-#ifndef STB_IMAGE_WRITE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image.h"
 #include "stb_image_write.h"
@@ -14,6 +12,7 @@
 #include <cereal/cereal.hpp>
 #include "config.hpp"
 #include <fstream>
+#include <vector>
 
 using namespace Eigen;
 
@@ -38,16 +37,22 @@ int main(int argc, char * argv[]){
     ////////////////////////////////////////////////////////////////////////
     // Load image and prepare matrix
     ////////////////////////////////////////////////////////////////////////
-    Matrix<float,Dynamic,Dynamic,RowMajor> gray = read_image(input_path.c_str());
+    Matrix<float, Dynamic, Dynamic, RowMajor> gray = eigen_io::read_image(input_path.c_str());
 
     ////////////////////////////////////////////////////////////////////////
     // Process image
     ////////////////////////////////////////////////////////////////////////
-    HoughRectangle ht(gray,config.thetaBins,config.rhoBins,config.thetaMin,config.thetaMax);
-    Matrix<float,Dynamic,Dynamic,RowMajor> wht = ht.windowed_hough(gray,config.r_min,config.r_max);
+    int thetaBins =256;
+    int thetaMin = -90;
+    int thetaMax = 90;
+    int rhoBins =256;
 
-    save_image(wht,output_path,config.thetaBins*config.rhoBins,config.thetaBins,config.rhoBins);
+    HoughRectangle ht(gray,thetaBins,rhoBins,thetaMin,thetaMax);
+    HoughRectangle::fMat wht = ht.hough_transform(gray);
 
+    std::vector<float> rho_maxs, theta_maxs;
+    std::vector<std::array<int,2>> indexes = find_local_maximum(wht,25);
+
+    eigen_io::save_image(wht, "image_max.png", thetaBins * rhoBins, thetaBins, rhoBins);
+    eigen_io::save_maximum(output_path, indexes);
 }
-#endif
-#endif

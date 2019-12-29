@@ -8,13 +8,10 @@
 #include "stb_image_write.h"
 #include "string"
 
-// TODO(luczeng): use specific using clauses
 using namespace Eigen;
 
-// TODO(luczeng): why do you pass in a unique_ptr by reference? Just pass the pointer, passing the unique pointer does
-// not give you any extra advantage, and it is confusing.
-//                std::unique_ptr are very useful inside classes, not so much as arguments to functions.
-// TODO(luczeng): use return type for gray, not output argument.
+namespace eigen_io {
+
 void convert_RawBuff2Mat(const std::unique_ptr<unsigned char[]> &data, MatrixXf &gray, const int &x, const int &y) {
     const int nx = x;
     const int ny = y;
@@ -24,6 +21,7 @@ void convert_RawBuff2Mat(const std::unique_ptr<unsigned char[]> &data, MatrixXf 
     gray = img.cast<float>();
 }
 
+//-----------------------------------------------------------------------------------------------------//
 void convert_Mat2RawBuff(const Matrix<float, Dynamic, Dynamic, RowMajor> &gray,
                          std::unique_ptr<unsigned char[]> &gray_UC, const int &size) {
     // gray_UC = new unsigned char[size];
@@ -32,6 +30,7 @@ void convert_Mat2RawBuff(const Matrix<float, Dynamic, Dynamic, RowMajor> &gray,
     }
 }
 
+//-----------------------------------------------------------------------------------------------------//
 int save_image(Matrix<float, Dynamic, Dynamic, RowMajor> &img, const std::string &filename, const int &size,
                const int &x, const int &y) {
     // Normalise to 0-255
@@ -45,13 +44,7 @@ int save_image(Matrix<float, Dynamic, Dynamic, RowMajor> &img, const std::string
     return stbi_write_png(filename.c_str(), x, y, 1, gray_UC_hough.get(), x);
 }
 
-/**
- * Loads png image to Eigen matrix
- *
- * \param img input float eigen matrix in RowMajor order
- * \param filename output file path ending in .png
- *
- */
+//-----------------------------------------------------------------------------------------------------//
 MatrixXf read_image(const std::string &filename) {
     // Load data to raw buffer
     int x, y, n;
@@ -69,10 +62,7 @@ MatrixXf read_image(const std::string &filename) {
     return img;
 }
 
-/*
- * Saves maximums detected position in text file
- *
- */
+//-----------------------------------------------------------------------------------------------------//
 void save_maximum(const std::string &filename, const std::vector<std::array<int, 2>> &indexes) {
     std::ofstream maximums(filename.c_str());
 
@@ -85,30 +75,8 @@ void save_maximum(const std::string &filename, const std::vector<std::array<int,
         std::cerr << "Couldnt save maximum file" << std::endl;
 }
 
-/*
- * Saves maximums detected position in text file
- * TODO: template and merge with previous func
- *
- */
-void save_maximum_values(const std::string &filename, const std::vector<std::array<float, 2>> &indexes) {
-    std::ofstream maximums(filename.c_str());
 
-    if (maximums.is_open()) {
-        for (int i = 0; i < indexes.size(); ++i) {
-            maximums << indexes[i][0] << " " << indexes[i][1] << "\n";
-        }
-        maximums.close();
-    } else
-        std::cerr << "Couldnt save maximum file" << std::endl;
-}
-
-/*
- * Convert normal coordinate to cartesian coordinates
- *
- *
- * \param normal line in normal form rho, theta
- * \return cartesian ax + by + c = 0, a,b,c
- */
+//-----------------------------------------------------------------------------------------------------//
 std::array<float, 3> convert_normal2cartesian(const float &angle, const float &rho) {
     std::array<float, 3> cartesian;
 
@@ -119,9 +87,7 @@ std::array<float, 3> convert_normal2cartesian(const float &angle, const float &r
     return cartesian;
 }
 
-/*
- * Convert normal rectangle into corner format
- */
+//-----------------------------------------------------------------------------------------------------//
 std::array<int, 8> convert_normal_rect2_corners_rect(const std::array<float, 3> &in_rectangle, const float &x_bias,
                                                      const float &y_bias) {
     std::array<int, 8> rectangle;
@@ -155,9 +121,7 @@ std::array<int, 8> convert_normal_rect2_corners_rect(const std::array<float, 3> 
     return rectangle;
 }
 
-/*
- * Convert all rectangles to corner format
- */
+//-----------------------------------------------------------------------------------------------------//
 std::vector<std::array<int, 8>> convert_all_rects_2_cartesian(const std::vector<std::array<float, 3>> &rectangles,
                                                               const float &x_bias, const float &y_bias) {
     std::vector<std::array<int, 8>> rectangles_cart;
@@ -167,10 +131,8 @@ std::vector<std::array<int, 8>> convert_all_rects_2_cartesian(const std::vector<
     return rectangles_cart;
 }
 
-/*
- * Saves detected pairs in text file
- */
-void save_pairs(const std::string &filename, const std::vector<std::array<float, 2>> &pairs) {
+//-----------------------------------------------------------------------------------------------------//
+void save_pairs(const std::string &filename, const std::vector<std::array<float, 4>> &pairs) {
     std::ofstream rectangle_file(filename.c_str());
 
     if (rectangle_file.is_open()) {
@@ -183,9 +145,7 @@ void save_pairs(const std::string &filename, const std::vector<std::array<float,
     }
 }
 
-/*
- * Saves detected rectangles in text file
- */
+//-----------------------------------------------------------------------------------------------------//
 void save_rectangle(const std::string &filename, const std::vector<std::array<int, 8>> &rectangles) {
     std::ofstream rectangle_file(filename.c_str());
 
@@ -200,3 +160,4 @@ void save_rectangle(const std::string &filename, const std::vector<std::array<in
         std::cerr << "Couldnt save maximum file" << std::endl;
     }
 }
+}  // namespace eigen_io

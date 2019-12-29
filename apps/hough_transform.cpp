@@ -12,7 +12,6 @@
 #include <cereal/cereal.hpp>
 #include "config.hpp"
 #include <fstream>
-#include <vector>
 
 using namespace Eigen;
 
@@ -34,33 +33,22 @@ int main(int argc, char * argv[]){
     cereal::JSONInputArchive archive(is);
     archive(config);
 
+    int thetaBins = 512;
+    int thetaMin = -90;
+    int thetaMax = 90;
+    int rhoBins = 512;
+    int h =32;
+
     ////////////////////////////////////////////////////////////////////////
     // Load image and prepare matrix
     ////////////////////////////////////////////////////////////////////////
-    Matrix<float,Dynamic,Dynamic,RowMajor>  gray = read_image(input_path.c_str());
+    Matrix<float, Dynamic, Dynamic, RowMajor> gray = eigen_io::read_image(input_path.c_str());
 
     ////////////////////////////////////////////////////////////////////////
     // Process image
     ////////////////////////////////////////////////////////////////////////
-    int thetaBins =256;
-    int thetaMin = -90;
-    int thetaMax = 90;
-    int rhoBins =256;
+    HoughRectangle ht(gray,config.thetaBins,config.rhoBins,config.thetaMin,config.thetaMax);
+    Matrix<float,Dynamic,Dynamic,RowMajor> wht = ht.hough_transform(gray);
 
-    // Compute Hough transform
-    HoughRectangle ht(gray,thetaBins,rhoBins,thetaMin,thetaMax);
-    HoughRectangle::fMat wht = ht.hough_transform(gray);
-
-    // Detect peaks
-    std::vector<std::array<int, 2>> indexes = find_local_maximum(wht, 25);
-    std::vector<float> rho_maxs, theta_maxs;
-    std::tie(rho_maxs, theta_maxs) = ht.index_rho_theta(indexes);
-
-    // Find pairs
-    std::vector<std::array<float,2>> pairs = ht.find_pairs(rho_maxs,theta_maxs,1,2,1);
-    
-    // Save pairs
-    save_pairs(output_path,pairs);
-
-
+    eigen_io::save_image(wht, output_path, config.thetaBins * config.rhoBins, config.thetaBins, config.rhoBins);
 }

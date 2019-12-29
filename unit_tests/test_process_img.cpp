@@ -6,7 +6,6 @@
 #include <cereal/archives/binary.hpp>
 #include <cereal/archives/json.hpp>
 #include <cereal/cereal.hpp>
-#include "config.hpp"
 #include "io.hpp"
 #include "process_image.hpp"
 #include "stb_image.h"
@@ -60,13 +59,8 @@ TEST_CASE("Test functions to compute the Hough Rectangle function") {
     }
 
     SECTION("Test the peak detection") {
-        HoughRectangle::fMat gray = read_image("../img/rectangle1.png");
-
-        // Parse config file
-        Config config;
-        std::ifstream is("../src/configs.json");
-        cereal::JSONInputArchive archive(is);
-        archive(config);
+        std::string test_img_file_path = UNIT_TEST_FOLDER_PATH;
+        HoughRectangle::fMat gray = eigen_io::read_image(test_img_file_path + "/../img/rectangle1.png");
 
         // Parameters
         int thetaBins = 256;
@@ -82,29 +76,27 @@ TEST_CASE("Test functions to compute the Hough Rectangle function") {
         std::vector<std::array<int, 2>> indexes = find_local_maximum(wht, 50);
         std::vector<float> rho_maxs, theta_maxs;
         std::tie(rho_maxs, theta_maxs) = ht.index_rho_theta(indexes);
-        // std::cout<<"Detected "<<indexes.size()<<" points"<<std::endl;
+         std::cout<<"Detected "<<indexes.size()<<" points"<<std::endl;
 
-        // for (int i = 0; i < rho_maxs.size(); ++i) {
-        // std::cout << i << " " << rho_maxs[i] << " " << theta_maxs[i]
+         //for (int i = 0; i < rho_maxs.size(); ++i) {
+         //std::cout << i << " " << rho_maxs[i] << " " << theta_maxs[i]
         //<< std::endl;
         //}
 
         // Match peaks into rectangles
-        // std::vector<std::array<float, 3>> rectangles =
-        // ht.match_maximums(rho_maxs, theta_maxs, 1, 1, 30, 3);
+        //std::vector<std::array<float, 3>> rectangles = ht.match_maximums(rho_maxs, theta_maxs, 1, 1, 30, 3);
 
-        // std::cout << "Found " << rectangles.size() << " rectangles"
+        //std::cout << "Found " << rectangles.size() << " rectangles" << std::endl;
+
+        //for (auto rect : rectangles) {
+        //std::cout << rect[0] << " " << rect[1] << " " << rect[2]
         //<< std::endl;
+        //}
 
-        ////for (auto rect : rectangles) {
-        ////std::cout << rect[0] << " " << rect[1] << " " << rect[2]
-        ////<< std::endl;
-        ////}
+         //std::vector<std::array<int, 8>> rectangles_cart =
+         //convert_all_rects_2_cartesian(rectangles,
+         //128,128);
 
-        // std::vector<std::array<int, 8>> rectangles_cart =
-        // convert_all_rects_2_cartesian(rectangles,
-        // 128,128);
-
-        // save_rectangle("rectangles.txt", rectangles_cart);
+         //save_rectangle("rectangles.txt", rectangles_cart);
     }
 }

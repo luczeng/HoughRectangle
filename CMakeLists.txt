@@ -37,35 +37,20 @@ add_subdirectory(third_party/Catch2)
 
 
 #----------------------------------------------------------------------------------------------------#
-# Main code
+# Main library
 #----------------------------------------------------------------------------------------------------#
 
-add_library(main_hough STATIC src/io.cpp src/process_image.cpp include/io.hpp include/config.hpp include/process_image.hpp)
-target_include_directories(main_hough PUBLIC include)
-target_link_libraries(main_hough PUBLIC Eigen3::Eigen PUBLIC cereal PRIVATE stb)
-
+add_library(hough_lib STATIC src/io.cpp src/process_image.cpp include/io.hpp include/config.hpp include/process_image.hpp)
+target_include_directories(hough_lib PUBLIC include)
+target_link_libraries(hough_lib  PUBLIC Eigen3::Eigen PUBLIC cereal PRIVATE stb)
 
 #----------------------------------------------------------------------------------------------------#
-#Executables
+# Source code
 #----------------------------------------------------------------------------------------------------#
-add_executable(main_hough_rectangle src/main_hough_rectangle.cpp )
-target_link_libraries(main_hough_rectangle PUBLIC Eigen3::Eigen PUBLIC main_hough PUBLIC cxxopts PRIVATE stb PUBLIC cereal)
+add_subdirectory(apps)
 
-add_executable(test_io unit_test/test_io.cpp)
-target_link_libraries(test_io PUBLIC Catch2::Catch2 PRIVATE stb PUBLIC main_hough)
-
-add_executable(test_process_img unit_test/test_process_img.cpp)
-target_include_directories(test_process_img PUBLIC include)
-target_link_libraries(test_process_img PUBLIC Catch2::Catch2 PRIVATE stb PUBLIC main_hough)
-
-add_executable(windowed_hough src/windowed_hough.cpp)
-target_link_libraries(windowed_hough PUBLIC Eigen3::Eigen PUBLIC main_hough PUBLIC cxxopts PRIVATE stb PRIVATE cereal)
-
-add_executable(hough_transform src/hough_transform.cpp)
-target_link_libraries(hough_transform PUBLIC Eigen3::Eigen PUBLIC main_hough PUBLIC cxxopts PRIVATE stb PRIVATE cereal)
-
-add_executable(find_maximums src/find_maximums.cpp)
-target_link_libraries(find_maximums PUBLIC Eigen3::Eigen PUBLIC main_hough PUBLIC cxxopts PRIVATE stb PRIVATE cereal)
-
-add_executable(find_pairs src/find_pairs.cpp)
-target_link_libraries(find_pairs PUBLIC Eigen3::Eigen PUBLIC main_hough PUBLIC cxxopts PRIVATE stb PRIVATE cereal)
+#----------------------------------------------------------------------------------------------------#
+# Tests
+#----------------------------------------------------------------------------------------------------#
+enable_testing()
+add_subdirectory(unit_tests)

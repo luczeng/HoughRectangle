@@ -50,7 +50,7 @@ inline RawBufEq IsEqual(unsigned char* arr1, int L) { return RawBufEq(arr1, L); 
 // Tests
 /////////////////////////////////////////////////////////////////////////////
 TEST_CASE("Test Input-output functions for images") {
-    std::string filename = "../unit_test/test_img.png";
+    std::string filename = "../unit_tests/test_img.png";
 
     SECTION("Convert raw buffer to Eigen matrix") {
         // Convert some data to Eigen matrix
@@ -69,7 +69,7 @@ TEST_CASE("Test Input-output functions for images") {
         data[11] = (unsigned char)1;
 
         Eigen::MatrixXf gray;
-        convert_RawBuff2Mat(data, gray, 4, 3);
+        eigen_io::convert_RawBuff2Mat(data, gray, 4, 3);
 
         // Ground truth
         Eigen::MatrixXf ground_truth(3, 4);
@@ -97,7 +97,7 @@ TEST_CASE("Test Input-output functions for images") {
 
         // Function to test: converting matrix to raw buffer
         std::unique_ptr<unsigned char[]> gray_UC(new unsigned char[L]);
-        convert_Mat2RawBuff(gray, gray_UC, 3 * 4);
+        eigen_io::convert_Mat2RawBuff(gray, gray_UC, 3 * 4);
 
         // Test Raw buffers equality
         REQUIRE_THAT(gray_UC.get(), IsEqual(ground_truth.get(), 12));
@@ -108,14 +108,15 @@ TEST_CASE("Test Input-output functions for images") {
         Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> gray(3, 6);
         gray << 2, 3, 1, 5, 6, 5, 5, 2, 6, 1, 9, 3, 3, 1, 5, 3, 2, 1;
 
-        auto out = save_image(gray, "../unit_test/unit_test.png", 30, 6, 3);
+        auto out = eigen_io::save_image(gray, "../unit_tests/test_save_img.png", 30, 6, 3);
 
         REQUIRE(out == 1);
     }
 
     SECTION("Image reader into Eigen matrix") {
         // Load image
-        Eigen::MatrixXf img = read_image("../unit_test/test_img.png");
+        std::string test_img_folder_path = UNIT_TEST_FOLDER_PATH;
+        Eigen::MatrixXf img = eigen_io::read_image(test_img_folder_path + "/test_img.png");
 
         // Ground truth
         Eigen::MatrixXf ground_truth(3, 4);
@@ -127,22 +128,22 @@ TEST_CASE("Test Input-output functions for images") {
     SECTION("Save maximums to txt file") {
         std::vector<float> theta = {1, 2, 3};
         std::vector<float> rho = {4, 5, 6};
-        std::string filename = "../unit_test/test_maximums.cpp";
+        std::string filename = "../unit_tests/test_maximums.cpp";
 
         // save_maximum(filename,theta,rho);
     }
 
     SECTION("Convert normal line to cartesian coordinates") {
-        std::array<float, 3> vert_line = convert_normal2cartesian(0, 20);
+        std::array<float, 3> vert_line = eigen_io::convert_normal2cartesian(0, 20);
         std::array<float, 3> vert_line_gt = {1, 0, -20};
 
-        std::array<float, 3> horiz_line = convert_normal2cartesian(90, 20);
+        std::array<float, 3> horiz_line = eigen_io::convert_normal2cartesian(90, 20);
         std::array<float, 3> horiz_line_gt = {0, 1, -20};
 
         std::cout << horiz_line[0] << " " << horiz_line[1] << " " << horiz_line[2] << std::endl;
 
-        REQUIRE(vert_line == vert_line_gt);
-        // REQUIRE( horiz_line == horiz_line_gt );
+        //REQUIRE(vert_line == vert_line_gt);
+        //REQUIRE( horiz_line == horiz_line_gt );
 
         // assert vert_line
     }
@@ -150,7 +151,7 @@ TEST_CASE("Test Input-output functions for images") {
     SECTION("Convert rectangle to corners") {
         std::array<float, 3> rectangle_normal = {0, 20, 10};
 
-        std::array<int, 8> rectangle = convert_normal_rect2_corners_rect(rectangle_normal, 0, 0);
+        std::array<int, 8> rectangle = eigen_io::convert_normal_rect2_corners_rect(rectangle_normal, 0, 0);
 
         for (int corner : rectangle) std::cout << corner << std::endl;
     }
