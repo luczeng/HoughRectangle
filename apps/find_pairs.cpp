@@ -37,7 +37,7 @@ int main(int argc, char * argv[]){
     ////////////////////////////////////////////////////////////////////////
     // Load image and prepare matrix
     ////////////////////////////////////////////////////////////////////////
-    Matrix<float,Dynamic,Dynamic,RowMajor>  gray = read_image(input_path.c_str());
+    Matrix<float, Dynamic, Dynamic, RowMajor> gray = eigen_io::read_image(input_path.c_str());
 
     ////////////////////////////////////////////////////////////////////////
     // Process image
@@ -60,7 +60,5 @@ int main(int argc, char * argv[]){
     std::vector<std::array<float,4>> pairs = ht.find_pairs(rho_maxs,theta_maxs,1,2,1);
     
     // Save pairs
-    save_pairs(output_path,pairs);
-
-
+    eigen_io::save_pairs(output_path, pairs);
 }

@@ -37,7 +37,7 @@ int main(int argc, char * argv[]){
     ////////////////////////////////////////////////////////////////////////
     // Load image and prepare matrix
     ////////////////////////////////////////////////////////////////////////
-    Matrix<float,Dynamic,Dynamic,RowMajor>  gray = read_image(input_path.c_str());
+    Matrix<float, Dynamic, Dynamic, RowMajor> gray = eigen_io::read_image(input_path.c_str());
 
     ////////////////////////////////////////////////////////////////////////
     // Process image
@@ -53,7 +53,6 @@ int main(int argc, char * argv[]){
     std::vector<float> rho_maxs, theta_maxs;
     std::vector<std::array<int,2>> indexes = find_local_maximum(wht,25);
 
-    save_image(wht,"image_max.png",thetaBins*rhoBins,thetaBins,rhoBins);
-    save_maximum(output_path,indexes);
-
+    eigen_io::save_image(wht, "image_max.png", thetaBins * rhoBins, thetaBins, rhoBins);
+    eigen_io::save_maximum(output_path, indexes);
 }

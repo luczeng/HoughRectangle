@@ -42,7 +42,7 @@ int main(int argc, char * argv[]){
     ////////////////////////////////////////////////////////////////////////
     // Load image and prepare matrix
     ////////////////////////////////////////////////////////////////////////
-    Matrix<float,Dynamic,Dynamic,RowMajor>  gray = read_image(input_path.c_str());
+    Matrix<float, Dynamic, Dynamic, RowMajor> gray = eigen_io::read_image(input_path.c_str());
 
     ////////////////////////////////////////////////////////////////////////
     // Process image
@@ -50,6 +50,5 @@ int main(int argc, char * argv[]){
     HoughRectangle ht(gray,config.thetaBins,config.rhoBins,config.thetaMin,config.thetaMax);
     Matrix<float,Dynamic,Dynamic,RowMajor> wht = ht.hough_transform(gray);
 
-    save_image(wht,output_path,config.thetaBins*config.rhoBins,config.thetaBins,config.rhoBins);
-
+    eigen_io::save_image(wht, output_path, config.thetaBins * config.rhoBins, config.thetaBins, config.rhoBins);
 }

@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+namespace eigen_io {
 // Image io
 /**
  * Converts raw buffer to Eigen float matrix
@@ -61,4 +62,5 @@ std::array<int, 8> convert_normal_rect2_corners_rect(const std::array<float, 3> 
 std::vector<std::array<int, 8>> convert_all_rects_2_cartesian(const std::vector<std::array<float, 3>> &rectangles,
                                                               const float &x_bias, const float &y_bias);
 
+}  // namespace eigen_io
 #endif

@@ -60,7 +60,7 @@ TEST_CASE("Test functions to compute the Hough Rectangle function") {
 
     SECTION("Test the peak detection") {
         std::string test_img_file_path = UNIT_TEST_FOLDER_PATH;
-        HoughRectangle::fMat gray = read_image(test_img_file_path + "/../img/rectangle1.png");
+        HoughRectangle::fMat gray = eigen_io::read_image(test_img_file_path + "/../img/rectangle1.png");
 
         // Parameters
         int thetaBins = 256;

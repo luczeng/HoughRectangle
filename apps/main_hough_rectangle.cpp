@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
     ////////////////////////////////////////////////////////////////////////
     // Load image and prepare matrix
     ////////////////////////////////////////////////////////////////////////
-    Matrix<float,Dynamic,Dynamic,RowMajor> gray = read_image(filename.c_str());
+    Matrix<float, Dynamic, Dynamic, RowMajor> gray = eigen_io::read_image(filename.c_str());
 
     ////////////////////////////////////////////////////////////////////////
     // Perform Hough transform
@@ -68,9 +68,10 @@ int main(int argc, char* argv[]) {
     
     // Find rectangle
     std::vector<std::array<float, 3>> rectangles = ht.match_pairs_into_rectangle(pairs,config.T_alpha);
-    std::vector<std::array<int,8>> rectangles_corners = convert_all_rects_2_cartesian(rectangles,gray.rows()/2,gray.cols()/2);
+    std::vector<std::array<int, 8>> rectangles_corners =
+        eigen_io::convert_all_rects_2_cartesian(rectangles, gray.rows() / 2, gray.cols() / 2);
     std::cout << "Found "<<rectangles_corners.size()<<" rectangles"<<std::endl;
-    save_rectangle("rectangles.txt",rectangles_corners);
+    eigen_io::save_rectangle("rectangles.txt", rectangles_corners);
 
     return 0;
 }
