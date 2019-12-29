@@ -51,14 +51,40 @@ int save_image(Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMa
 Eigen::MatrixXf read_image(const std::string &filename);
 
 // Result io
+/*
+ * Saves maximums detected position in text file
+ *
+ */
 void save_maximum(const std::string &filename, const std::vector<std::array<int, 2>> &maximums);
+/*
+ * Saves detected pairs in text file
+ */
 void save_pairs(const std::string &filename, const std::vector<std::array<float, 4>> &pairs);
+
+/*
+ * Saves detected rectangles in text file
+ */
 void save_rectangle(const std::string &filename, const std::vector<std::array<int, 8>> &indexes);
 
 // Conversion utils
+/*
+ * Convert normal coordinate to cartesian coordinates
+ *
+ *
+ * \param normal line in normal form rho, theta
+ * \return cartesian ax + by + c = 0, a,b,c
+ */
 std::array<float, 3> convert_normal2cartesian(const float &angle, const float &rho);
+
+/*
+ * Convert normal rectangle into corner format
+ */
 std::array<int, 8> convert_normal_rect2_corners_rect(const std::array<float, 3> &in_rectangle, const float &x_bias,
                                                      const float &y_bias);
+
+/*
+ * Convert all rectangles to corner format
+ */
 std::vector<std::array<int, 8>> convert_all_rects_2_cartesian(const std::vector<std::array<float, 3>> &rectangles,
                                                               const float &x_bias, const float &y_bias);
 
