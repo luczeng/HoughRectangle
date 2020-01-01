@@ -58,6 +58,20 @@ TEST_CASE("Test functions to compute the Hough Rectangle function") {
         REQUIRE(idxs == max_pos);
     }
 
+    SECTION("Test duplicate removal") { 
+        std::vector<std::array<float, 8>> rectangles;
+        std::array<float,8> rect1 = {40,20,29,1,1,2,2,1};
+        std::array<float,8> rect2 = {28,19,19,2,3,1,2,9};
+
+        rectangles.push_back(rect1);
+        rectangles.push_back(rect2);
+
+        auto ht = HoughRectangle();
+        auto rect = ht.remove_duplicates(rectangles,1,1);
+
+        REQUIRE( rect == rect1);
+    }
+
     SECTION("Test the peak detection") {
         std::string test_img_file_path = UNIT_TEST_FOLDER_PATH;
         HoughRectangle::fMat gray = eigen_io::read_image(test_img_file_path + "/../img/rectangle1.png");

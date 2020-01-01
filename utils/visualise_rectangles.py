@@ -12,9 +12,10 @@ args = parser.parse_args()
 x = np.loadtxt(args.maximum_file)
 
 plt.imshow(mpimg.imread(args.input_path),cmap = 'gray')
-# for i in range(x.shape[0]):
-for i in range(10):
-    # print(i)
-    plt.plot( x[i,0::2],x[i,1::2],'rx')
+if x.shape[0] == 8:
+    plt.plot( x[0::2],x[1::2],'rx')
+else:
+    for rect in x:
+        plt.plot( rect[0::2],rect[1::2],'rx')
 plt.axis('off')
 plt.show()

@@ -66,6 +66,11 @@ void save_pairs(const std::string &filename, const std::vector<std::array<float,
  */
 void save_rectangle(const std::string &filename, const std::vector<std::array<int, 8>> &indexes);
 
+/*
+ * Saves detected rectangle in text file
+ */
+void save_rectangle(const std::string &filename, const std::array<int, 8> &rectangles);
+
 // Conversion utils
 /*
  * Convert normal coordinate to cartesian coordinates
@@ -79,14 +84,20 @@ std::array<float, 3> convert_normal2cartesian(const float &angle, const float &r
 /*
  * Convert normal rectangle into corner format
  */
-std::array<int, 8> convert_normal_rect2_corners_rect(const std::array<float, 3> &in_rectangle, const float &x_bias,
+std::array<int, 8> convert_normal_rect2_corners_rect(const std::array<float, 8> &in_rectangle, const float &x_bias,
                                                      const float &y_bias);
 
 /*
  * Convert all rectangles to corner format
  */
-std::vector<std::array<int, 8>> convert_all_rects_2_cartesian(const std::vector<std::array<float, 3>> &rectangles,
+std::vector<std::array<int, 8>> convert_all_rects_2_cartesian(const std::vector<std::array<float, 8>> &rectangles,
                                                               const float &x_bias, const float &y_bias);
+
+/*
+ * Convert rectangle to corner format
+ */
+std::array<int,8> convert_all_rects_2_cartesian(const std::array<float,8> & rectangle,const float &x_bias, const float &y_bias);
+
 
 }  // namespace eigen_io
 #endif

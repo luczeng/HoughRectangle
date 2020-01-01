@@ -59,6 +59,7 @@ class HoughRectangle {
      * @param img Eigen float, Dynamic, RowMajor matrix to process
      */
     typedef Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> fMat;
+    HoughRectangle();
     HoughRectangle(fMat &img, int thetaBins = 256, int rhoBins = 256, float thetaMin = -90,
                    float thetaMax = 90);  // declaration
 
@@ -138,8 +139,20 @@ class HoughRectangle {
      * @param[out] rectangles a vector of arrays of size 3. First element is the angle, 2nd corresponding rho, 3rd rho
      * of opposite corner.
      */
-    std::vector<std::array<float, 3>> match_pairs_into_rectangle(const std::vector<std::array<float, 4>> &pairs,
+    std::vector<std::array<float, 8>> match_pairs_into_rectangle(const std::vector<std::array<float, 4>> &pairs,
                                                                  const float &T_alpha);
+
+    /**
+     * Filters rectangles based on criteria that evalutes the parallelism, orthogonality and symmetry of the rectangles.
+     * Returns the best rectangle
+     *
+     * @param[in] rectangles rectangles to filter
+     * @param[in] a weight coefficient for degrees. A good value is a = 1
+     * @param[in] b weight coefficient for pixels. A good value is b = 4
+     * @param[out] rect best rectangle found based on criteria
+     */
+    std::array<float, 8> remove_duplicates(std::vector<std::array<float, 8>> rectangles, float a,
+                                                           float b);
 };
 
 #endif
