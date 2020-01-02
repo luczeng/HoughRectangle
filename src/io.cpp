@@ -88,7 +88,7 @@ std::array<float, 3> convert_normal2cartesian(const float &angle, const float &r
 }
 
 //-----------------------------------------------------------------------------------------------------//
-std::array<int, 8> convert_normal_rect2_corners_rect(const std::array<float, 3> &in_rectangle, const float &x_bias,
+std::array<int, 8> convert_normal_rect2_corners_rect(const std::array<float, 8> &in_rectangle, const float &x_bias,
                                                      const float &y_bias) {
     std::array<int, 8> rectangle;
 
@@ -122,11 +122,19 @@ std::array<int, 8> convert_normal_rect2_corners_rect(const std::array<float, 3> 
 }
 
 //-----------------------------------------------------------------------------------------------------//
-std::vector<std::array<int, 8>> convert_all_rects_2_cartesian(const std::vector<std::array<float, 3>> &rectangles,
+std::vector<std::array<int, 8>> convert_all_rects_2_cartesian(const std::vector<std::array<float, 8>> &rectangles,
                                                               const float &x_bias, const float &y_bias) {
     std::vector<std::array<int, 8>> rectangles_cart;
-    for (std::array<float, 3> rect : rectangles)
+    for (std::array<float, 8> rect : rectangles)
         rectangles_cart.push_back(convert_normal_rect2_corners_rect(rect, x_bias, y_bias));
+
+    return rectangles_cart;
+}
+
+//-----------------------------------------------------------------------------------------------------//
+std::array<int, 8> convert_all_rects_2_cartesian(const std::array<float, 8> &rectangles,
+                                                              const float &x_bias, const float &y_bias) {
+    std::array<int, 8> rectangles_cart = (convert_normal_rect2_corners_rect(rectangles, x_bias, y_bias));
 
     return rectangles_cart;
 }
@@ -155,6 +163,20 @@ void save_rectangle(const std::string &filename, const std::vector<std::array<in
                            << rectangles[i][3] << " " << rectangles[i][4] << " " << rectangles[i][5] << " "
                            << rectangles[i][6] << " " << rectangles[i][7] << "\n";
         }
+        rectangle_file.close();
+    } else {
+        std::cerr << "Couldnt save maximum file" << std::endl;
+    }
+}
+
+//-----------------------------------------------------------------------------------------------------//
+void save_rectangle(const std::string &filename, const std::array<int, 8> &rectangles) {
+    std::ofstream rectangle_file(filename.c_str());
+
+    if (rectangle_file.is_open()) {
+        rectangle_file << rectangles[0] << " " << rectangles[1] << " " << rectangles[2] << " "
+                           << rectangles[3] << " " << rectangles[4] << " " << rectangles[5] << " "
+                           << rectangles[6] << " " << rectangles[7] << "\n";
         rectangle_file.close();
     } else {
         std::cerr << "Couldnt save maximum file" << std::endl;
