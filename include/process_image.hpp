@@ -128,8 +128,8 @@ class HoughRectangle {
      * rho, 4th = error on theta
      */
     std::vector<std::array<float, 4>> find_pairs(const std::vector<float> &rho_maxs,
-                                                 const std::vector<float> &theta_maxs, const float &T_t,
-                                                 const float &T_rho, const float &T_L);
+                                                 const std::vector<float> &theta_maxs, const float &T_rho,
+                                                 const float &T_t, const float &T_L);
 
     /**
      * Matches detected peaks into rectangle

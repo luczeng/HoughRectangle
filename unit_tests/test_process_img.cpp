@@ -41,8 +41,6 @@ TEST_CASE("Test functions to compute the Hough Rectangle function") {
     SECTION("Test the local maximum detection") {
         // Input
         Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> img(4, 5);
-        // Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>
-        // img;
         img << 1, 2, 4, 5, 5, 5, 3, 9, 2, 5, 4, 2, 6, 5, 9, 3, 9, 1, 8, 2;
 
         // Ground truth
@@ -58,7 +56,27 @@ TEST_CASE("Test functions to compute the Hough Rectangle function") {
         REQUIRE(idxs == max_pos);
     }
 
+    SECTION("Test pair matching"){
+        //Input data
+        std::vector<float> rho_vec = {50,-49,10,20,-48};
+        std::vector<float> theta_vec = {45,10,15,17,44};
+
+        //Pair matcher
+        auto ht = HoughRectangle();
+        auto pairs = ht.find_pairs(rho_vec,theta_vec,2.1,1.1,2);
+
+        //GT
+        std::vector<std::array<float,4>> pairs_gt;
+        std::array<float,4> pair_gt = {49,44.5,2,1};
+        pairs_gt.push_back(pair_gt);
+        pairs_gt.push_back(pair_gt);
+
+        REQUIRE( pairs_gt == pairs);
+
+    }
+
     SECTION("Test duplicate removal") { 
+        //Input data
         std::vector<std::array<float, 8>> rectangles;
         std::array<float,8> rect1 = {40,20,29,1,1,2,2,1};
         std::array<float,8> rect2 = {28,19,19,2,3,1,2,9};
@@ -66,6 +84,7 @@ TEST_CASE("Test functions to compute the Hough Rectangle function") {
         rectangles.push_back(rect1);
         rectangles.push_back(rect2);
 
+        //Remove duplicates
         auto ht = HoughRectangle();
         auto rect = ht.remove_duplicates(rectangles,1,1);
 

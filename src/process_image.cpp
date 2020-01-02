@@ -220,8 +220,8 @@ std::tuple<std::vector<float>, std::vector<float>> HoughRectangle::index_rho_the
 
 /*************************************************************************************/
 std::vector<std::array<float, 4>> HoughRectangle::find_pairs(const std::vector<float>& rho_maxs,
-                                                             const std::vector<float>& theta_maxs, const float& T_t,
-                                                             const float& T_rho, const float& T_L) {
+                                                             const std::vector<float>& theta_maxs, const float& T_rho,
+                                                             const float& T_t, const float& T_L) {
     // Match peaks into pairs
     std::vector<std::array<float, 4>> pairs;  // 1st: rho, 2nd: theta
     std::array<float, 4> pair;
@@ -285,8 +285,8 @@ std::array<float, 8> HoughRectangle::remove_duplicates(std::vector<std::array<fl
         new_criteria = sqrt(a * (rectangles[i][5] + rectangles[i][6] + rectangles[i][7]) +
                             b * (rectangles[i][3] + rectangles[i][4]));
         if (new_criteria < criteria) {
-            //criteria = new_criteria;
-            std::cout << criteria << std::endl;
+            criteria = new_criteria;
+            //std::cout << criteria << std::endl;
             rect = rectangles[i];
         }
     }
