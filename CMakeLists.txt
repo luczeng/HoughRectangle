@@ -53,4 +53,4 @@ add_subdirectory(apps)
 # Tests
 #----------------------------------------------------------------------------------------------------#
 enable_testing()
-add_subdirectory(unit_tests)
+add_subdirectory(tests)

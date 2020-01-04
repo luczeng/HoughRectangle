@@ -9,6 +9,7 @@
 #include "io.hpp"
 #include "stb_image.h"
 #include "stb_image_write.h"
+#include "config.hpp"
 
 #define PI 3.14159265
 
@@ -121,22 +122,60 @@ HoughRectangle::fMat HoughRectangle::windowed_hough(const HoughRectangle::fMat& 
 /*************************************************************************************/
 HoughRectangle::fMat HoughRectangle::apply_windowed_hough(const fMat& img, const int& L_window, const int& r_min,
                                                           const int& r_max) {
+    //TODO FINISH
     for (int i = 0; i < img.rows() - L_window; ++i) {
         for (int j = 0; j < img.cols() - L_window; ++j) {
             // Applying circular mask to local region
-            // TODO(luczeng): This is weird. You keep overwriting a local variable.
             Matrix<float, Dynamic, Dynamic, RowMajor> subregion = img.block(i, j, L_window, L_window);
         }
     }
-    // TODO(luczeng): return something?
     return HoughRectangle::fMat{};
 }
 
 /*************************************************************************************/
+void HoughRectangle::hough_transform(const fMat& img,fMat & acc) {
+    // Cartesian coordinate vectors
+    VectorXi vecX = VectorXi::LinSpaced(Sequential, img.cols(), 0, img.cols() - 1);
+    VectorXi vecY = VectorXi::LinSpaced(Sequential, img.rows(), 0, img.rows() - 1);
+    int mid_X = round(img.cols() / 2);
+    int mid_Y = round(img.rows() / 2);
+    vecX = vecX.array() - mid_X;
+    vecY = vecY.array() - mid_Y;
+
+    // Pre-compute cosines and sinuses:
+    VectorXf cosT = cos(m_theta_vec.array() * PI / 180.0);
+    VectorXf sinT = sin(m_theta_vec.array() * PI / 180.0);
+
+    // Compute Hough transform
+    for (int i = 0; i < img.rows(); ++i) {
+        for (int j = 0; j < img.cols(); ++j) {
+            if (img(i, j) != 0) {
+                // generate sinusoidal curve
+                for (int k = 0; k < m_theta_vec.size(); ++k) {
+                    // Calculate rho value
+                    float rho_tmp = (vecX[j] * cosT[k] + vecY[i] * sinT[k]);
+
+                    std::vector<float>::iterator idx;
+                    idx = std::lower_bound(m_rho_vec.begin(), m_rho_vec.end(), rho_tmp);  // could be replaced
+                    int idx_rho = idx - m_rho_vec.begin() - 1;
+
+                    if (idx_rho < 0) {
+                        idx_rho = 0;
+                    }
+
+                    // Fill accumulator
+                    acc(idx_rho, k) = acc(idx_rho, k) + 1;
+                    if (acc(idx_rho, k) > pow(2, 32)) {
+                        std::cout << "Max value overpassed";
+                    }
+                }
+            }
+        }
+    }
+}
+/*************************************************************************************/
 HoughRectangle::fMat HoughRectangle::hough_transform(const fMat& img) {
     // Define accumulator matrix, theta and rho vectors
-    // TODO(luczeng): please give your users the freedom to pass in their self-allocated matrix. They might
-    // want to reuse memory and thus save a lot of time (if fMat is big).
     HoughRectangle::fMat acc = MatrixXf::Zero(m_rhoBins, m_thetaBins);  // accumulator
 
     // Cartesian coordinate vectors
@@ -177,8 +216,6 @@ HoughRectangle::fMat HoughRectangle::hough_transform(const fMat& img) {
             }
         }
     }
-
-    // Enhanced HT
 
     return acc;
 }
@@ -244,8 +281,6 @@ std::vector<std::array<float, 4>> HoughRectangle::find_pairs(const std::vector<f
             pairs.push_back(pair);
         }
     }
-
-    std::cout << "Found " << pairs.size() << " pairs" << std::endl;
 
     return pairs;
 }

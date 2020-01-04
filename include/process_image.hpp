@@ -68,6 +68,14 @@ class HoughRectangle {
      * Applies the classic Hough transform on the image
      *
      * @param[in] img input image to be processed
+     * @param[in, out] acc accumulator (hough transform). Size must be rho_vec_size x theta_vec_size.
+     */
+    void hough_transform(const fMat& img,fMat & acc);
+
+    /**
+     * Applies the classic Hough transform on the image
+     *
+     * @param[in] img input image to be processed
      * @param[out] acc accumulator (hough transform)
      */
     fMat hough_transform(const fMat &img);
