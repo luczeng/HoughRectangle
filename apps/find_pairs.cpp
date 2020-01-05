@@ -57,7 +57,7 @@ int main(int argc, char * argv[]){
     std::tie(rho_maxs, theta_maxs) = ht.index_rho_theta(indexes);
 
     // Find pairs
-    std::vector<std::array<float,4>> pairs = ht.find_pairs(rho_maxs,theta_maxs,1,2,1);
+    std::vector<std::array<float,4>> pairs = ht.find_pairs(rho_maxs,theta_maxs,8,8,2);
     
     // Save pairs
     eigen_io::save_pairs(output_path, pairs);

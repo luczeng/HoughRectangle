@@ -11,6 +11,7 @@
 #include "config.hpp"
 #include "cxxopts.hpp"
 #include "io.hpp"
+#include "rectangle_utils.hpp"
 #include "process_image.hpp"
 #include "stb_image.h"
 #include "stb_image_write.h"
@@ -65,9 +66,9 @@ int main(int argc, char* argv[]) {
 
     // Cartesian rectangles
     auto rectangles_corners =
-        eigen_io::convert_all_rects_2_cartesian(detected_rectangle, gray.rows() / 2, gray.cols() / 2);
+        convert_all_rects_2_cartesian(detected_rectangle, hough_img.cols(), hough_img.rows());
 
-    eigen_io::save_rectangle("rectangles.txt", rectangles_corners);
+    eigen_io::save_rectangle(output_filename, rectangles_corners);
 
     return 0;
 }

@@ -12,6 +12,9 @@ target_include_directories(test_process_img PUBLIC include)
 target_link_libraries(test_process_img PUBLIC Catch2::Catch2 PRIVATE stb PUBLIC hough_lib)
 add_test(NAME img_process_lib_test COMMAND test_process_img)
 #------------------------------------------------------------------#
+add_executable(test_rectangle_utils test_rectangle_utils.cpp)
+target_link_libraries(test_rectangle_utils PUBLIC Catch2::Catch2 PRIVATE stb PUBLIC hough_lib)
+add_test(NAME rectangle_utils_test COMMAND test_rectangle_utils)
 
 
 
