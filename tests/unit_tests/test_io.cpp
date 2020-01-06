@@ -126,15 +126,14 @@ TEST_CASE("Test Input-output functions for images") {
     }
 
     SECTION("Save maximums to txt file") {
-        std::vector<std::array<int,2>> vec_max;
-        vec_max.push_back({1,2});
-        vec_max.push_back({3,4});
+        std::vector<std::array<int, 2>> vec_max;
+        vec_max.push_back({1, 2});
+        vec_max.push_back({3, 4});
         std::string test_img_folder_path = UNIT_TEST_FOLDER_PATH;
         std::string filename = test_img_folder_path + "/test_save_maximums.txt";
 
-        eigen_io::save_maximum(filename,vec_max);
+        eigen_io::save_maximum(filename, vec_max);
     }
-
 }
 #endif
 #endif

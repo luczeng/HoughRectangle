@@ -81,17 +81,17 @@ TEST_CASE("Tests the rectangle utils") {
         std::array<float, 8> rectangle_normal = {0, 10, 10, 0, 0, 0, 0, 0};
 
         std::array<int, 8> rectangle = convert_normal_rect2_corners_rect(rectangle_normal, 0, 0);
-        std::array<int,8> rectangle_gt = {-10,10,-10,-10,10,10,10,-10};
+        std::array<int, 8> rectangle_gt = {-10, 10, -10, -10, 10, 10, 10, -10};
 
         REQUIRE(rectangle_gt == rectangle);
-        
+
         // Conversion for normal size image
         std::array<float, 8> rectangle_normal2 = {0, 10, 10, 0, 0, 0, 0, 0};
         int size_x = 64;
         int size_y = 128;
 
         std::array<int, 8> rectangle2 = convert_normal_rect2_corners_rect(rectangle_normal2, 64, 128);
-        std::array<int,8> rectangle_gt2 = {22,74,22,54,42,74,42,54};
+        std::array<int, 8> rectangle_gt2 = {22, 74, 22, 54, 42, 74, 42, 54};
 
         REQUIRE(rectangle_gt2 == rectangle2);
     }

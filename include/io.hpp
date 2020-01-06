@@ -71,6 +71,5 @@ void save_rectangle(const std::string &filename, const std::vector<std::array<in
  */
 void save_rectangle(const std::string &filename, const std::array<int, 8> &rectangles);
 
-
 }  // namespace eigen_io
 #endif

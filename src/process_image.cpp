@@ -9,7 +9,6 @@
 #include "io.hpp"
 #include "stb_image.h"
 #include "stb_image_write.h"
-#include "config.hpp"
 
 #define PI 3.14159265
 
@@ -65,8 +64,7 @@ std::vector<std::array<int, 2>> find_local_maximum(const Matrix<float, Dynamic, 
     return idxs;
 }
 /*************************************************************************************/
-HoughRectangle::HoughRectangle() : m_img(),m_thetaBins(),m_thetaMin(),m_thetaMax(),m_rhoBins(),m_theta_vec() {};
-
+HoughRectangle::HoughRectangle() : m_img(), m_thetaBins(), m_thetaMin(), m_thetaMax(), m_rhoBins(), m_theta_vec(){};
 
 /*************************************************************************************/
 HoughRectangle::HoughRectangle(HoughRectangle::fMat& img, int thetaBins, int rhoBins, float thetaMin, float thetaMax) {
@@ -122,7 +120,7 @@ HoughRectangle::fMat HoughRectangle::windowed_hough(const HoughRectangle::fMat& 
 /*************************************************************************************/
 HoughRectangle::fMat HoughRectangle::apply_windowed_hough(const fMat& img, const int& L_window, const int& r_min,
                                                           const int& r_max) {
-    //TODO FINISH
+    // TODO FINISH
     for (int i = 0; i < img.rows() - L_window; ++i) {
         for (int j = 0; j < img.cols() - L_window; ++j) {
             // Applying circular mask to local region
@@ -133,7 +131,7 @@ HoughRectangle::fMat HoughRectangle::apply_windowed_hough(const fMat& img, const
 }
 
 /*************************************************************************************/
-void HoughRectangle::hough_transform(const fMat& img,fMat & acc) {
+void HoughRectangle::hough_transform(const fMat& img, fMat& acc) {
     // Cartesian coordinate vectors
     VectorXi vecX = VectorXi::LinSpaced(Sequential, img.cols(), 0, img.cols() - 1);
     VectorXi vecY = VectorXi::LinSpaced(Sequential, img.rows(), 0, img.rows() - 1);
@@ -264,6 +262,9 @@ std::vector<std::array<float, 4>> HoughRectangle::find_pairs(const std::vector<f
     std::array<float, 4> pair;
     for (int i = 0; i < rho_maxs.size(); ++i) {
         for (int j = 0; j < rho_maxs.size(); ++j) {
+            // Remove lines too close to origin (remove when windowed Hough is implemented)
+            if (rho_maxs[i] < 3) continue;
+
             // Parralelism
             if (abs(theta_maxs[i] - theta_maxs[j]) > T_t) continue;
 
@@ -308,20 +309,19 @@ std::vector<std::array<float, 8>> HoughRectangle::match_pairs_into_rectangle(
 }
 
 /*************************************************************************************/
-std::array<float, 8> HoughRectangle::remove_duplicates(std::vector<std::array<float, 8>> rectangles,
-                                                                    float a, float b) {
+std::array<float, 8> HoughRectangle::remove_duplicates(std::vector<std::array<float, 8>> rectangles, float a, float b) {
     float criteria =
         sqrt(a * (rectangles[0][5] + rectangles[0][6] + rectangles[0][7]) + b * (rectangles[0][3] + rectangles[0][4]));
     float new_criteria;
-    std::array<float,8> rect;
+    std::array<float, 8> rect;
     rect = rectangles[0];
-            
+
     for (int i = 1; i < rectangles.size(); ++i) {
         new_criteria = sqrt(a * (rectangles[i][5] + rectangles[i][6] + rectangles[i][7]) +
                             b * (rectangles[i][3] + rectangles[i][4]));
         if (new_criteria < criteria) {
             criteria = new_criteria;
-            //std::cout << criteria << std::endl;
+            // std::cout << criteria << std::endl;
             rect = rectangles[i];
         }
     }

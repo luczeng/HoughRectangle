@@ -70,7 +70,7 @@ class HoughRectangle {
      * @param[in] img input image to be processed
      * @param[in, out] acc accumulator (hough transform). Size must be rho_vec_size x theta_vec_size.
      */
-    void hough_transform(const fMat& img,fMat & acc);
+    void hough_transform(const fMat &img, fMat &acc);
 
     /**
      * Applies the classic Hough transform on the image
@@ -159,8 +159,7 @@ class HoughRectangle {
      * @param[in] b weight coefficient for pixels. A good value is b = 4
      * @param[out] rect best rectangle found based on criteria
      */
-    std::array<float, 8> remove_duplicates(std::vector<std::array<float, 8>> rectangles, float a,
-                                                           float b);
+    std::array<float, 8> remove_duplicates(std::vector<std::array<float, 8>> rectangles, float a, float b);
 };
 
 #endif

@@ -60,5 +60,5 @@ std::vector<std::array<int, 8>> convert_all_rects_2_cartesian(const std::vector<
  * @param[in] x_size number of columns of image
  * @param[in] y_size number of rows of image
  */
-std::array<int, 8> convert_all_rects_2_cartesian(const std::array<float, 8> &rectangle, const int &x_bias,
-                                                 const int &y_bias);
+std::array<int, 8> convert_all_rects_2_corner_format(const std::array<float, 8> &rectangle, const int &x_bias,
+                                                     const int &y_bias);

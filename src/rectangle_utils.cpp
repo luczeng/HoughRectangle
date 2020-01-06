@@ -68,14 +68,14 @@ std::array<int, 8> convert_normal_rect2_corners_rect(const std::array<float, 8> 
     compute_line_intersections(line1, line2, line3, line4, rectangle);
 
     // Convert to image format
-    convert_cartesian2image_coordinates(rectangle,x_size,y_size);
+    convert_cartesian2image_coordinates(rectangle, x_size, y_size);
 
     return rectangle;
 }
 
 //-----------------------------------------------------------------------------------------------------//
-std::vector<std::array<int, 8>> convert_all_rects_2_cartesian(const std::vector<std::array<float, 8>> &rectangles,
-                                                              const int &x_size, const int  &y_size) {
+std::vector<std::array<int, 8>> convert_all_rects_2_corner_format(const std::vector<std::array<float, 8>> &rectangles,
+                                                                  const int &x_size, const int &y_size) {
     std::vector<std::array<int, 8>> rectangles_cart;
     for (std::array<float, 8> rect : rectangles)
         rectangles_cart.push_back(convert_normal_rect2_corners_rect(rect, x_size, y_size));
@@ -84,8 +84,8 @@ std::vector<std::array<int, 8>> convert_all_rects_2_cartesian(const std::vector<
 }
 
 //-----------------------------------------------------------------------------------------------------//
-std::array<int, 8> convert_all_rects_2_cartesian(const std::array<float, 8> &rectangles, const int  &x_size,
-                                                 const int  &y_size) {
+std::array<int, 8> convert_all_rects_2_corner_format(const std::array<float, 8> &rectangles, const int &x_size,
+                                                     const int &y_size) {
     std::array<int, 8> rectangles_cart = convert_normal_rect2_corners_rect(rectangles, x_size, y_size);
 
     return rectangles_cart;

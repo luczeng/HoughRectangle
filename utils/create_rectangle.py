@@ -55,8 +55,8 @@ cv2.imwrite("rectangle3.png",img_non_centered)
 L = 32
 img_rotated = np.zeros([N,N])
 mid = int(N/2)
-L_x = int((L-1)/1.2)
-L_y = int((L-1)/4)
+L_x = int((L-1)/2.5)
+L_y = int((L-1)/6)
 
 img_rotated[mid-L_y,mid-L_x:mid+L_x] = 255
 img_rotated[mid-L_y:mid+L_y,mid+L_x] = 255

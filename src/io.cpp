@@ -75,8 +75,6 @@ void save_maximum(const std::string &filename, const std::vector<std::array<int,
         std::cerr << "Couldnt save maximum file" << std::endl;
 }
 
-
-
 //-----------------------------------------------------------------------------------------------------//
 void save_pairs(const std::string &filename, const std::vector<std::array<float, 4>> &pairs) {
     std::ofstream rectangle_file(filename.c_str());
@@ -112,9 +110,8 @@ void save_rectangle(const std::string &filename, const std::array<int, 8> &recta
     std::ofstream rectangle_file(filename.c_str());
 
     if (rectangle_file.is_open()) {
-        rectangle_file << rectangles[0] << " " << rectangles[1] << " " << rectangles[2] << " "
-                           << rectangles[3] << " " << rectangles[4] << " " << rectangles[5] << " "
-                           << rectangles[6] << " " << rectangles[7] << "\n";
+        rectangle_file << rectangles[0] << " " << rectangles[1] << " " << rectangles[2] << " " << rectangles[3] << " "
+                       << rectangles[4] << " " << rectangles[5] << " " << rectangles[6] << " " << rectangles[7] << "\n";
         rectangle_file.close();
     } else {
         std::cerr << "Couldnt save maximum file" << std::endl;
