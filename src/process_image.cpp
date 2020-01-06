@@ -296,7 +296,7 @@ std::vector<std::array<float, 8>> HoughRectangle::match_pairs_into_rectangle(
             if (j == i) continue;
 
             // Orthogonality
-            float delta_alpha = (abs(abs(pairs[i][1] - pairs[j][1]) - 90) > T_alpha);
+            float delta_alpha = abs(abs(pairs[i][1] - pairs[j][1]) - 90);
             if (delta_alpha > T_alpha) continue;
 
             rectangles.push_back({pairs[i][1], pairs[i][0], pairs[j][0], pairs[i][2], pairs[j][2], pairs[i][3],

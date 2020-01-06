@@ -10,8 +10,8 @@
     "r_min":11,
     "r_max":61,
     "min_side_length":25,
-    "T_theta" :1,
-    "T_rho" : 1,
+    "T_theta" :8,
+    "T_rho" : 4,
     "T_l" : 2,
     "T_alpha": 2
     }
