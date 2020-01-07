@@ -4,6 +4,9 @@ target_link_libraries(find_pairs PUBLIC Eigen3::Eigen PUBLIC hough_lib PRIVATE  
 add_executable(main_hough_rectangle main_hough_rectangle.cpp )
 target_link_libraries(main_hough_rectangle PUBLIC Eigen3::Eigen PUBLIC hough_lib PUBLIC cxxopts PRIVATE stb PUBLIC cereal)
 
+add_executable(main_hough_rectangle_centered main_hough_rectangle_centered.cpp )
+target_link_libraries(main_hough_rectangle_centered PUBLIC Eigen3::Eigen PUBLIC hough_lib PUBLIC cxxopts PRIVATE stb PUBLIC cereal)
+
 add_executable(windowed_hough windowed_hough.cpp)
 target_link_libraries(windowed_hough PUBLIC Eigen3::Eigen PUBLIC hough_lib  PUBLIC cxxopts PRIVATE stb PRIVATE cereal)
 

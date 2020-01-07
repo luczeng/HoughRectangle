@@ -126,34 +126,13 @@ TEST_CASE("Test Input-output functions for images") {
     }
 
     SECTION("Save maximums to txt file") {
-        std::vector<float> theta = {1, 2, 3};
-        std::vector<float> rho = {4, 5, 6};
-        std::string filename = "../unit_tests/test_maximums.cpp";
+        std::vector<std::array<int, 2>> vec_max;
+        vec_max.push_back({1, 2});
+        vec_max.push_back({3, 4});
+        std::string test_img_folder_path = UNIT_TEST_FOLDER_PATH;
+        std::string filename = test_img_folder_path + "/test_save_maximums.txt";
 
-        // save_maximum(filename,theta,rho);
-    }
-
-    SECTION("Convert normal line to cartesian coordinates") {
-        std::array<float, 3> vert_line = eigen_io::convert_normal2cartesian(0, 20);
-        std::array<float, 3> vert_line_gt = {1, 0, -20};
-
-        std::array<float, 3> horiz_line = eigen_io::convert_normal2cartesian(90, 20);
-        std::array<float, 3> horiz_line_gt = {0, 1, -20};
-
-        std::cout << horiz_line[0] << " " << horiz_line[1] << " " << horiz_line[2] << std::endl;
-
-        //REQUIRE(vert_line == vert_line_gt);
-        //REQUIRE( horiz_line == horiz_line_gt );
-
-        // assert vert_line
-    }
-
-    SECTION("Convert rectangle to corners") {
-        std::array<float, 8> rectangle_normal = {0, 20, 10, 0, 0, 0, 0, 0};
-
-        std::array<int, 8> rectangle = eigen_io::convert_normal_rect2_corners_rect(rectangle_normal, 0, 0);
-
-        for (int corner : rectangle) std::cout << corner << std::endl;
+        eigen_io::save_maximum(filename, vec_max);
     }
 }
 #endif

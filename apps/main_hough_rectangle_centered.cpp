@@ -17,6 +17,7 @@
 #include "stb_image_write.h"
 #include "string"
 
+// TODO(luczeng): better to use separate using clauses, otherwise you quickly get name clashes.
 using Eigen::Dynamic;
 using Eigen::Matrix;
 using Eigen::RowMajor;
@@ -47,46 +48,25 @@ int main(int argc, char* argv[]) {
 
     // Perform Hough transform
     HoughRectangle ht(gray, config.thetaBins, config.rhoBins, config.thetaMin, config.thetaMax);
+    HoughRectangle::fMat hough_img = ht.hough_transform(gray);
 
-    // Loop over each pixel to find rectangle
-    std::vector<std::array<int, 8>> rectangles;
-    HoughRectangle::fMat hough_img(config.thetaBins, config.rhoBins);
+    // Detect peaks
+    std::vector<std::array<int, 2>> indexes = find_local_maximum(hough_img, config.min_side_length);
+    std::vector<float> rho_maxs, theta_maxs;
+    std::tie(rho_maxs, theta_maxs) = ht.index_rho_theta(indexes);
 
-    for (int i = 0; i < gray.rows() - config.L_window; ++i) {
-        std::cout << "Row " << i << "/" << gray.rows() << std::endl;
-        for (int j = 0; j < gray.cols() - config.L_window; ++j) {
-            // Hough transform
-            hough_img.setZero();
-            ht.hough_transform(gray.block(i, j, config.L_window, config.L_window), hough_img);
+    // Find pairs
+    std::vector<std::array<float, 4>> pairs =
+        ht.find_pairs(rho_maxs, theta_maxs, config.T_rho, config.T_theta, config.T_l);
 
-            // Detect peaks
-            std::vector<std::array<int, 2>> indexes = find_local_maximum(hough_img, config.min_side_length);
-            std::vector<float> rho_maxs, theta_maxs;
-            std::tie(rho_maxs, theta_maxs) = ht.index_rho_theta(indexes);
+    // Find rectangle
+    std::vector<std::array<float, 8>> rectangles = ht.match_pairs_into_rectangle(pairs, config.T_alpha);
+    std::array<float, 8> detected_rectangle = ht.remove_duplicates(rectangles, 1, 4);
 
-            // Find pairs
-            std::vector<std::array<float, 4>> pairs =
-                ht.find_pairs(rho_maxs, theta_maxs, config.T_rho, config.T_theta, config.T_l);
-            if (pairs.size() == 0) {
-                continue;
-            }  // no pairs detected
+    // Cartesian rectangles
+    auto rectangles_corners = convert_all_rects_2_corner_format(detected_rectangle, gray.cols(), gray.rows());
 
-            // Find rectangle
-            std::vector<std::array<float, 8>> rectangles_tmp = ht.match_pairs_into_rectangle(pairs, config.T_alpha);
-            if (rectangles_tmp.size() == 0) {
-                continue;
-            }  // if no rectangle detected
-            std::array<float, 8> detected_rectangle = ht.remove_duplicates(rectangles_tmp, 1, 4);
-
-            // Cartesian rectangles
-            auto rectangles_corners = convert_all_rects_2_corner_format(detected_rectangle, gray.rows(), gray.cols());
-
-            // Concatenate
-            rectangles.push_back(rectangles_corners);
-        }
-    }
-
-    eigen_io::save_rectangle(output_filename.c_str(), rectangles);
+    eigen_io::save_rectangle(output_filename, rectangles_corners);
 
     return 0;
 }

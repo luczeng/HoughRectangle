@@ -56,44 +56,42 @@ TEST_CASE("Test functions to compute the Hough Rectangle function") {
         REQUIRE(idxs == max_pos);
     }
 
-    SECTION("Test pair matching"){
-        //Input data
-        std::vector<float> rho_vec = {50,-49,10,20,-48};
-        std::vector<float> theta_vec = {45,10,15,17,44};
+    SECTION("Test pair matching") {
+        // Input data
+        std::vector<float> rho_vec = {50, -49, 10, 20, -48};
+        std::vector<float> theta_vec = {45, 10, 15, 17, 44};
 
-        //Pair matcher
+        // Pair matcher
         auto ht = HoughRectangle();
-        auto pairs = ht.find_pairs(rho_vec,theta_vec,2.1,1.1,2);
+        auto pairs = ht.find_pairs(rho_vec, theta_vec, 2.1, 1.1, 2);
 
-        //GT
-        std::vector<std::array<float,4>> pairs_gt;
-        std::array<float,4> pair_gt = {49,44.5,2,1};
+        // GT
+        std::vector<std::array<float, 4>> pairs_gt;
+        std::array<float, 4> pair_gt = {49, 44.5, 2, 1};
         pairs_gt.push_back(pair_gt);
-        pairs_gt.push_back(pair_gt);
 
-        REQUIRE( pairs_gt == pairs);
-
+        REQUIRE(pairs_gt == pairs);
     }
 
-    SECTION("Test duplicate removal") { 
-        //Input data
+    SECTION("Test duplicate removal") {
+        // Input data
         std::vector<std::array<float, 8>> rectangles;
-        std::array<float,8> rect1 = {40,20,29,1,1,2,2,1};
-        std::array<float,8> rect2 = {28,19,19,2,3,1,2,9};
+        std::array<float, 8> rect1 = {40, 20, 29, 1, 1, 2, 2, 1};
+        std::array<float, 8> rect2 = {28, 19, 19, 2, 3, 1, 2, 9};
 
         rectangles.push_back(rect1);
         rectangles.push_back(rect2);
 
-        //Remove duplicates
+        // Remove duplicates
         auto ht = HoughRectangle();
-        auto rect = ht.remove_duplicates(rectangles,1,1);
+        auto rect = ht.remove_duplicates(rectangles, 1, 1);
 
-        REQUIRE( rect == rect1);
+        REQUIRE(rect == rect1);
     }
 
     SECTION("Test the peak detection") {
         std::string test_img_file_path = UNIT_TEST_FOLDER_PATH;
-        HoughRectangle::fMat gray = eigen_io::read_image(test_img_file_path + "/../img/rectangle1.png");
+        HoughRectangle::fMat gray = eigen_io::read_image(test_img_file_path + "/../../img/rectangle1.png");
 
         // Parameters
         int thetaBins = 256;
@@ -109,27 +107,27 @@ TEST_CASE("Test functions to compute the Hough Rectangle function") {
         std::vector<std::array<int, 2>> indexes = find_local_maximum(wht, 50);
         std::vector<float> rho_maxs, theta_maxs;
         std::tie(rho_maxs, theta_maxs) = ht.index_rho_theta(indexes);
-         std::cout<<"Detected "<<indexes.size()<<" points"<<std::endl;
+        std::cout << "Detected " << indexes.size() << " points" << std::endl;
 
-         //for (int i = 0; i < rho_maxs.size(); ++i) {
-         //std::cout << i << " " << rho_maxs[i] << " " << theta_maxs[i]
+        // for (int i = 0; i < rho_maxs.size(); ++i) {
+        // std::cout << i << " " << rho_maxs[i] << " " << theta_maxs[i]
         //<< std::endl;
         //}
 
         // Match peaks into rectangles
-        //std::vector<std::array<float, 3>> rectangles = ht.match_maximums(rho_maxs, theta_maxs, 1, 1, 30, 3);
+        // std::vector<std::array<float, 3>> rectangles = ht.match_maximums(rho_maxs, theta_maxs, 1, 1, 30, 3);
 
-        //std::cout << "Found " << rectangles.size() << " rectangles" << std::endl;
+        // std::cout << "Found " << rectangles.size() << " rectangles" << std::endl;
 
-        //for (auto rect : rectangles) {
-        //std::cout << rect[0] << " " << rect[1] << " " << rect[2]
+        // for (auto rect : rectangles) {
+        // std::cout << rect[0] << " " << rect[1] << " " << rect[2]
         //<< std::endl;
         //}
 
-         //std::vector<std::array<int, 8>> rectangles_cart =
-         //convert_all_rects_2_cartesian(rectangles,
-         //128,128);
+        // std::vector<std::array<int, 8>> rectangles_cart =
+        // convert_all_rects_2_cartesian(rectangles,
+        // 128,128);
 
-         //save_rectangle("rectangles.txt", rectangles_cart);
+        // save_rectangle("rectangles.txt", rectangles_cart);
     }
 }

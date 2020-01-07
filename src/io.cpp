@@ -75,70 +75,6 @@ void save_maximum(const std::string &filename, const std::vector<std::array<int,
         std::cerr << "Couldnt save maximum file" << std::endl;
 }
 
-
-//-----------------------------------------------------------------------------------------------------//
-std::array<float, 3> convert_normal2cartesian(const float &angle, const float &rho) {
-    std::array<float, 3> cartesian;
-
-    cartesian[0] = cos((180 - angle) * M_PI / 180.0);
-    cartesian[1] = sin((180 - angle) * M_PI / 180.0);
-    cartesian[2] = -rho;
-
-    return cartesian;
-}
-
-//-----------------------------------------------------------------------------------------------------//
-std::array<int, 8> convert_normal_rect2_corners_rect(const std::array<float, 8> &in_rectangle, const float &x_bias,
-                                                     const float &y_bias) {
-    std::array<int, 8> rectangle;
-
-    // Angle shift between first set of lines and second set of lines
-    float bias;
-    if (in_rectangle[0] < 0)
-        bias = 90;
-    else
-        bias = -90;
-
-    // Create rectangle lines
-    std::array<float, 3> line1 = convert_normal2cartesian(in_rectangle[0], in_rectangle[1]);
-    std::array<float, 3> line2 = convert_normal2cartesian(in_rectangle[0], -in_rectangle[1]);
-    std::array<float, 3> line3 = convert_normal2cartesian(in_rectangle[0] + bias, in_rectangle[2]);
-    std::array<float, 3> line4 = convert_normal2cartesian(in_rectangle[0] + bias, -in_rectangle[2]);
-
-    // Compute rectangle corners
-    rectangle[0] = (-line1[2] * line3[1] + line1[1] * line3[2]) / (line1[0] * line3[1] - line1[1] * line3[0]) + x_bias;
-    rectangle[1] = -(-line1[0] * line3[2] + line1[2] * line3[0]) / (line1[0] * line3[1] - line1[1] * line3[0]) + y_bias;
-
-    rectangle[2] = (-line1[2] * line4[1] + line1[1] * line4[2]) / (line1[0] * line4[1] - line1[1] * line4[0]) + x_bias;
-    rectangle[3] = -(-line1[0] * line4[2] + line1[2] * line4[0]) / (line1[0] * line4[1] - line1[1] * line4[0]) + y_bias;
-
-    rectangle[4] = (-line2[2] * line3[1] + line2[1] * line3[2]) / (line2[0] * line3[1] - line2[1] * line3[0]) + x_bias;
-    rectangle[5] = -(-line2[0] * line3[2] + line2[2] * line3[0]) / (line2[0] * line3[1] - line2[1] * line3[0]) + y_bias;
-
-    rectangle[6] = (-line2[2] * line4[1] + line2[1] * line4[2]) / (line2[0] * line4[1] - line2[1] * line4[0]) + x_bias;
-    rectangle[7] = -(-line2[0] * line4[2] + line2[2] * line4[0]) / (line2[0] * line4[1] - line2[1] * line4[0]) + y_bias;
-
-    return rectangle;
-}
-
-//-----------------------------------------------------------------------------------------------------//
-std::vector<std::array<int, 8>> convert_all_rects_2_cartesian(const std::vector<std::array<float, 8>> &rectangles,
-                                                              const float &x_bias, const float &y_bias) {
-    std::vector<std::array<int, 8>> rectangles_cart;
-    for (std::array<float, 8> rect : rectangles)
-        rectangles_cart.push_back(convert_normal_rect2_corners_rect(rect, x_bias, y_bias));
-
-    return rectangles_cart;
-}
-
-//-----------------------------------------------------------------------------------------------------//
-std::array<int, 8> convert_all_rects_2_cartesian(const std::array<float, 8> &rectangles,
-                                                              const float &x_bias, const float &y_bias) {
-    std::array<int, 8> rectangles_cart = (convert_normal_rect2_corners_rect(rectangles, x_bias, y_bias));
-
-    return rectangles_cart;
-}
-
 //-----------------------------------------------------------------------------------------------------//
 void save_pairs(const std::string &filename, const std::vector<std::array<float, 4>> &pairs) {
     std::ofstream rectangle_file(filename.c_str());
@@ -174,9 +110,8 @@ void save_rectangle(const std::string &filename, const std::array<int, 8> &recta
     std::ofstream rectangle_file(filename.c_str());
 
     if (rectangle_file.is_open()) {
-        rectangle_file << rectangles[0] << " " << rectangles[1] << " " << rectangles[2] << " "
-                           << rectangles[3] << " " << rectangles[4] << " " << rectangles[5] << " "
-                           << rectangles[6] << " " << rectangles[7] << "\n";
+        rectangle_file << rectangles[0] << " " << rectangles[1] << " " << rectangles[2] << " " << rectangles[3] << " "
+                       << rectangles[4] << " " << rectangles[5] << " " << rectangles[6] << " " << rectangles[7] << "\n";
         rectangle_file.close();
     } else {
         std::cerr << "Couldnt save maximum file" << std::endl;

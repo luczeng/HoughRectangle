@@ -64,8 +64,7 @@ std::vector<std::array<int, 2>> find_local_maximum(const Matrix<float, Dynamic, 
     return idxs;
 }
 /*************************************************************************************/
-HoughRectangle::HoughRectangle() : m_img(),m_thetaBins(),m_thetaMin(),m_thetaMax(),m_rhoBins(),m_theta_vec() {};
-
+HoughRectangle::HoughRectangle() : m_img(), m_thetaBins(), m_thetaMin(), m_thetaMax(), m_rhoBins(), m_theta_vec(){};
 
 /*************************************************************************************/
 HoughRectangle::HoughRectangle(HoughRectangle::fMat& img, int thetaBins, int rhoBins, float thetaMin, float thetaMax) {
@@ -121,22 +120,60 @@ HoughRectangle::fMat HoughRectangle::windowed_hough(const HoughRectangle::fMat& 
 /*************************************************************************************/
 HoughRectangle::fMat HoughRectangle::apply_windowed_hough(const fMat& img, const int& L_window, const int& r_min,
                                                           const int& r_max) {
+    // TODO FINISH
     for (int i = 0; i < img.rows() - L_window; ++i) {
         for (int j = 0; j < img.cols() - L_window; ++j) {
             // Applying circular mask to local region
-            // TODO(luczeng): This is weird. You keep overwriting a local variable.
             Matrix<float, Dynamic, Dynamic, RowMajor> subregion = img.block(i, j, L_window, L_window);
         }
     }
-    // TODO(luczeng): return something?
     return HoughRectangle::fMat{};
 }
 
 /*************************************************************************************/
+void HoughRectangle::hough_transform(const fMat& img, fMat& acc) {
+    // Cartesian coordinate vectors
+    VectorXi vecX = VectorXi::LinSpaced(Sequential, img.cols(), 0, img.cols() - 1);
+    VectorXi vecY = VectorXi::LinSpaced(Sequential, img.rows(), 0, img.rows() - 1);
+    int mid_X = round(img.cols() / 2);
+    int mid_Y = round(img.rows() / 2);
+    vecX = vecX.array() - mid_X;
+    vecY = vecY.array() - mid_Y;
+
+    // Pre-compute cosines and sinuses:
+    VectorXf cosT = cos(m_theta_vec.array() * PI / 180.0);
+    VectorXf sinT = sin(m_theta_vec.array() * PI / 180.0);
+
+    // Compute Hough transform
+    for (int i = 0; i < img.rows(); ++i) {
+        for (int j = 0; j < img.cols(); ++j) {
+            if (img(i, j) != 0) {
+                // generate sinusoidal curve
+                for (int k = 0; k < m_theta_vec.size(); ++k) {
+                    // Calculate rho value
+                    float rho_tmp = (vecX[j] * cosT[k] + vecY[i] * sinT[k]);
+
+                    std::vector<float>::iterator idx;
+                    idx = std::lower_bound(m_rho_vec.begin(), m_rho_vec.end(), rho_tmp);  // could be replaced
+                    int idx_rho = idx - m_rho_vec.begin() - 1;
+
+                    if (idx_rho < 0) {
+                        idx_rho = 0;
+                    }
+
+                    // Fill accumulator
+                    acc(idx_rho, k) = acc(idx_rho, k) + 1;
+                    if (acc(idx_rho, k) > pow(2, 32)) {
+                        std::cout << "Max value overpassed";
+                    }
+                }
+            }
+        }
+    }
+}
+/*************************************************************************************/
 HoughRectangle::fMat HoughRectangle::hough_transform(const fMat& img) {
     // Define accumulator matrix, theta and rho vectors
-    // TODO(luczeng): please give your users the freedom to pass in their self-allocated matrix. They might
-    // want to reuse memory and thus save a lot of time (if fMat is big).
     HoughRectangle::fMat acc = MatrixXf::Zero(m_rhoBins, m_thetaBins);  // accumulator
 
     // Cartesian coordinate vectors
@@ -177,8 +214,6 @@ HoughRectangle::fMat HoughRectangle::hough_transform(const fMat& img) {
             }
         }
     }
-
-    // Enhanced HT
 
     return acc;
 }
@@ -227,6 +262,9 @@ std::vector<std::array<float, 4>> HoughRectangle::find_pairs(const std::vector<f
     std::array<float, 4> pair;
     for (int i = 0; i < rho_maxs.size(); ++i) {
         for (int j = 0; j < rho_maxs.size(); ++j) {
+            // Remove lines too close to origin (remove when windowed Hough is implemented)
+            if (rho_maxs[i] < 3) continue;
+
             // Parralelism
             if (abs(theta_maxs[i] - theta_maxs[j]) > T_t) continue;
 
@@ -245,8 +283,6 @@ std::vector<std::array<float, 4>> HoughRectangle::find_pairs(const std::vector<f
         }
     }
 
-    std::cout << "Found " << pairs.size() << " pairs" << std::endl;
-
     return pairs;
 }
 
@@ -261,7 +297,7 @@ std::vector<std::array<float, 8>> HoughRectangle::match_pairs_into_rectangle(
             if (j == i) continue;
 
             // Orthogonality
-            float delta_alpha = (abs(abs(pairs[i][1] - pairs[j][1]) - 90) > T_alpha);
+            float delta_alpha = abs(abs(pairs[i][1] - pairs[j][1]) - 90);
             if (delta_alpha > T_alpha) continue;
 
             rectangles.push_back({pairs[i][1], pairs[i][0], pairs[j][0], pairs[i][2], pairs[j][2], pairs[i][3],
@@ -273,20 +309,19 @@ std::vector<std::array<float, 8>> HoughRectangle::match_pairs_into_rectangle(
 }
 
 /*************************************************************************************/
-std::array<float, 8> HoughRectangle::remove_duplicates(std::vector<std::array<float, 8>> rectangles,
-                                                                    float a, float b) {
+std::array<float, 8> HoughRectangle::remove_duplicates(std::vector<std::array<float, 8>> rectangles, float a, float b) {
     float criteria =
         sqrt(a * (rectangles[0][5] + rectangles[0][6] + rectangles[0][7]) + b * (rectangles[0][3] + rectangles[0][4]));
     float new_criteria;
-    std::array<float,8> rect;
+    std::array<float, 8> rect;
     rect = rectangles[0];
-            
+
     for (int i = 1; i < rectangles.size(); ++i) {
         new_criteria = sqrt(a * (rectangles[i][5] + rectangles[i][6] + rectangles[i][7]) +
                             b * (rectangles[i][3] + rectangles[i][4]));
         if (new_criteria < criteria) {
             criteria = new_criteria;
-            //std::cout << criteria << std::endl;
+            // std::cout << criteria << std::endl;
             rect = rectangles[i];
         }
     }
