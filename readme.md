@@ -21,7 +21,7 @@ mkdir build
 cd build
 cmake ..
 make
-./main_hough_rectangle -i some_img.png -o output_img.txt
+./apps/main_hough_rectangle -i some_img.png -o output_img.txt
 ```
 
 The rectangles are saved line by line in the following format: x1,y1,x2,y2,x3,y3,x4,y4
