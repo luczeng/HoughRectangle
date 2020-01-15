@@ -1,4 +1,11 @@
 #include <vector>
+
+template <class T>
+using rectangle_T = std::array<T,8>;
+template <class T>
+using rectangles_T = std::vector<rectangle_T<T>>;
+
+
 /**
  * Convert normal coordinate to cartesian coordinates
  *
@@ -21,7 +28,7 @@ std::array<float, 3> convert_normal2cartesian(const float &angle, const float &r
  */
 void compute_line_intersections(const std::array<float, 3> &line1, const std::array<float, 3> &line2,
                                 const std::array<float, 3> &line3, const std::array<float, 3> &line4,
-                                std::array<int, 8> &polygon);
+                                rectangle_T<int> &polygon);
 
 /**
  * Converts cartesian coordinates in image coordinates. Require to know the size of the image. For now, converts
@@ -31,7 +38,7 @@ void compute_line_intersections(const std::array<float, 3> &line1, const std::ar
  * @param[in] x_size number of column of image
  * @param[in] y_size number of rows of image
  */
-void convert_cartesian2image_coordinates(std::array<int, 8> &rectangle, const int &x_size, const int &y_size);
+void convert_cartesian2image_coordinates(rectangle_T<int> &rectangle, const int &x_size, const int &y_size);
 
 /**
  * Convert normal rectangle into corner rectangle and image coordinate
@@ -40,7 +47,7 @@ void convert_cartesian2image_coordinates(std::array<int, 8> &rectangle, const in
  * @param[in] x_size number of columns of image
  * @param[in] y_size number of rows of image
  */
-std::array<int, 8> convert_normal_rect2_corners_rect(const std::array<float, 8> &in_rectangle, const int &x_size,
+rectangle_T<int> convert_normal_rect2_corners_rect(const rectangle_T<float> &in_rectangle, const int &x_size,
                                                      const int &y_size);
 
 /**
@@ -50,7 +57,7 @@ std::array<int, 8> convert_normal_rect2_corners_rect(const std::array<float, 8> 
  * @param[in] x_size number of columns of image
  * @param[in] y_size number of rows of image
  */
-std::vector<std::array<int, 8>> convert_all_rects_2_cartesian(const std::vector<std::array<float, 8>> &rectangle,
+rectangle_T<int> convert_all_rects_2_cartesian(const rectangles_T<float> &rectangle,
                                                               const int &x_size, const int &y_size);
 
 /**
@@ -60,5 +67,5 @@ std::vector<std::array<int, 8>> convert_all_rects_2_cartesian(const std::vector<
  * @param[in] x_size number of columns of image
  * @param[in] y_size number of rows of image
  */
-std::array<int, 8> convert_all_rects_2_corner_format(const std::array<float, 8> &rectangle, const int &x_bias,
+rectangle_T<int> convert_all_rects_2_corner_format(const rectangle_T<float> &rectangle, const int &x_bias,
                                                      const int &y_bias);

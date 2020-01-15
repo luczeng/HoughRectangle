@@ -4,6 +4,7 @@
 #include <cmath>
 #include <vector>
 
+
 //-----------------------------------------------------------------------------------------------------//
 std::array<float, 3> convert_normal2cartesian(const float &angle, const float &rho) {
     std::array<float, 3> cartesian;
@@ -17,7 +18,7 @@ std::array<float, 3> convert_normal2cartesian(const float &angle, const float &r
 //-----------------------------------------------------------------------------------------------------//
 void compute_line_intersections(const std::array<float, 3> &line1, const std::array<float, 3> &line2,
                                 const std::array<float, 3> &line3, const std::array<float, 3> &line4,
-                                std::array<int, 8> &polygon) {
+                                rectangle_T<int> &polygon) {
     // What rounding does this do?
     polygon[0] = (-line1[2] * line3[1] + line1[1] * line3[2]) / (line1[0] * line3[1] - line1[1] * line3[0]);
     polygon[1] = (-line1[0] * line3[2] + line1[2] * line3[0]) / (line1[0] * line3[1] - line1[1] * line3[0]);
@@ -33,7 +34,7 @@ void compute_line_intersections(const std::array<float, 3> &line1, const std::ar
 }
 
 //-----------------------------------------------------------------------------------------------------//
-void convert_cartesian2image_coordinates(std::array<int, 8> &rectangle, const int &x_size, const int &y_size) {
+void convert_cartesian2image_coordinates(rectangle_T<int> &rectangle, const int &x_size, const int &y_size) {
     int x_bias = int(x_size / 2);
     int y_bias = int(y_size / 2);
 
@@ -47,9 +48,9 @@ void convert_cartesian2image_coordinates(std::array<int, 8> &rectangle, const in
     rectangle[7] = -rectangle[7] + y_bias;
 }
 //-----------------------------------------------------------------------------------------------------//
-std::array<int, 8> convert_normal_rect2_corners_rect(const std::array<float, 8> &in_rectangle, const int &x_size,
+rectangle_T<int> convert_normal_rect2_corners_rect(const std::array<float, 8> &in_rectangle, const int &x_size,
                                                      const int &y_size) {
-    std::array<int, 8> rectangle;
+    rectangle_T<int> rectangle;
 
     // Angle shift between first set of lines and second set of lines
     float bias;
@@ -74,9 +75,9 @@ std::array<int, 8> convert_normal_rect2_corners_rect(const std::array<float, 8> 
 }
 
 //-----------------------------------------------------------------------------------------------------//
-std::vector<std::array<int, 8>> convert_all_rects_2_corner_format(const std::vector<std::array<float, 8>> &rectangles,
+rectangles_T<int> convert_all_rects_2_corner_format(const std::vector<std::array<float, 8>> &rectangles,
                                                                   const int &x_size, const int &y_size) {
-    std::vector<std::array<int, 8>> rectangles_cart;
+    rectangles_T<int> rectangles_cart;
     for (std::array<float, 8> rect : rectangles)
         rectangles_cart.push_back(convert_normal_rect2_corners_rect(rect, x_size, y_size));
 
@@ -84,9 +85,9 @@ std::vector<std::array<int, 8>> convert_all_rects_2_corner_format(const std::vec
 }
 
 //-----------------------------------------------------------------------------------------------------//
-std::array<int, 8> convert_all_rects_2_corner_format(const std::array<float, 8> &rectangles, const int &x_size,
+rectangle_T<int> convert_all_rects_2_corner_format(const std::array<float, 8> &rectangles, const int &x_size,
                                                      const int &y_size) {
-    std::array<int, 8> rectangles_cart = convert_normal_rect2_corners_rect(rectangles, x_size, y_size);
+    rectangle_T<int> rectangles_cart = convert_normal_rect2_corners_rect(rectangles, x_size, y_size);
 
     return rectangles_cart;
 }

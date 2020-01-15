@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
     HoughRectangle ht(gray, config.thetaBins, config.rhoBins, config.thetaMin, config.thetaMax);
 
     // Loop over each pixel to find rectangle
-    std::vector<std::array<int, 8>> rectangles;
+    rectangles_T<int> rectangles;
     HoughRectangle::fMat hough_img(config.thetaBins, config.rhoBins);
 
     for (int i = 0; i < gray.rows() - config.L_window; ++i) {
@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
             }  // no pairs detected
 
             // Find rectangle
-            std::vector<std::array<float, 8>> rectangles_tmp = ht.match_pairs_into_rectangle(pairs, config.T_alpha);
+            rectangles_T<float> rectangles_tmp = ht.match_pairs_into_rectangle(pairs, config.T_alpha);
             if (rectangles_tmp.size() == 0) {
                 continue;
             }  // if no rectangle detected
