@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
 
     // Loop over each pixel to find rectangle
     rectangles_T<float> rectangles;
-    HoughRectangle::fMat hough_img( config.rhoBins, config.thetaBins);
+    HoughRectangle::fMat hough_img(config.rhoBins, config.thetaBins);
 
     for (int i = 0; i < gray.rows() - config.L_window; ++i) {
         std::cout << "Row " << i << "/" << gray.rows() << std::endl;
@@ -78,14 +78,17 @@ int main(int argc, char* argv[]) {
             }  // if no rectangle detected
             std::array<float, 8> detected_rectangle = ht.remove_duplicates(rectangles_tmp, 1, 4);
 
-            // Cartesian rectangles
-            //auto rectangles_corners = convert_all_rects_2_corner_format(detected_rectangle, gray.rows(), gray.cols());
-
             // Concatenate
             rectangles.push_back(detected_rectangle);
         }
     }
 
+    if (rectangles.size() == 0) {
+        std::cout<< "Did not detect any rectangle" <<std::endl;
+        exit(0);
+    }
+
+    // Clean up and save
     std::array<float, 8> detected_rectangle = ht.remove_duplicates(rectangles, 1, 4);
     auto rectangles_corners = convert_all_rects_2_corner_format(detected_rectangle, gray.rows(), gray.cols());
     eigen_io::save_rectangle(output_filename.c_str(), rectangles_corners);

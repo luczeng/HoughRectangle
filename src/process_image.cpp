@@ -145,27 +145,22 @@ void HoughRectangle::hough_transform(const fMat& img, fMat& acc) {
     VectorXf sinT = sin(m_theta_vec.array() * PI / 180.0);
 
     // Compute Hough transform
+    std::vector<float>::iterator idx;
+    int idx_rho;
+    VectorXf rho_vec_tmp;
     for (int i = 0; i < img.rows(); ++i) {
         for (int j = 0; j < img.cols(); ++j) {
             if (img(i, j) != 0) {
                 // generate sinusoidal curve
+                rho_vec_tmp = vecX[j] * cosT + vecY[i] * sinT;
+
+                // Find corresponding position and fill accumulator
                 for (int k = 0; k < m_theta_vec.size(); ++k) {
-                    // Calculate rho value
-                    float rho_tmp = (vecX[j] * cosT[k] + vecY[i] * sinT[k]);
-
-                    std::vector<float>::iterator idx;
-                    idx = std::lower_bound(m_rho_vec.begin(), m_rho_vec.end(), rho_tmp);  // could be replaced
-                    int idx_rho = idx - m_rho_vec.begin() - 1;
-
-                    if (idx_rho < 0) {
-                        idx_rho = 0;
-                    }
+                    idx = std::lower_bound(m_rho_vec.begin(), m_rho_vec.end(), rho_vec_tmp[k]);  // could be replaced
+                    idx_rho = idx - m_rho_vec.begin() - 1;
 
                     // Fill accumulator
                     acc(idx_rho, k) = acc(idx_rho, k) + 1;
-                    if (acc(idx_rho, k) > pow(2, 32)) {
-                        std::cout << "Max value overpassed";
-                    }
                 }
             }
         }
