@@ -84,7 +84,7 @@ class HoughRectangle {
      * Performs the Windowed hough transform on a single patch
      *
      * \param[in] img input float image
-     * \param[out] acc accumulator (windowed hough transform)
+     * \param[out] acc accumulator (windowed hough transform). Y-axis: rho. X-axis: theta.
      */
     fMat windowed_hough(const fMat &img, const int &r_min, const int &r_max);
 
@@ -144,8 +144,9 @@ class HoughRectangle {
      *
      * @param[in] rho_maxs vector specifying rho positions of detected peaks
      * @param[in] theta_maxs vector specifying theta positions of detected peaks
-     * @param[out] rectangles a vector of arrays of size 3. First element is the angle, 2nd corresponding rho, 3rd rho
-     * of opposite corner.
+     * @param[out] rectangles a vector of arrays of size 8. First element is the angle, 2nd corresponding rho, 3rd rho
+     * of opposite corner. Next 5 elements are respectively: error on rho for opposite corners, error on theta for opposite corners and
+     * error on perpendicularity.
      */
     std::vector<std::array<float, 8>> match_pairs_into_rectangle(const std::vector<std::array<float, 4>> &pairs,
                                                                  const float &T_alpha);

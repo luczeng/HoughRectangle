@@ -75,7 +75,7 @@ rectangle_T<int> convert_normal_rect2_corners_rect(const std::array<float, 8> &i
 }
 
 //-----------------------------------------------------------------------------------------------------//
-rectangles_T<int> convert_all_rects_2_corner_format(const std::vector<std::array<float, 8>> &rectangles,
+rectangles_T<int> convert_all_rects_2_corner_format(const rectangles_T<float>  &rectangles,
                                                                   const int &x_size, const int &y_size) {
     rectangles_T<int> rectangles_cart;
     for (std::array<float, 8> rect : rectangles)
@@ -85,7 +85,7 @@ rectangles_T<int> convert_all_rects_2_corner_format(const std::vector<std::array
 }
 
 //-----------------------------------------------------------------------------------------------------//
-rectangle_T<int> convert_all_rects_2_corner_format(const std::array<float, 8> &rectangles, const int &x_size,
+rectangle_T<int> convert_all_rects_2_corner_format(const rectangle_T<float> &rectangles, const int &x_size,
                                                      const int &y_size) {
     rectangle_T<int> rectangles_cart = convert_normal_rect2_corners_rect(rectangles, x_size, y_size);
 

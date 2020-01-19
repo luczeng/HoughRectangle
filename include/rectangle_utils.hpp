@@ -1,10 +1,16 @@
 #include <vector>
 
+/**
+ * Rectangle type. Format is: theta, rho1, rho2, rho1_error, rho2_error, theta1_error, theta2_error
+ */
 template <class T>
 using rectangle_T = std::array<T,8>;
+
+/**
+ * Multiple rectangles type. Format is: theta, rho1, rho2, rho1_error, rho2_error, theta1_error, theta2_error
+ */
 template <class T>
 using rectangles_T = std::vector<rectangle_T<T>>;
-
 
 /**
  * Convert normal coordinate to cartesian coordinates
@@ -57,9 +63,18 @@ rectangle_T<int> convert_normal_rect2_corners_rect(const rectangle_T<float> &in_
  * @param[in] x_size number of columns of image
  * @param[in] y_size number of rows of image
  */
-rectangle_T<int> convert_all_rects_2_cartesian(const rectangles_T<float> &rectangle,
+rectangles_T<int> convert_all_rects_2_cartesian(const rectangles_T<float> &rectangle,
                                                               const int &x_size, const int &y_size);
 
+/**
+ * Convert all rectangles to corner format
+ *
+ * @param[in,out] rectangles rectangles to convert
+ * @param[in] x_size number of columns of image
+ * @param[in] y_size number of rows of image
+ */
+rectangles_T<int> convert_all_rects_2_corner_format(const rectangles_T<float>  &rectangles,
+                                                                  const int &x_size, const int &y_size);
 /**
  * Convert rectangle to corner format
  *
@@ -67,5 +82,5 @@ rectangle_T<int> convert_all_rects_2_cartesian(const rectangles_T<float> &rectan
  * @param[in] x_size number of columns of image
  * @param[in] y_size number of rows of image
  */
-rectangle_T<int> convert_all_rects_2_corner_format(const rectangle_T<float> &rectangle, const int &x_bias,
-                                                     const int &y_bias);
+rectangle_T<int> convert_all_rects_2_corner_format(const rectangle_T<float> &rectangle, const int &x_size,
+                                                     const int &y_size);
