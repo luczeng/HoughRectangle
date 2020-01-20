@@ -76,6 +76,9 @@ int main(int argc, char* argv[]) {
             if (rectangles_tmp.size() == 0) {
                 continue;
             }  // if no rectangle detected
+            else {
+                std::cout << "Rectangle detected"<<" "<< i << " "<< j <<std::endl;
+            }
             std::array<float, 8> detected_rectangle = ht.remove_duplicates(rectangles_tmp, 1, 4);
 
             // Concatenate

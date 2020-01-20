@@ -4,7 +4,7 @@
  * Rectangle type. Format is: theta, rho1, rho2, rho1_error, rho2_error, theta1_error, theta2_error
  */
 template <class T>
-using rectangle_T = std::array<T,8>;
+using rectangle_T = std::array<T, 8>;
 
 /**
  * Multiple rectangles type. Format is: theta, rho1, rho2, rho1_error, rho2_error, theta1_error, theta2_error
@@ -47,6 +47,17 @@ void compute_line_intersections(const std::array<float, 3> &line1, const std::ar
 void convert_cartesian2image_coordinates(rectangle_T<int> &rectangle, const int &x_size, const int &y_size);
 
 /**
+ * Correct rectangle position given offset of window from which it was computed
+ *
+ * @param[in,out] rectangle "corner" rectangle to be processed
+ * @param[in] x_bias x position of the upper left corner of the window
+ * @param[in] y_bias x position of the upper left corner of the window
+ * @param[out] x_bias x position of the upper left corner of the window
+ * @param[out] x_bias x position of the upper left corner of the window
+ */
+void correct_offset_rectangle(rectangle_T<int> &rectangle, int x_bias, int y_bias, int n_x, int n_y);
+
+/**
  * Convert normal rectangle into corner rectangle and image coordinate
  *
  * @param[in,out] rectangle rectangle in cartesian coordinates and corner format
@@ -54,7 +65,7 @@ void convert_cartesian2image_coordinates(rectangle_T<int> &rectangle, const int 
  * @param[in] y_size number of rows of image
  */
 rectangle_T<int> convert_normal_rect2_corners_rect(const rectangle_T<float> &in_rectangle, const int &x_size,
-                                                     const int &y_size);
+                                                   const int &y_size);
 
 /**
  * Convert all rectangles to corner format and image coordinate
@@ -63,8 +74,8 @@ rectangle_T<int> convert_normal_rect2_corners_rect(const rectangle_T<float> &in_
  * @param[in] x_size number of columns of image
  * @param[in] y_size number of rows of image
  */
-rectangles_T<int> convert_all_rects_2_cartesian(const rectangles_T<float> &rectangle,
-                                                              const int &x_size, const int &y_size);
+rectangles_T<int> convert_all_rects_2_cartesian(const rectangles_T<float> &rectangle, const int &x_size,
+                                                const int &y_size);
 
 /**
  * Convert all rectangles to corner format
@@ -73,8 +84,8 @@ rectangles_T<int> convert_all_rects_2_cartesian(const rectangles_T<float> &recta
  * @param[in] x_size number of columns of image
  * @param[in] y_size number of rows of image
  */
-rectangles_T<int> convert_all_rects_2_corner_format(const rectangles_T<float>  &rectangles,
-                                                                  const int &x_size, const int &y_size);
+rectangles_T<int> convert_all_rects_2_corner_format(const rectangles_T<float> &rectangles, const int &x_size,
+                                                    const int &y_size);
 /**
  * Convert rectangle to corner format
  *
@@ -83,4 +94,4 @@ rectangles_T<int> convert_all_rects_2_corner_format(const rectangles_T<float>  &
  * @param[in] y_size number of rows of image
  */
 rectangle_T<int> convert_all_rects_2_corner_format(const rectangle_T<float> &rectangle, const int &x_size,
-                                                     const int &y_size);
+                                                   const int &y_size);
