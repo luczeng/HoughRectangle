@@ -67,6 +67,20 @@ std::vector<std::array<int, 2>> find_local_maximum(const Matrix<float, Dynamic, 
 HoughRectangle::HoughRectangle() : m_img(), m_thetaBins(), m_thetaMin(), m_thetaMax(), m_rhoBins(), m_theta_vec(){};
 
 /*************************************************************************************/
+HoughRectangle::HoughRectangle( int n_rows,int thetaBins, int rhoBins, float thetaMin, float thetaMax) {
+
+    m_thetaBins = thetaBins;
+    m_thetaMin = thetaMin;
+    m_thetaMax = thetaMax;
+    m_rhoBins = rhoBins;
+
+    m_theta_vec = VectorXf::LinSpaced(Sequential, thetaBins, thetaMin, thetaMax);
+
+    m_rho_vec = LinearSpacedArray(-sqrt(pow(n_rows / 2.0, 2) + pow(n_rows / 2.0, 2)),
+                                  sqrt(pow(n_rows / 2.0, 2) + pow(n_rows / 2.0, 2)), rhoBins);
+}
+
+/*************************************************************************************/
 HoughRectangle::HoughRectangle(HoughRectangle::fMat& img, int thetaBins, int rhoBins, float thetaMin, float thetaMax) {
     m_img = img;
     m_thetaBins = thetaBins;
@@ -304,6 +318,27 @@ std::vector<std::array<float, 8>> HoughRectangle::match_pairs_into_rectangle(
 }
 
 /*************************************************************************************/
+std::array<int, 8> HoughRectangle::remove_duplicates(std::vector<std::array<int, 8>> rectangles, float a, float b) {
+    float criteria =
+        sqrt(a * (rectangles[0][5] + rectangles[0][6] + rectangles[0][7]) + b * (rectangles[0][3] + rectangles[0][4]));
+    float new_criteria;
+    std::array<int, 8> rect;
+    rect = rectangles[0];
+
+    for (int i = 1; i < rectangles.size(); ++i) {
+        new_criteria = sqrt(a * (rectangles[i][5] + rectangles[i][6] + rectangles[i][7]) +
+                            b * (rectangles[i][3] + rectangles[i][4]));
+        if (new_criteria < criteria) {
+            criteria = new_criteria;
+            // std::cout << criteria << std::endl;
+            rect = rectangles[i];
+        }
+    }
+
+    return rect;
+}
+
+/*************************************************************************************/
 std::array<float, 8> HoughRectangle::remove_duplicates(std::vector<std::array<float, 8>> rectangles, float a, float b) {
     float criteria =
         sqrt(a * (rectangles[0][5] + rectangles[0][6] + rectangles[0][7]) + b * (rectangles[0][3] + rectangles[0][4]));
@@ -323,4 +358,3 @@ std::array<float, 8> HoughRectangle::remove_duplicates(std::vector<std::array<fl
 
     return rect;
 }
-

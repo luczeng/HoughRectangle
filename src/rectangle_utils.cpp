@@ -48,18 +48,16 @@ void convert_cartesian2image_coordinates(rectangle_T<int> &rectangle, const int 
     rectangle[7] = -rectangle[7] + y_bias;
 }
 //-----------------------------------------------------------------------------------------------------//
-void correct_offset_rectangle(rectangle_T<int> &rectangle,int x_bias, int y_bias,int n_x,int n_y) {
-    int x_offset = round(n_x / 2.0) - x_bias;
-    int y_offset = round(n_y / 2.0) - y_bias;
+void correct_offset_rectangle(rectangle_T<int> &rectangle,int x_bias, int y_bias) {
 
-    rectangle[0] = rectangle[0] + x_offset; 
-    rectangle[1] = rectangle[1] + y_offset; 
-    rectangle[2] = rectangle[2] + x_offset; 
-    rectangle[3] = rectangle[3] + y_offset; 
-    rectangle[4] = rectangle[4] + x_offset; 
-    rectangle[5] = rectangle[5] + y_offset; 
-    rectangle[6] = rectangle[6] + x_offset; 
-    rectangle[7] = rectangle[7] + y_offset; 
+    rectangle[0] = rectangle[0] + x_bias; 
+    rectangle[1] = rectangle[1] + y_bias; 
+    rectangle[2] = rectangle[2] + x_bias; 
+    rectangle[3] = rectangle[3] + y_bias; 
+    rectangle[4] = rectangle[4] + x_bias; 
+    rectangle[5] = rectangle[5] + y_bias; 
+    rectangle[6] = rectangle[6] + x_bias; 
+    rectangle[7] = rectangle[7] + y_bias; 
 
 }
 //-----------------------------------------------------------------------------------------------------//

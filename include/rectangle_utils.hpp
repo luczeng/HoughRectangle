@@ -52,10 +52,8 @@ void convert_cartesian2image_coordinates(rectangle_T<int> &rectangle, const int 
  * @param[in,out] rectangle "corner" rectangle to be processed
  * @param[in] x_bias x position of the upper left corner of the window
  * @param[in] y_bias x position of the upper left corner of the window
- * @param[out] x_bias x position of the upper left corner of the window
- * @param[out] x_bias x position of the upper left corner of the window
  */
-void correct_offset_rectangle(rectangle_T<int> &rectangle, int x_bias, int y_bias, int n_x, int n_y);
+void correct_offset_rectangle(rectangle_T<int> &rectangle, int x_bias, int y_bias);
 
 /**
  * Convert normal rectangle into corner rectangle and image coordinate

@@ -14,9 +14,9 @@ if __name__ == '__main__':
 
     plt.imshow(mpimg.imread(args.input_path),cmap = 'gray')
     if x.shape[0] == 8:
-        plt.plot( x[0::2],x[1::2],'x')
+        plt.plot( x[0::2],x[1::2],'rx')
     else:
         for rect in x:
-            plt.plot( rect[0::2],rect[1::2],'x')
+            plt.plot( rect[0::2],rect[1::2],'rx')
     plt.axis('off')
     plt.show()

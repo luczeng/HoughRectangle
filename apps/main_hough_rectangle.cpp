@@ -46,10 +46,10 @@ int main(int argc, char* argv[]) {
     Matrix<float, Dynamic, Dynamic, RowMajor> gray = eigen_io::read_image(filename.c_str());
 
     // Perform Hough transform
-    HoughRectangle ht(gray, config.thetaBins, config.rhoBins, config.thetaMin, config.thetaMax);
+    HoughRectangle ht(config.L_window, config.thetaBins, config.rhoBins, config.thetaMin, config.thetaMax);
 
     // Loop over each pixel to find rectangle
-    rectangles_T<float> rectangles;
+    rectangles_T<int> rectangles;
     HoughRectangle::fMat hough_img(config.rhoBins, config.thetaBins);
 
     for (int i = 0; i < gray.rows() - config.L_window; ++i) {
@@ -80,9 +80,11 @@ int main(int argc, char* argv[]) {
                 std::cout << "Rectangle detected"<<" "<< i << " "<< j <<std::endl;
             }
             std::array<float, 8> detected_rectangle = ht.remove_duplicates(rectangles_tmp, 1, 4);
+            auto rectangles_corners = convert_all_rects_2_corner_format(detected_rectangle, config.L_window, config.L_window);
+            correct_offset_rectangle(rectangles_corners,j,i);
 
             // Concatenate
-            rectangles.push_back(detected_rectangle);
+            rectangles.push_back(rectangles_corners);
         }
     }
 
@@ -92,9 +94,9 @@ int main(int argc, char* argv[]) {
     }
 
     // Clean up and save
-    std::array<float, 8> detected_rectangle = ht.remove_duplicates(rectangles, 1, 4);
-    auto rectangles_corners = convert_all_rects_2_corner_format(detected_rectangle, gray.rows(), gray.cols());
-    eigen_io::save_rectangle(output_filename.c_str(), rectangles_corners);
+    //std::array<int, 8> detected_rectangle = ht.remove_duplicates(rectangles, 1, 4);
+    //auto rectangles_corners = convert_all_rects_2_corner_format(detected_rectangle, gray.rows(), gray.cols());
+    eigen_io::save_rectangle(output_filename.c_str(), rectangles);
 
     return 0;
 }
