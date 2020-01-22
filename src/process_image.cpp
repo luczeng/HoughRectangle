@@ -67,6 +67,20 @@ std::vector<std::array<int, 2>> find_local_maximum(const Matrix<float, Dynamic, 
 HoughRectangle::HoughRectangle() : m_img(), m_thetaBins(), m_thetaMin(), m_thetaMax(), m_rhoBins(), m_theta_vec(){};
 
 /*************************************************************************************/
+HoughRectangle::HoughRectangle( int n_rows,int thetaBins, int rhoBins, float thetaMin, float thetaMax) {
+
+    m_thetaBins = thetaBins;
+    m_thetaMin = thetaMin;
+    m_thetaMax = thetaMax;
+    m_rhoBins = rhoBins;
+
+    m_theta_vec = VectorXf::LinSpaced(Sequential, thetaBins, thetaMin, thetaMax);
+
+    m_rho_vec = LinearSpacedArray(-sqrt(pow(n_rows / 2.0, 2) + pow(n_rows / 2.0, 2)),
+                                  sqrt(pow(n_rows / 2.0, 2) + pow(n_rows / 2.0, 2)), rhoBins);
+}
+
+/*************************************************************************************/
 HoughRectangle::HoughRectangle(HoughRectangle::fMat& img, int thetaBins, int rhoBins, float thetaMin, float thetaMax) {
     m_img = img;
     m_thetaBins = thetaBins;
@@ -145,27 +159,22 @@ void HoughRectangle::hough_transform(const fMat& img, fMat& acc) {
     VectorXf sinT = sin(m_theta_vec.array() * PI / 180.0);
 
     // Compute Hough transform
+    std::vector<float>::iterator idx;
+    int idx_rho;
+    VectorXf rho_vec_tmp;
     for (int i = 0; i < img.rows(); ++i) {
         for (int j = 0; j < img.cols(); ++j) {
             if (img(i, j) != 0) {
                 // generate sinusoidal curve
+                rho_vec_tmp = vecX[j] * cosT + vecY[i] * sinT;
+
+                // Find corresponding position and fill accumulator
                 for (int k = 0; k < m_theta_vec.size(); ++k) {
-                    // Calculate rho value
-                    float rho_tmp = (vecX[j] * cosT[k] + vecY[i] * sinT[k]);
-
-                    std::vector<float>::iterator idx;
-                    idx = std::lower_bound(m_rho_vec.begin(), m_rho_vec.end(), rho_tmp);  // could be replaced
-                    int idx_rho = idx - m_rho_vec.begin() - 1;
-
-                    if (idx_rho < 0) {
-                        idx_rho = 0;
-                    }
+                    idx = std::lower_bound(m_rho_vec.begin(), m_rho_vec.end(), rho_vec_tmp[k]);  // could be replaced
+                    idx_rho = idx - m_rho_vec.begin() - 1;
 
                     // Fill accumulator
                     acc(idx_rho, k) = acc(idx_rho, k) + 1;
-                    if (acc(idx_rho, k) > pow(2, 32)) {
-                        std::cout << "Max value overpassed";
-                    }
                 }
             }
         }
@@ -309,6 +318,27 @@ std::vector<std::array<float, 8>> HoughRectangle::match_pairs_into_rectangle(
 }
 
 /*************************************************************************************/
+std::array<int, 8> HoughRectangle::remove_duplicates(std::vector<std::array<int, 8>> rectangles, float a, float b) {
+    float criteria =
+        sqrt(a * (rectangles[0][5] + rectangles[0][6] + rectangles[0][7]) + b * (rectangles[0][3] + rectangles[0][4]));
+    float new_criteria;
+    std::array<int, 8> rect;
+    rect = rectangles[0];
+
+    for (int i = 1; i < rectangles.size(); ++i) {
+        new_criteria = sqrt(a * (rectangles[i][5] + rectangles[i][6] + rectangles[i][7]) +
+                            b * (rectangles[i][3] + rectangles[i][4]));
+        if (new_criteria < criteria) {
+            criteria = new_criteria;
+            // std::cout << criteria << std::endl;
+            rect = rectangles[i];
+        }
+    }
+
+    return rect;
+}
+
+/*************************************************************************************/
 std::array<float, 8> HoughRectangle::remove_duplicates(std::vector<std::array<float, 8>> rectangles, float a, float b) {
     float criteria =
         sqrt(a * (rectangles[0][5] + rectangles[0][6] + rectangles[0][7]) + b * (rectangles[0][3] + rectangles[0][4]));
@@ -328,4 +358,3 @@ std::array<float, 8> HoughRectangle::remove_duplicates(std::vector<std::array<fl
 
     return rect;
 }
-

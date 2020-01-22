@@ -46,11 +46,11 @@ int main(int argc, char* argv[]) {
     Matrix<float, Dynamic, Dynamic, RowMajor> gray = eigen_io::read_image(filename.c_str());
 
     // Perform Hough transform
-    HoughRectangle ht(gray, config.thetaBins, config.rhoBins, config.thetaMin, config.thetaMax);
+    HoughRectangle ht(config.L_window, config.thetaBins, config.rhoBins, config.thetaMin, config.thetaMax);
 
     // Loop over each pixel to find rectangle
-    std::vector<std::array<int, 8>> rectangles;
-    HoughRectangle::fMat hough_img(config.thetaBins, config.rhoBins);
+    rectangles_T<int> rectangles;
+    HoughRectangle::fMat hough_img(config.rhoBins, config.thetaBins);
 
     for (int i = 0; i < gray.rows() - config.L_window; ++i) {
         std::cout << "Row " << i << "/" << gray.rows() << std::endl;
@@ -72,20 +72,30 @@ int main(int argc, char* argv[]) {
             }  // no pairs detected
 
             // Find rectangle
-            std::vector<std::array<float, 8>> rectangles_tmp = ht.match_pairs_into_rectangle(pairs, config.T_alpha);
+            rectangles_T<float> rectangles_tmp = ht.match_pairs_into_rectangle(pairs, config.T_alpha);
             if (rectangles_tmp.size() == 0) {
                 continue;
             }  // if no rectangle detected
+            else {
+                std::cout << "Rectangle detected"<<" "<< i << " "<< j <<std::endl;
+            }
             std::array<float, 8> detected_rectangle = ht.remove_duplicates(rectangles_tmp, 1, 4);
-
-            // Cartesian rectangles
-            auto rectangles_corners = convert_all_rects_2_corner_format(detected_rectangle, gray.rows(), gray.cols());
+            auto rectangles_corners = convert_all_rects_2_corner_format(detected_rectangle, config.L_window, config.L_window);
+            correct_offset_rectangle(rectangles_corners,j,i);
 
             // Concatenate
             rectangles.push_back(rectangles_corners);
         }
     }
 
+    if (rectangles.size() == 0) {
+        std::cout<< "Did not detect any rectangle" <<std::endl;
+        exit(0);
+    }
+
+    // Clean up and save
+    //std::array<int, 8> detected_rectangle = ht.remove_duplicates(rectangles, 1, 4);
+    //auto rectangles_corners = convert_all_rects_2_corner_format(detected_rectangle, gray.rows(), gray.cols());
     eigen_io::save_rectangle(output_filename.c_str(), rectangles);
 
     return 0;
