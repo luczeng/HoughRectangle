@@ -6,7 +6,9 @@ The Hough rectangle detection is based on detecting specific patterns in the Hou
 
 The implementation is done in c++ and is intended to be lightweight, ie no image processing library is used. We mostly rely on "Eigen" for image manipulation. The algorithm expects edge detection to be performed first. The edge detection is not part of the repo. You can use any library to perform this preprocessing. 
 
-The work is currently in progress. Stay tuned for progress!
+I plan to bring improvements to the original algorithm in order to make it faster. The main cause for slowness is the sliding window scheme. I plan to reuse previous computations in order to reduce redudant ones. More info to come.
+
+The work is currently in progress. Stay tuned!
 
 ## Requirements
 - cmake >3.11.4
@@ -25,6 +27,29 @@ make
 ```
 
 The rectangles are saved line by line in the following format: x1,y1,x2,y2,x3,y3,x4,y4
+
+## Algorithm
+The Hough rectangle detection algorithm relies on detecting specific patterns in the Hough domain, as illustrated below:
+
+Rectangle            |  Corresponding Hough pattern | Detected rectangle
+:-------------------------:|:-------------------------:|:----------------------:
+<img src="img/rectangle2.png" width="256" height="256">  |   <img src="img/examples/example_hough.png" width="256" height="256"> | <img src="img/examples/detected_rec.png" width = 256 height = 256> 
+
+
+## Project status:
+- Hough transform : done
+- Enhanced Hough transform : done
+- Windowed Hough transform : done
+- Peak detection: done
+- Hough rectangle detection on rectangle-centric image: done
+- Hough rectangle detection on full image: done
+- Acceleration: in progress
+
+## Helper scripts
+Some python opencv scripts in "utils" folder are provided to facilitate usage. Require _opencv_ and _matplolib_. Call `-h`for help:  
+  
+-`detect_edges`: applies Canny edge detection algorithm to input.  
+-`create_rectangle`: creates some dummy rectangles, with or without an angle.  
 
 ## Configuration:
 Algorithm parameters can be modified in `src/configs.json`:
@@ -54,26 +79,3 @@ Algorithm parameters can be modified in `src/configs.json`:
    - T_rho: minimum normal length difference (in pixel) between two corners of a rectangle
    - T_l:
    - T_alpha: minimum corner difference (in degrees) between opposite corners of a rectangle.
-
-## Algorithm
-The Hough rectangle detection algorithm relies on detecting specific patterns in the Hough domain, as illustrated below:
-
-Rectangle            |  Corresponding Hough pattern | Detected rectangle
-:-------------------------:|:-------------------------:|:----------------------:
-<img src="img/rectangle2.png" width="256" height="256">  |   <img src="img/examples/example_hough.png" width="256" height="256"> | <img src="img/examples/detected_rec.png" width = 256 height = 256> 
-
-
-## Project status:
-- Hough transform : done
-- Enhanced Hough transform : done
-- Windowed Hough transform : done
-- Peak detection: done
-- Hough rectangle detection on rectangle-centric image: done
-- Hough rectangle detection on full image: in progress
-
-## Helper scripts
-Some python opencv scripts in "utils" folder are provided to facilitate usage. Require _opencv_ and _matplolib_. Call `-h`for help:  
-  
--`detect_edges`: applies Canny edge detection algorithm to input.  
--`create_rectangle`: creates some dummy rectangles, with or without an angle.  
-

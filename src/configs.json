@@ -1,18 +1,18 @@
 {
     "value0": {
         "thetaBins": 180,
-        "rhoBins": 128,
+        "rhoBins": 100,
 	"thetaMin": -90,
 	"thetaMax": 90,
     "h": 32,
     "w": 32,
-    "L_window": 32,
+    "L_window": 80,
     "r_min":11,
     "r_max":61,
-    "min_side_length":5,
-    "T_theta" : 0.5,
-    "T_rho" : 0.5,
+    "min_side_length":40,
+    "T_theta" : 2,
+    "T_rho" : 2,
     "T_l" : 2,
-    "T_alpha": 1
+    "T_alpha": 2
     }
 }
