@@ -40,7 +40,7 @@ add_subdirectory(third_party/Catch2)
 # Main library
 #----------------------------------------------------------------------------------------------------#
 
-add_library(hough_lib STATIC src/rectangle_utils.cpp src/io.cpp src/process_image.cpp include/rectangle_utils.hpp include/io.hpp include/config.hpp include/process_image.hpp)
+add_library(hough_lib STATIC src/eigen_utils.cpp src/rectangle_utils.cpp src/io.cpp src/process_image.cpp include/eigen_utils.hpp include/rectangle_utils.hpp include/io.hpp include/config.hpp include/process_image.hpp)
 target_include_directories(hough_lib PUBLIC include)
 target_link_libraries(hough_lib  PUBLIC Eigen3::Eigen PUBLIC cereal PRIVATE stb)
 
