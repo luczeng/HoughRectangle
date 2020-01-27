@@ -4,6 +4,8 @@
 add_executable(main_hough_rectangle main_hough_rectangle.cpp )
 target_link_libraries(main_hough_rectangle PUBLIC Eigen3::Eigen PUBLIC hough_lib PUBLIC cxxopts PRIVATE stb PUBLIC cereal)
 
+add_executable(main_fast_rectangle_detect main_fast_rectangle_detect.cpp )
+target_link_libraries(main_fast_rectangle_detect PUBLIC Eigen3::Eigen PUBLIC hough_lib PUBLIC cxxopts PRIVATE stb PUBLIC cereal)
 #add_executable(main_hough_rectangle_centered main_hough_rectangle_centered.cpp )
 #target_link_libraries(main_hough_rectangle_centered PUBLIC Eigen3::Eigen PUBLIC hough_lib PUBLIC cxxopts PRIVATE stb PUBLIC cereal)
 

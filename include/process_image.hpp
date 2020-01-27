@@ -47,6 +47,7 @@ class HoughRectangle {
     int m_thetaMin;
     int m_thetaMax;
     int m_rhoBins;
+    int m_L_window;
 
     Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> m_img;
 
@@ -60,7 +61,7 @@ class HoughRectangle {
      */
     typedef Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> fMat;
     HoughRectangle();
-    HoughRectangle( int n_rows,int thetaBins, int rhoBins, float thetaMin, float thetaMax);
+    HoughRectangle( int L_window,int thetaBins, int rhoBins, float thetaMin, float thetaMax);
     HoughRectangle(fMat &img, int thetaBins = 256, int rhoBins = 256, float thetaMin = -90,
                    float thetaMax = 90);  // declaration
 
@@ -81,6 +82,9 @@ class HoughRectangle {
      */
     fMat hough_transform(const fMat &img);
 
+    void hough_transform_vec(const std::array<Eigen::VectorXf,2>& columns, fMat & acc, std::vector<int> &acc_column_left);
+
+    void fast_hough_transform(fMat & acc, const std::array<Eigen::VectorXf,2> & acc_col_left,std::vector<int> & acc_column_left);
     /**
      * Performs the Windowed hough transform on a single patch
      *

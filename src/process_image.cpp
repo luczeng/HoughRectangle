@@ -5,11 +5,12 @@
 #include <array>
 #include <iostream>
 #include <tuple>
+#include "array"
 #include "config.hpp"
+#include "eigen_utils.hpp"
 #include "io.hpp"
 #include "stb_image.h"
 #include "stb_image_write.h"
-#include "eigen_utils.hpp"
 
 #define PI 3.14159265
 
@@ -19,17 +20,17 @@ using namespace Eigen;
 HoughRectangle::HoughRectangle() : m_img(), m_thetaBins(), m_thetaMin(), m_thetaMax(), m_rhoBins(), m_theta_vec(){};
 
 /*************************************************************************************/
-HoughRectangle::HoughRectangle( int n_rows,int thetaBins, int rhoBins, float thetaMin, float thetaMax) {
-
+HoughRectangle::HoughRectangle(int L_window, int thetaBins, int rhoBins, float thetaMin, float thetaMax) {
     m_thetaBins = thetaBins;
     m_thetaMin = thetaMin;
     m_thetaMax = thetaMax;
     m_rhoBins = rhoBins;
+    m_L_window = L_window;
 
     m_theta_vec = VectorXf::LinSpaced(Sequential, thetaBins, thetaMin, thetaMax);
 
-    m_rho_vec = LinearSpacedArray(-sqrt(pow(n_rows / 2.0, 2) + pow(n_rows / 2.0, 2)),
-                                  sqrt(pow(n_rows / 2.0, 2) + pow(n_rows / 2.0, 2)), rhoBins);
+    m_rho_vec = LinearSpacedArray(-sqrt(pow(L_window / 2.0, 2) + pow(L_window / 2.0, 2)),
+                                  sqrt(pow(L_window / 2.0, 2) + pow(L_window / 2.0, 2)), rhoBins);
 }
 
 /*************************************************************************************/
@@ -179,6 +180,66 @@ HoughRectangle::fMat HoughRectangle::hough_transform(const fMat& img) {
     return acc;
 }
 
+/*************************************************************************************/
+void HoughRectangle::hough_transform_vec(const std::array<VectorXf, 2>& columns, HoughRectangle::fMat& acc,
+                                         std::vector<int>& acc_col_left) {
+    // Cartesian coordinate vectors
+    float mid_X = round(m_L_window / 2);
+    float mid_Y = round(m_L_window / 2);
+    std::array<float, 2> vec_x = {-mid_X, mid_X};
+    std::array<float, 2> vec_y = {-mid_Y, mid_Y};
+
+    // Pre-compute cosines and sinuses:
+    VectorXf cosT = cos(m_theta_vec.array() * PI / 180.0);
+    VectorXf sinT = sin(m_theta_vec.array() * PI / 180.0);
+
+    // Compute Hough transform
+    int i = 0;
+    for (auto column : columns) {
+        for (int j = 0; j < column.size(); ++j) {
+            if (column(j) != 0) {
+                // generate sinusoidal curve
+                for (int k = 0; k < m_theta_vec.size(); ++k) {
+                    // Calculate rho value
+                    float rho_tmp = (vec_x[i] * cosT[k] + vec_y[i] * sinT[k]);
+
+                    std::vector<float>::iterator idx;
+                    idx = std::lower_bound(m_rho_vec.begin(), m_rho_vec.end(), rho_tmp);  // could be replaced
+                    int idx_rho = idx - m_rho_vec.begin() - 1;
+
+                    if (idx_rho < 0) {
+                        idx_rho = 0;
+                    }
+
+                    // Fill accumulator
+                    acc(idx_rho, k) = acc(idx_rho, k) + 1;
+                    if (i == 0) {
+                        acc_col_left.push_back(idx_rho);
+                        acc_col_left.push_back(k);
+                    }
+                    if (acc(idx_rho, k) > pow(2, 32)) {
+                        std::cout << "Max value overpassed";
+                    }
+                }
+            }
+        }
+        ++i;
+    }
+    //std::cout << acc_col_left.size() << std::endl;
+}
+
+/*************************************************************************************/
+void HoughRectangle::fast_hough_transform(HoughRectangle::fMat& acc, const std::array<VectorXf, 2>& img_columns,
+                                          std::vector<int>& acc_column) {
+    // Subtract left col
+    for (int i = 0; i < acc_column.size(); i += 2) {
+        acc(acc_column[i], acc_column[i + 1]) -= 1;
+    }
+    acc_column.clear();
+
+    // Add right col to acc
+    hough_transform_vec(img_columns, acc, acc_column);
+}
 /*************************************************************************************/
 HoughRectangle::fMat HoughRectangle::enhance_hough(const HoughRectangle::fMat& hough, const int& h, const int& w) {
     HoughRectangle::fMat houghpp = MatrixXf::Zero(hough.rows(), hough.cols());
