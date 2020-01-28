@@ -16,10 +16,8 @@
 #include "stb_image.h"
 #include "stb_image_write.h"
 #include "string"
+#include "rectangle_detection.hpp"
 
-using Eigen::Dynamic;
-using Eigen::Matrix;
-using Eigen::RowMajor;
 
 int main(int argc, char* argv[]) {
     // Nota bene: casting big images to unsigned char in Eigen result in a
@@ -66,20 +64,20 @@ int main(int argc, char* argv[]) {
 
             // Find pairs
             std::vector<std::array<float, 4>> pairs =
-                ht.find_pairs(rho_maxs, theta_maxs, config.T_rho, config.T_theta, config.T_l);
+                rectangle_detect::find_pairs(rho_maxs, theta_maxs, config.T_rho, config.T_theta, config.T_l);
             if (pairs.size() == 0) {
                 continue;
             }  // no pairs detected
 
             // Find rectangle
-            rectangles_T<float> rectangles_tmp = ht.match_pairs_into_rectangle(pairs, config.T_alpha);
+            rectangles_T<float> rectangles_tmp = rectangle_detect::match_pairs_into_rectangle(pairs, config.T_alpha);
             if (rectangles_tmp.size() == 0) {
                 continue;
             }  // if no rectangle detected
             else {
                 std::cout << "Rectangle detected"<<" "<< i << " "<< j <<std::endl;
             }
-            std::array<float, 8> detected_rectangle = ht.remove_duplicates(rectangles_tmp, 1, 4);
+            std::array<float, 8> detected_rectangle = rectangle_detect::remove_duplicates(rectangles_tmp, 1, 4);
             auto rectangles_corners = convert_all_rects_2_corner_format(detected_rectangle, config.L_window, config.L_window);
             correct_offset_rectangle(rectangles_corners,j,i);
 
@@ -94,7 +92,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Clean up and save
-    //std::array<int, 8> detected_rectangle = ht.remove_duplicates(rectangles, 1, 4);
+    //std::array<int, 8> detected_rectangle = rectangle_detect::remove_duplicates(rectangles, 1, 4);
     //auto rectangles_corners = convert_all_rects_2_corner_format(detected_rectangle, gray.rows(), gray.cols());
     eigen_io::save_rectangle(output_filename.c_str(), rectangles);
 

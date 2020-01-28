@@ -11,6 +11,7 @@
 #include "config.hpp"
 #include "io.hpp"
 #include "process_image.hpp"
+#include "rectangle_detection.hpp"
 #include "stb_image.h"
 #include "stb_image_write.h"
 
@@ -51,7 +52,7 @@ int main(int argc, char* argv[]) {
     std::tie(rho_maxs, theta_maxs) = ht.index_rho_theta(indexes);
 
     // Find pairs
-    std::vector<std::array<float, 4>> pairs = ht.find_pairs(rho_maxs, theta_maxs, 8, 8, 2);
+    std::vector<std::array<float, 4>> pairs = rectangle_detect::find_pairs(rho_maxs, theta_maxs, 8, 8, 2);
 
     // Save pairs
     eigen_io::save_pairs(output_path, pairs);

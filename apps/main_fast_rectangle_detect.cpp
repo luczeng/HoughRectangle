@@ -1,6 +1,4 @@
 #include <iostream>
-// TODO(luczeng): It's always a bit hacky to make #include depend on specific #define statements.
-//                Better encapsulate in a seperate header
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <Eigen/Dense>
@@ -14,13 +12,12 @@
 #include "io.hpp"
 #include "process_image.hpp"
 #include "rectangle_utils.hpp"
+#include "rectangle_detection.hpp"
+#include "recursive_hough_transform.hpp"
 #include "stb_image.h"
 #include "stb_image_write.h"
 #include "string"
 
-using Eigen::Dynamic;
-using Eigen::Matrix;
-using Eigen::RowMajor;
 
 int main(int argc, char* argv[]) {
     // Nota bene: casting big images to unsigned char in Eigen result in a
@@ -46,8 +43,9 @@ int main(int argc, char* argv[]) {
     // Load image and prepare matrix
     Matrix<float, Dynamic, Dynamic, RowMajor> gray = eigen_io::read_image(filename.c_str());
 
-    // Perform Hough transform
+    // Init
     HoughRectangle ht(config.L_window, config.thetaBins, config.rhoBins, config.thetaMin, config.thetaMax);
+    RecursiveHoughTransform fast_ht(config.L_window, config.thetaBins, config.rhoBins, config.thetaMin, config.thetaMax);
 
     // Loop over each pixel to find rectangle
     rectangles_T<int> rectangles;
@@ -56,14 +54,16 @@ int main(int argc, char* argv[]) {
     std::vector<int> acc_left_col;
     for (int i = 0; i < gray.rows() - config.L_window; ++i) {
         for (int j = 0; j < gray.cols() - config.L_window; ++j) {
+            // First column pixel
             if (j == 0) {
                 ht.hough_transform(gray.block(i, j, config.L_window, config.L_window), acc);
                 continue;
             }
+            
             // Hough transform
             std::array<Eigen::VectorXf, 2> columns = {gray.col(j), gray.col(j + config.L_window - 1)};
             std::vector<int> acc_column_previous;
-            ht.fast_hough_transform(acc, columns, acc_left_col);
+            fast_ht.fast_hough_transform(acc, columns, acc_left_col);
 
             // Detect peaks
             std::vector<std::array<int, 2>> indexes = find_local_maximum(acc, config.min_side_length);
@@ -72,18 +72,18 @@ int main(int argc, char* argv[]) {
 
             // Find pairs
             std::vector<std::array<float, 4>> pairs =
-                ht.find_pairs(rho_maxs, theta_maxs, config.T_rho, config.T_theta, config.T_l);
+                rectangle_detect::find_pairs(rho_maxs, theta_maxs, config.T_rho, config.T_theta, config.T_l);
             if (pairs.size() == 0) {
                 continue;
             }  // no pairs detected
 
             // Find rectangle
-            rectangles_T<float> rectangles_tmp = ht.match_pairs_into_rectangle(pairs, config.T_alpha);
+            rectangles_T<float> rectangles_tmp = rectangle_detect::match_pairs_into_rectangle(pairs, config.T_alpha);
             if (rectangles_tmp.size() == 0) {
                 continue;
             }  // if no rectangle detected
 
-            std::array<float, 8> detected_rectangle = ht.remove_duplicates(rectangles_tmp, 1, 4);
+            std::array<float, 8> detected_rectangle = rectangle_detect::remove_duplicates(rectangles_tmp, 1, 4);
             auto rectangles_corners = convert_all_rects_2_corner_format(detected_rectangle, config.L_window, config.L_window);
             correct_offset_rectangle(rectangles_corners,j,i);
 

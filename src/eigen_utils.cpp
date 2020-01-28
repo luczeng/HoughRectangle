@@ -20,7 +20,6 @@ void normalise_img(Matrix<float, Dynamic, Dynamic, RowMajor>& img) {
     img = tmp;
 }
 
-// TODO(luczeng): maybe give credit to the original author ;)
 /*************************************************************************************/
 std::vector<float> LinearSpacedArray(const float& a, const float& b, const std::size_t& N) {
     double h = (b - a) / static_cast<float>(N - 1);

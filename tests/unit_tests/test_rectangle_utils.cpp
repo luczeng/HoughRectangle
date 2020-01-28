@@ -79,7 +79,7 @@ TEST_CASE("Tests the rectangle utils") {
     SECTION("Correct rectangle position given offset of window from which it was computed")
     {
         std::array<int, 8> rectangle = {33, 63, 33, 65, 31, 63, 31, 65};
-        std::array<int, 8> rectangle_gt = {43, 83, 43, 85, 11, 83, 41, 85};
+        std::array<int, 8> rectangle_gt = {43, 83, 43, 85, 41, 83, 41, 85};
 
         correct_offset_rectangle(rectangle,10,20);
 

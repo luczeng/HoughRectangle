@@ -11,6 +11,7 @@
 #include "stb_image.h"
 #include "stb_image_write.h"
 #include "string"
+#include "rectangle_detection.hpp"
 
 TEST_CASE("Test functions to compute the Hough Rectangle function") {
     SECTION("Tests the ring mask") {
@@ -62,8 +63,7 @@ TEST_CASE("Test functions to compute the Hough Rectangle function") {
         std::vector<float> theta_vec = {45, 10, 15, 17, 44};
 
         // Pair matcher
-        auto ht = HoughRectangle();
-        auto pairs = ht.find_pairs(rho_vec, theta_vec, 2.1, 1.1, 2);
+        auto pairs = rectangle_detect::find_pairs(rho_vec, theta_vec, 2.1, 1.1, 2);
 
         // GT
         std::vector<std::array<float, 4>> pairs_gt;
@@ -83,8 +83,7 @@ TEST_CASE("Test functions to compute the Hough Rectangle function") {
         rectangles.push_back(rect2);
 
         // Remove duplicates
-        auto ht = HoughRectangle();
-        auto rect = ht.remove_duplicates(rectangles, 1, 1);
+        auto rect = rectangle_detect::remove_duplicates(rectangles, 1, 1);
 
         REQUIRE(rect == rect1);
     }
