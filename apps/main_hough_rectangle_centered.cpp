@@ -12,10 +12,15 @@
 #include "process_image.hpp"
 #include "rectangle_detection.hpp"
 #include "rectangle_utils.hpp"
+#include "eigen_utils.hpp"
 #include "stb_image.h"
 #include "stb_image_write.h"
 #include "string"
 
+
+using Eigen::Dynamic;
+using Eigen::Matrix;
+using Eigen::RowMajor;
 
 int main(int argc, char* argv[]) {
     // Nota bene: casting big images to unsigned char in Eigen result in a

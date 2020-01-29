@@ -10,14 +10,18 @@
 #include <fstream>
 #include "config.hpp"
 #include "cxxopts.hpp"
+#include "eigen_utils.hpp"
 #include "io.hpp"
 #include "process_image.hpp"
+#include "rectangle_detection.hpp"
 #include "rectangle_utils.hpp"
 #include "stb_image.h"
 #include "stb_image_write.h"
 #include "string"
-#include "rectangle_detection.hpp"
 
+using Eigen::Dynamic;
+using Eigen::Matrix;
+using Eigen::RowMajor;
 
 int main(int argc, char* argv[]) {
     // Nota bene: casting big images to unsigned char in Eigen result in a
@@ -53,7 +57,6 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < gray.rows() - config.L_window; ++i) {
         std::cout << "Row " << i << "/" << gray.rows() << std::endl;
         for (int j = 0; j < gray.cols() - config.L_window; ++j) {
-            // Hough transform
             hough_img.setZero();
             ht.hough_transform(gray.block(i, j, config.L_window, config.L_window), hough_img);
 
@@ -75,11 +78,13 @@ int main(int argc, char* argv[]) {
                 continue;
             }  // if no rectangle detected
             else {
-                std::cout << "Rectangle detected"<<" "<< i << " "<< j <<std::endl;
+                std::cout << "Rectangle detected"
+                          << " " << i << " " << j << std::endl;
             }
             std::array<float, 8> detected_rectangle = rectangle_detect::remove_duplicates(rectangles_tmp, 1, 4);
-            auto rectangles_corners = convert_all_rects_2_corner_format(detected_rectangle, config.L_window, config.L_window);
-            correct_offset_rectangle(rectangles_corners,j,i);
+            auto rectangles_corners =
+                convert_all_rects_2_corner_format(detected_rectangle, config.L_window, config.L_window);
+            correct_offset_rectangle(rectangles_corners, j, i);
 
             // Concatenate
             rectangles.push_back(rectangles_corners);
@@ -87,13 +92,13 @@ int main(int argc, char* argv[]) {
     }
 
     if (rectangles.size() == 0) {
-        std::cout<< "Did not detect any rectangle" <<std::endl;
+        std::cout << "Did not detect any rectangle" << std::endl;
         exit(0);
     }
 
     // Clean up and save
-    //std::array<int, 8> detected_rectangle = rectangle_detect::remove_duplicates(rectangles, 1, 4);
-    //auto rectangles_corners = convert_all_rects_2_corner_format(detected_rectangle, gray.rows(), gray.cols());
+    // std::array<int, 8> detected_rectangle = rectangle_detect::remove_duplicates(rectangles, 1, 4);
+    // auto rectangles_corners = convert_all_rects_2_corner_format(detected_rectangle, gray.rows(), gray.cols());
     eigen_io::save_rectangle(output_filename.c_str(), rectangles);
 
     return 0;

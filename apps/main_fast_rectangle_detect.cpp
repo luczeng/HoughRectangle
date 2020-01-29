@@ -17,7 +17,12 @@
 #include "stb_image.h"
 #include "stb_image_write.h"
 #include "string"
+#include "eigen_utils.hpp"
 
+
+using Eigen::Dynamic;
+using Eigen::Matrix;
+using Eigen::RowMajor;
 
 int main(int argc, char* argv[]) {
     // Nota bene: casting big images to unsigned char in Eigen result in a
