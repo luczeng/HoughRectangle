@@ -1,6 +1,4 @@
 #include <iostream>
-// TODO(luczeng): It's always a bit hacky to make #include depend on specific #define statements.
-//                Better encapsulate in a seperate header
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <Eigen/Dense>
@@ -12,15 +10,12 @@
 #include "cxxopts.hpp"
 #include "io.hpp"
 #include "process_image.hpp"
+#include "rectangle_detection.hpp"
 #include "rectangle_utils.hpp"
 #include "stb_image.h"
 #include "stb_image_write.h"
 #include "string"
 
-// TODO(luczeng): better to use separate using clauses, otherwise you quickly get name clashes.
-using Eigen::Dynamic;
-using Eigen::Matrix;
-using Eigen::RowMajor;
 
 int main(int argc, char* argv[]) {
     // Nota bene: casting big images to unsigned char in Eigen result in a
@@ -57,11 +52,11 @@ int main(int argc, char* argv[]) {
 
     // Find pairs
     std::vector<std::array<float, 4>> pairs =
-        ht.find_pairs(rho_maxs, theta_maxs, config.T_rho, config.T_theta, config.T_l);
+        rectangle_detect::find_pairs(rho_maxs, theta_maxs, config.T_rho, config.T_theta, config.T_l);
 
     // Find rectangle
-    std::vector<std::array<float, 8>> rectangles = ht.match_pairs_into_rectangle(pairs, config.T_alpha);
-    std::array<float, 8> detected_rectangle = ht.remove_duplicates(rectangles, 1, 4);
+    std::vector<std::array<float, 8>> rectangles = rectangle_detect::match_pairs_into_rectangle(pairs, config.T_alpha);
+    std::array<float, 8> detected_rectangle = rectangle_detect::remove_duplicates(rectangles, 1, 4);
 
     // Cartesian rectangles
     auto rectangles_corners = convert_all_rects_2_corner_format(detected_rectangle, gray.cols(), gray.rows());

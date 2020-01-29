@@ -5,7 +5,9 @@
 #include <array>
 #include <iostream>
 #include <tuple>
+#include "array"
 #include "config.hpp"
+#include "eigen_utils.hpp"
 #include "io.hpp"
 #include "stb_image.h"
 #include "stb_image_write.h"
@@ -15,69 +17,20 @@
 using namespace Eigen;
 
 /*************************************************************************************/
-void Log(const char* message) { std::cout << message << std::endl; }
-
-/*************************************************************************************/
-void normalise_img(Matrix<float, Dynamic, Dynamic, RowMajor>& img) {
-    Matrix<float, Dynamic, Dynamic, RowMajor> high;
-    high.setOnes(img.rows(), img.cols());
-    high *= 255;
-
-    Matrix<float, Dynamic, Dynamic, RowMajor> low;
-    low.setZero(img.rows(), img.cols());
-
-    Matrix<float, Dynamic, Dynamic, RowMajor> tmp = (img.array() > 128.0).select(high, low);
-
-    img = tmp;
-}
-
-// TODO(luczeng): maybe give credit to the original author ;)
-/*************************************************************************************/
-std::vector<float> LinearSpacedArray(const float& a, const float& b, const std::size_t& N) {
-    double h = (b - a) / static_cast<float>(N - 1);
-    std::vector<float> xs(N);
-    std::vector<float>::iterator x;
-    float val;
-    for (x = xs.begin(), val = a; x != xs.end(); ++x, val += h) {
-        *x = val;
-    }
-    return xs;
-}
-
-/*************************************************************************************/
-std::vector<std::array<int, 2>> find_local_maximum(const Matrix<float, Dynamic, Dynamic, RowMajor>& hough,
-                                                   const float& threshold) {
-    std::vector<std::array<int, 2>> idxs;
-
-    // This loop can probably be replaced by something faster(factorized?)
-    // TODO(luczeng): what about std::max_element?
-    // for (Index i = 0; i < hough.size(); ++i) {
-    for (int i = 0; i < hough.rows(); ++i) {
-        for (int j = 0; j < hough.cols(); ++j) {
-            if (hough(i, j) >= threshold) {
-                std::array<int, 2> x = {i, j};
-                idxs.push_back(x);
-            }
-        }
-    }
-
-    return idxs;
-}
-/*************************************************************************************/
 HoughRectangle::HoughRectangle() : m_img(), m_thetaBins(), m_thetaMin(), m_thetaMax(), m_rhoBins(), m_theta_vec(){};
 
 /*************************************************************************************/
-HoughRectangle::HoughRectangle( int n_rows,int thetaBins, int rhoBins, float thetaMin, float thetaMax) {
-
+HoughRectangle::HoughRectangle(int L_window, int thetaBins, int rhoBins, float thetaMin, float thetaMax) {
     m_thetaBins = thetaBins;
     m_thetaMin = thetaMin;
     m_thetaMax = thetaMax;
     m_rhoBins = rhoBins;
+    m_L_window = L_window;
 
     m_theta_vec = VectorXf::LinSpaced(Sequential, thetaBins, thetaMin, thetaMax);
 
-    m_rho_vec = LinearSpacedArray(-sqrt(pow(n_rows / 2.0, 2) + pow(n_rows / 2.0, 2)),
-                                  sqrt(pow(n_rows / 2.0, 2) + pow(n_rows / 2.0, 2)), rhoBins);
+    m_rho_vec = LinearSpacedArray(-sqrt(pow(L_window / 2.0, 2) + pow(L_window / 2.0, 2)),
+                                  sqrt(pow(L_window / 2.0, 2) + pow(L_window / 2.0, 2)), rhoBins);
 }
 
 /*************************************************************************************/
@@ -227,6 +180,7 @@ HoughRectangle::fMat HoughRectangle::hough_transform(const fMat& img) {
     return acc;
 }
 
+
 /*************************************************************************************/
 HoughRectangle::fMat HoughRectangle::enhance_hough(const HoughRectangle::fMat& hough, const int& h, const int& w) {
     HoughRectangle::fMat houghpp = MatrixXf::Zero(hough.rows(), hough.cols());
@@ -262,99 +216,5 @@ std::tuple<std::vector<float>, std::vector<float>> HoughRectangle::index_rho_the
     return std::make_tuple(rho_max, theta_max);
 }
 
-/*************************************************************************************/
-std::vector<std::array<float, 4>> HoughRectangle::find_pairs(const std::vector<float>& rho_maxs,
-                                                             const std::vector<float>& theta_maxs, const float& T_rho,
-                                                             const float& T_t, const float& T_L) {
-    // Match peaks into pairs
-    std::vector<std::array<float, 4>> pairs;  // 1st: rho, 2nd: theta
-    std::array<float, 4> pair;
-    for (int i = 0; i < rho_maxs.size(); ++i) {
-        for (int j = 0; j < rho_maxs.size(); ++j) {
-            // Remove lines too close to origin (remove when windowed Hough is implemented)
-            if (rho_maxs[i] < 3) continue;
 
-            // Parralelism
-            if (abs(theta_maxs[i] - theta_maxs[j]) > T_t) continue;
 
-            // Symmetry wrt x axis
-            if (abs(rho_maxs[i] + rho_maxs[j]) > T_rho) continue;
-
-            // Approximately same length
-
-            // Construct extended peak
-            pair[0] = 0.5 * abs(rho_maxs[i] - rho_maxs[j]);
-            pair[1] = 0.5 * (theta_maxs[i] + theta_maxs[j]);
-            pair[2] = abs(rho_maxs[i] + rho_maxs[j]);      // error measure on rho
-            pair[3] = abs(theta_maxs[i] - theta_maxs[j]);  // error measure on theta
-
-            pairs.push_back(pair);
-        }
-    }
-
-    return pairs;
-}
-
-/*************************************************************************************/
-std::vector<std::array<float, 8>> HoughRectangle::match_pairs_into_rectangle(
-    const std::vector<std::array<float, 4>>& pairs, const float& T_alpha) {
-    std::vector<std::array<float, 8>> rectangles;
-
-    // Match pairs into rectangle
-    for (int i = 0; i < pairs.size(); i++) {
-        for (int j = 0; j < pairs.size(); j++) {
-            if (j == i) continue;
-
-            // Orthogonality
-            float delta_alpha = abs(abs(pairs[i][1] - pairs[j][1]) - 90);
-            if (delta_alpha > T_alpha) continue;
-
-            rectangles.push_back({pairs[i][1], pairs[i][0], pairs[j][0], pairs[i][2], pairs[j][2], pairs[i][3],
-                                  pairs[j][3], delta_alpha});
-        }
-    }
-
-    return rectangles;
-}
-
-/*************************************************************************************/
-std::array<int, 8> HoughRectangle::remove_duplicates(std::vector<std::array<int, 8>> rectangles, float a, float b) {
-    float criteria =
-        sqrt(a * (rectangles[0][5] + rectangles[0][6] + rectangles[0][7]) + b * (rectangles[0][3] + rectangles[0][4]));
-    float new_criteria;
-    std::array<int, 8> rect;
-    rect = rectangles[0];
-
-    for (int i = 1; i < rectangles.size(); ++i) {
-        new_criteria = sqrt(a * (rectangles[i][5] + rectangles[i][6] + rectangles[i][7]) +
-                            b * (rectangles[i][3] + rectangles[i][4]));
-        if (new_criteria < criteria) {
-            criteria = new_criteria;
-            // std::cout << criteria << std::endl;
-            rect = rectangles[i];
-        }
-    }
-
-    return rect;
-}
-
-/*************************************************************************************/
-std::array<float, 8> HoughRectangle::remove_duplicates(std::vector<std::array<float, 8>> rectangles, float a, float b) {
-    float criteria =
-        sqrt(a * (rectangles[0][5] + rectangles[0][6] + rectangles[0][7]) + b * (rectangles[0][3] + rectangles[0][4]));
-    float new_criteria;
-    std::array<float, 8> rect;
-    rect = rectangles[0];
-
-    for (int i = 1; i < rectangles.size(); ++i) {
-        new_criteria = sqrt(a * (rectangles[i][5] + rectangles[i][6] + rectangles[i][7]) +
-                            b * (rectangles[i][3] + rectangles[i][4]));
-        if (new_criteria < criteria) {
-            criteria = new_criteria;
-            // std::cout << criteria << std::endl;
-            rect = rectangles[i];
-        }
-    }
-
-    return rect;
-}

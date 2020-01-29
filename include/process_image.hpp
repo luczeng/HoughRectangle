@@ -5,48 +5,20 @@
 #include <tuple>
 #include "config.hpp"
 
-/**
- * Function to make sure binary is 0 and 255
- *
- * @param img Eigen float matrix to be normalized
- */
-void normalise_img(Eigen::MatrixXf &img);
-
-/*
- * Returns a linearly spaced array
- *
- * @param a starting value
- * @param b end value
- * @param N number of bins
- * @return vector<float>
- */
-// TODO(luczeng): this is a perfect use case for a template
-std::vector<float> LinearSpacedArray(const float &a, const float &b, const std::size_t &N);
-
-/*
- * Finds position of all elements superior to threshold
- *
- * @param hough Eigen float matrix
- * @float threshold float
- * @return vector of Eigen::Index of the positions where hough is more than threshold
- */
-std::vector<std::array<int, 2>> find_local_maximum(
-    const Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> &img, const float &threshold);
 
 /**
  *
- * Class containing all the tools to perform rectangle detection on an image.
+ * Class containing all classic Hough rectangle methods
  *
- * This class implements the Hough transform, enhanced hough transform, windowed hough transform and utility functions
- * in order to compute the so called Hough Rectangle detection.
- *
+ * This class implements the Hough transform, enhanced hough transform, windowed hough transform 
  */
 class HoughRectangle {
-   private:
+   protected:
     int m_thetaBins;
     int m_thetaMin;
     int m_thetaMax;
     int m_rhoBins;
+    int m_L_window;
 
     Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> m_img;
 
@@ -60,7 +32,7 @@ class HoughRectangle {
      */
     typedef Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> fMat;
     HoughRectangle();
-    HoughRectangle( int n_rows,int thetaBins, int rhoBins, float thetaMin, float thetaMax);
+    HoughRectangle(int L_window, int thetaBins, int rhoBins, float thetaMin, float thetaMax);
     HoughRectangle(fMat &img, int thetaBins = 256, int rhoBins = 256, float thetaMin = -90,
                    float thetaMax = 90);  // declaration
 
@@ -127,42 +99,6 @@ class HoughRectangle {
      * @param[out] rho_vec, theta_vec tuple of vectors containing the rho and theta maximums
      */
     std::tuple<std::vector<float>, std::vector<float>> index_rho_theta(const std::vector<std::array<int, 2>> &indexes);
-
-    /*
-     * Match detected peaks into pairs
-     *
-     * @param[in] rho_maxs vector specifying rho positions of detected peaks
-     * @param[in] theta_maxs vector specifying theta positions of detected peaks
-     * @param[out] pairs vector containing the extended peaks of pairs. 1st element = rho, 2nd = theta, 3rd = error on
-     * rho, 4th = error on theta
-     */
-    std::vector<std::array<float, 4>> find_pairs(const std::vector<float> &rho_maxs,
-                                                 const std::vector<float> &theta_maxs, const float &T_rho,
-                                                 const float &T_t, const float &T_L);
-
-    /**
-     * Matches detected peaks into rectangle
-     *
-     * @param[in] rho_maxs vector specifying rho positions of detected peaks
-     * @param[in] theta_maxs vector specifying theta positions of detected peaks
-     * @param[out] rectangles a vector of arrays of size 8. First element is the angle, 2nd corresponding rho, 3rd rho
-     * of opposite corner. Next 5 elements are respectively: error on rho for opposite corners, error on theta for opposite corners and
-     * error on perpendicularity.
-     */
-    std::vector<std::array<float, 8>> match_pairs_into_rectangle(const std::vector<std::array<float, 4>> &pairs,
-                                                                 const float &T_alpha);
-
-    /**
-     * Filters rectangles based on criteria that evalutes the parallelism, orthogonality and symmetry of the rectangles.
-     * Returns the best rectangle
-     *
-     * @param[in] rectangles rectangles to filter
-     * @param[in] a weight coefficient for degrees. A good value is a = 1
-     * @param[in] b weight coefficient for pixels. A good value is b = 4
-     * @param[out] rect best rectangle found based on criteria
-     */
-    std::array<int, 8> remove_duplicates(std::vector<std::array<int, 8>> rectangles, float a, float b);
-    std::array<float, 8> remove_duplicates(std::vector<std::array<float, 8>> rectangles, float a, float b);
 };
 
 #endif
