@@ -14,6 +14,7 @@
 #include "rectangle_detection.hpp"
 #include "stb_image.h"
 #include "stb_image_write.h"
+#include "eigen_utils.hpp"
 
 using namespace Eigen;
 

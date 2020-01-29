@@ -12,6 +12,7 @@
 #include "stb_image_write.h"
 #include "string"
 #include "rectangle_detection.hpp"
+#include "eigen_utils.hpp"
 
 TEST_CASE("Test functions to compute the Hough Rectangle function") {
     SECTION("Tests the ring mask") {

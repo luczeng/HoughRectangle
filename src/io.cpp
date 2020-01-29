@@ -51,7 +51,7 @@ MatrixXf read_image(const std::string &filename) {
     std::unique_ptr<unsigned char[]> data(stbi_load(filename.c_str(), &x, &y, &n, 0));
 
     if (data == NULL) {
-        std::err << "Can't load image" << std::endl;
+        std::cerr << "Can't load image" << std::endl;
     }
 
     // Convert to raw buffer

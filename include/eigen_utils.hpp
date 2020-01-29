@@ -1,7 +1,7 @@
 #include <Eigen/Dense>
+#include <array>
 #include <iostream>
 #include <vector>
-#include <array>
 
 /**
  * Function to make sure binary is 0 and 255
